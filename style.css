@@ -131,3 +131,7 @@ tr:hover td { background: var(--bg); }
   main { padding: 12px; }
   .reglage-stade { grid-template-columns: 1fr; }
 }
+
+#reglages-ia { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+#reglages-ia label.modele, #reglages-modeles label.modele { display: flex; flex-direction: column; gap: 4px; margin: 0; }
+#reglages-ia input:not([type=checkbox]) { max-width: 420px; }

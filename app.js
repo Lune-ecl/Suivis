@@ -47,6 +47,24 @@ const LIBELLES_MODELES = {
   retour: 'Ajouté au début si la personne revient d\'absence ({raison} disponible)',
 };
 
+const EXEMPLES_DEFAUT = `L'entraînement de Senma lui permet de reprendre les bases du Kaiseki Kenshin, appris auprès de Katori. Si la maîtrise de son chakra lui semble aisée dans ce cadre paisible, les difficultés rencontrées lorsque son attention est perturbée lui rappellent à quel point la concentration est essentielle, d'autant plus qu'un hôpital est rarement un lieu silencieux. Il lui serait désormais judicieux de s'entraîner dans des endroits plus animés, afin d'apprendre à rester concentré malgré ce qui l'entoure.
+
+Zennon revient sur ses points faibles, travaillant sa concentration, la circulation de son chakra ainsi que la stabilité de sa sphère lors de ses déplacements. Ses efforts portent leurs fruits, et ses progrès lui permettent désormais de s'atteler à l'apprentissage du Kaiseki Kenshin.
+
+Seiya aborde cette fois-ci son entraînement en travaillant d'abord la circulation de son chakra, qu'il s'efforce de diriger vers ses bras, ses mains puis ses jambes de la manière la plus régulière possible. Il s'exerce par la suite à le modeler, une première fois sous la forme d'une sphère et une seconde sous une forme plus allongée ou plus étendue, en ajustant la quantité de chakra mobilisée. Les pauses qu'il s'accorde lui permettent de retrouver une meilleure stabilité, et il finit même par associer circulation et modelage dans un même exercice. Il devrait désormais apprendre à réaliser cet exercice combiné jusqu'au bout en travaillant le contrôle, la stabilité et l'intensité de son chakra, afin que chaque changement de forme se fasse sans la moindre perte de maîtrise.`;
+
+const IA_DEFAUT = {
+  modele: 'claude-opus-5-5',
+  exemples: EXEMPLES_DEFAUT,
+  consignes: '',
+  ajouterProgression: false,
+};
+
+// La clé API reste dans ce navigateur : elle n'est jamais incluse dans l'export.
+const CLE_API = 'suivis-cle-api';
+const lireCleApi = () => { try { return localStorage.getItem(CLE_API) || ''; } catch { return ''; } };
+const ecrireCleApi = v => { try { v ? localStorage.setItem(CLE_API, v) : localStorage.removeItem(CLE_API); } catch {} };
+
 /* ---------------- Données ---------------- */
 
 let donnees = charger();
@@ -59,6 +77,7 @@ function etatVide() {
     reglages: {
       stades: structuredClone(STADES_DEFAUT),
       modeles: structuredClone(MODELES_DEFAUT),
+      ia: structuredClone(IA_DEFAUT),
     },
   };
 }
@@ -75,6 +94,7 @@ function charger() {
         reglages: {
           stades: d.reglages?.stades || base.reglages.stades,
           modeles: { ...base.reglages.modeles, ...(d.reglages?.modeles || {}) },
+          ia: { ...base.reglages.ia, ...(d.reglages?.ia || {}) },
         },
       };
     }
@@ -156,7 +176,7 @@ function remplir(modele, vars) {
   return modele.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
 }
 
-function genererReponse(p, narration) {
+function messageProgression(p, narration) {
   const pr = progression(p);
   const m = donnees.reglages.modeles;
   let cle;
@@ -199,17 +219,106 @@ function genererReponse(p, narration) {
   return texte;
 }
 
+/* ---------------- Retour rédigé par Claude ---------------- */
+
+const SDK_URL = 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.129.0/+esm';
+
+function construirePrompt(p, narration) {
+  const ia = donnees.reglages.ia;
+  const pr = progression(p);
+
+  const system =
+`Tu rédiges les retours de suivi d'un jeu de rôle narratif dans un univers ninja (chakra, villages, techniques, maîtres). Pour chaque narration d'entraînement envoyée par un joueur, tu écris un retour sur son personnage.
+
+Règles :
+- En français soutenu et fluide, à la troisième personne, au présent, en nommant le personnage. Ne t'adresse jamais au joueur.
+- Un seul paragraphe de 3 à 5 phrases : sans titre, sans liste, sans emoji, sans guillemets autour du texte.
+- Résume précisément ce que le personnage a travaillé dans cette narration, en reprenant ses éléments concrets (techniques, lieux, personnes, exercices). Souligne ce qui fonctionne et les difficultés rencontrées.
+- Termine par une piste concrète pour la suite, ou indique qu'il peut passer à l'étape suivante si ses progrès le justifient.
+- Reste cohérent avec l'avancement du personnage et ses retours précédents : prolonge les pistes déjà données, ne lui reconseille pas ce qu'il a déjà acquis.
+- N'invente aucun événement absent de la narration.
+- Réponds uniquement avec le texte du retour.
+
+Exemples de retours dont tu reprends le ton, la longueur et la construction :
+<exemples>
+${ia.exemples.trim()}
+</exemples>${ia.consignes.trim() ? `
+
+Consignes supplémentaires :
+${ia.consignes.trim()}` : ''}`;
+
+  const precedentes = narrationsDe(p.id)
+    .filter(n => n.id !== narration.id)
+    .sort((a, b) => a.date.localeCompare(b.date) || a.cree - b.cree)
+    .slice(-3);
+  const abs = absencesDe(p.id)
+    .filter(a => (a.fin || a.debut) >= ajouterJours(narration.date, -14) && a.debut <= narration.date)
+    .map(a => `${fr(a.debut)} → ${fr(a.fin)} : ${a.raison || 'sans raison'}`);
+
+  const user =
+`<personnage>
+Nom : ${p.nom}
+Village : ${p.village}
+Stade : ${p.stade}${pr.seuil ? ` (${pr.compte}/${pr.seuil} ${pr.stade.unite}${pr.prochain ? `, prochain stade : ${pr.prochain}` : ''})` : ''}
+Narrations au total : ${pr.total}${p.notes ? `\nNotes du suivi : ${p.notes}` : ''}${abs.length ? `\nAbsences récentes : ${abs.join(' ; ')}` : ''}
+</personnage>
+
+<historique>
+${precedentes.map(n => `<narration date="${fr(n.date)}">
+${n.texte || '(vide)'}
+</narration>
+<retour>
+${n.reponse || '(aucun)'}
+</retour>`).join('\n') || 'Première narration suivie.'}
+</historique>
+
+<narration_a_traiter date="${fr(narration.date)}">
+${narration.texte}
+</narration_a_traiter>
+
+Rédige le retour pour cette narration.`;
+
+  return { system, user };
+}
+
+async function genererRetourIA(p, narration) {
+  const { default: Anthropic } = await import(SDK_URL);
+  const client = new Anthropic({ apiKey: lireCleApi(), dangerouslyAllowBrowser: true });
+  const { system, user } = construirePrompt(p, narration);
+  const reponse = await client.beta.messages.create({
+    model: donnees.reglages.ia.modele || IA_DEFAUT.modele,
+    max_tokens: 16000,
+    betas: ['server-side-fallback-2026-07-01'],
+    fallbacks: 'default',
+    system,
+    messages: [{ role: 'user', content: user }],
+  });
+  if (reponse.stop_reason === 'refusal') throw new Error('Claude a refusé de rédiger ce retour.');
+  const texte = reponse.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
+  if (!texte) throw new Error('Réponse vide.');
+  return texte;
+}
+
+// Produit la réponse finale : retour rédigé par Claude si une clé est configurée,
+// sinon le message de progression.
+async function produireReponse(p, n) {
+  const progressionTxt = messageProgression(p, n);
+  if (!lireCleApi()) return progressionTxt;
+  const retour = await genererRetourIA(p, n);
+  return donnees.reglages.ia.ajouterProgression ? `${retour}\n\n${progressionTxt}` : retour;
+}
+
 /* ---------------- Utilitaires UI ---------------- */
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-function toast(msg) {
+function toast(msg, duree = 1800) {
   const t = $('#toast');
   t.textContent = msg;
   t.classList.add('visible');
   clearTimeout(toast.t);
-  toast.t = setTimeout(() => t.classList.remove('visible'), 1800);
+  toast.t = setTimeout(() => t.classList.remove('visible'), duree);
 }
 
 async function copier(texte) {
@@ -378,10 +487,16 @@ function rendreFiche(id) {
         <div class="ligne"><label>Date <input type="date" id="n-date" value="${auj}"></label></div>
         <textarea id="n-texte" rows="5" placeholder="Colle ici la narration…"></textarea>
         <div><button data-act="narrer" class="primary">Enregistrer et générer la réponse</button></div>
-        ${ficheReponse ? `
+        ${lireCleApi() ? '' : '<div class="aide">Sans clé API Claude (Réglages), la réponse est le message de progression. Tu peux aussi copier le prompt pour le coller dans claude.ai.</div>'}
+        ${ficheReponse?.chargement ? '<div class="aide">✍️ Claude rédige le retour…</div>' : ''}
+        ${ficheReponse && !ficheReponse.chargement ? `
           <label>Réponse (modifiable)
-            <textarea id="n-reponse" rows="5">${esc(ficheReponse.texte)}</textarea></label>
-          <div><button data-act="copier-reponse" class="primary">📋 Copier la réponse</button></div>` : ''}
+            <textarea id="n-reponse" rows="7">${esc(ficheReponse.texte)}</textarea></label>
+          <div class="ligne">
+            <button data-act="copier-reponse" class="primary">📋 Copier la réponse</button>
+            ${lireCleApi() ? '<button data-act="regenerer">🔄 Régénérer</button>' : ''}
+            <button data-act="copier-prompt">🤖 Copier le prompt</button>
+          </div>` : ''}
       </div>
 
       <div class="bloc">
@@ -446,9 +561,22 @@ $('#fiche').addEventListener('click', e => {
     if (!texte && !confirm('La narration est vide. Enregistrer quand même ?')) return;
     const n = { id: uid(), personneId: id, date, texte, stade: p.stade, cree: Date.now() };
     donnees.narrations.push(n);
-    n.reponse = genererReponse(p, n);
-    ficheReponse = { narrationId: n.id, texte: n.reponse };
-    toast('✅ Narration enregistrée');
+    sauver();
+    tout();
+    return remplirReponse(p, n);
+  }
+
+  if (act === 'regenerer') {
+    const n = donnees.narrations.find(x => x.id === ficheReponse?.narrationId);
+    if (n) return remplirReponse(p, n);
+    return;
+  }
+
+  if (act === 'copier-prompt') {
+    const n = donnees.narrations.find(x => x.id === ficheReponse?.narrationId);
+    if (!n) return;
+    const { system, user } = construirePrompt(p, n);
+    return copier(`${system}\n\n---\n\n${user}`);
   }
 
   if (act === 'copier-reponse') {
@@ -484,6 +612,26 @@ $('#fiche').addEventListener('click', e => {
   tout();
   rendreFiche(id);
 });
+
+async function remplirReponse(p, n) {
+  ficheReponse = { narrationId: n.id, texte: '', chargement: true };
+  rendreFiche(p.id);
+  try {
+    n.reponse = await produireReponse(p, n);
+    toast('✅ Narration enregistrée');
+  } catch (err) {
+    console.error(err);
+    n.reponse = messageProgression(p, n);
+    const raison = err.status === 401 ? 'clé API invalide'
+      : err.status === 429 ? 'trop de requêtes, réessaie dans un instant'
+      : err.message || String(err);
+    toast('⚠️ Retour Claude impossible (' + raison + ') : message de progression utilisé', 5000);
+  }
+  ficheReponse = { narrationId: n.id, texte: n.reponse };
+  sauver();
+  tout();
+  if ($('#fiche').open && $('#fiche .fiche-contenu')?.dataset.id === p.id) rendreFiche(p.id);
+}
 
 // Garde la réponse modifiée en mémoire même sans cliquer « Copier »
 $('#fiche').addEventListener('input', e => {
@@ -599,6 +747,23 @@ function rendreRapport() {
     L.push('');
   }
 
+  if ($('#rap-retours').checked) {
+    const retours = donnees.narrations
+      .filter(n => n.date >= debut && n.date <= fin && n.reponse)
+      .sort((a, b) => a.date.localeCompare(b.date) || a.cree - b.cree);
+    if (retours.length) {
+      L.push('📝 RETOURS DE LA SEMAINE');
+      L.push('');
+      for (const v of villages()) {
+        const ids = new Set(personnesFiltrees(v, '').map(p => p.id));
+        const duVillage = retours.filter(n => ids.has(n.personneId));
+        if (!duVillage.length) continue;
+        L.push(`🏘️ ${v.toUpperCase()}`);
+        for (const n of duVillage) L.push(n.reponse, '');
+      }
+    }
+  }
+
   L.push('📊 BILAN');
   L.push(`• ${donnees.personnes.length} personne(s) suivie(s), ${totalNarr} narration(s) cette semaine`);
   L.push(`• Répartition : ${stades().map(s => `${s.nom} ${donnees.personnes.filter(p => p.stade === s.nom).length}`).join(' · ')}`);
@@ -609,7 +774,7 @@ function rendreRapport() {
   $('#rapport').value = L.join('\n');
 }
 
-$('#rap-semaine').addEventListener('input', rendreRapport);
+['#rap-semaine', '#rap-retours'].forEach(s => $(s).addEventListener('input', rendreRapport));
 $('#btn-rapport-copier').addEventListener('click', () => copier($('#rapport').value));
 
 /* ---------------- Réglages ---------------- */
@@ -627,6 +792,19 @@ function rendreReglages() {
           </select></label>` : '<span class="aide">Dernier stade, pas de seuil</span><span></span>'}
     </div>`).join('');
 
+  const ia = donnees.reglages.ia;
+  $('#reglages-ia').innerHTML = `
+    <label class="modele">Clé API
+      <input type="password" id="ia-cle" value="${esc(lireCleApi())}" placeholder="sk-ant-…" autocomplete="off"></label>
+    <label class="modele">Modèle
+      <input data-ia="modele" value="${esc(ia.modele)}"></label>
+    <label class="modele">Exemples de retours (le style à imiter, un par paragraphe)
+      <textarea rows="10" data-ia="exemples">${esc(ia.exemples)}</textarea></label>
+    <label class="modele">Consignes supplémentaires (facultatif : techniques, maîtres, règles de l'univers…)
+      <textarea rows="3" data-ia="consignes">${esc(ia.consignes)}</textarea></label>
+    <label class="ligne"><input type="checkbox" data-ia="ajouterProgression"${ia.ajouterProgression ? ' checked' : ''}>
+      Ajouter le message de progression à la fin du retour</label>`;
+
   $('#reglages-modeles').innerHTML = Object.keys(MODELES_DEFAUT).map(k => `
     <label class="modele">${LIBELLES_MODELES[k]}
       <textarea rows="3" data-modele="${k}">${esc(donnees.reglages.modeles[k])}</textarea></label>`).join('');
@@ -637,6 +815,10 @@ $('#page-reglages').addEventListener('change', e => {
   if (t.dataset.stade !== undefined) {
     const s = stades()[t.dataset.stade];
     s[t.dataset.champ] = t.dataset.champ === 'seuil' ? Number(t.value) || 1 : t.value;
+  } else if (t.id === 'ia-cle') {
+    ecrireCleApi(t.value.trim());
+  } else if (t.dataset.ia) {
+    donnees.reglages.ia[t.dataset.ia] = t.type === 'checkbox' ? t.checked : t.value;
   } else if (t.dataset.modele) {
     donnees.reglages.modeles[t.dataset.modele] = t.value;
   } else return;

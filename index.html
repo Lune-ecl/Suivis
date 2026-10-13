@@ -43,6 +43,7 @@
     <section id="page-rapport" class="page">
       <div class="toolbar">
         <label>Semaine du <input id="rap-semaine" type="date"></label>
+        <label class="ligne"><input type="checkbox" id="rap-retours" checked> Inclure les retours</label>
         <button id="btn-rapport-copier" class="primary">📋 Copier le compte rendu</button>
       </div>
       <textarea id="rapport" rows="30" spellcheck="false"></textarea>
@@ -53,7 +54,14 @@
       <h2>Stades &amp; seuils</h2>
       <div id="reglages-stades"></div>
 
-      <h2>Modèles de réponse</h2>
+      <h2>Retours rédigés par Claude</h2>
+      <p class="aide">Avec une clé API Anthropic (console.anthropic.com), chaque narration postée reçoit un retour rédigé
+        dans le style de tes exemples, en tenant compte du stade et des retours précédents de la personne.
+        La clé reste dans ce navigateur et n'est jamais exportée. Chaque retour est facturé sur ton compte API.</p>
+      <div id="reglages-ia"></div>
+
+      <h2>Message de progression</h2>
+      <p class="aide">Utilisé sans clé API, ou ajouté à la fin du retour si l'option est cochée.</p>
       <p class="aide">Variables disponibles : <code>{nom}</code> <code>{village}</code> <code>{stade}</code>
         <code>{compte}</code> <code>{seuil}</code> <code>{restant}</code> <code>{unite}</code>
         <code>{prochain}</code> <code>{total}</code> <code>{date}</code></p>
