@@ -10,13 +10,14 @@ Les données sont enregistrées dans le navigateur (localStorage). Pense à **ex
 ## Pages
 
 - **Casiers** : une carte par personne (village, stade, progression, absent). Clique pour ouvrir la fiche :
-  - coller une narration → elle est enregistrée et un **retour** est rédigé par Claude dans le style de tes exemples, en tenant compte du stade et des retours précédents (modifiable, boutons copier / régénérer) ;
-  - sans clé API, la réponse est un message de progression (« 3/7 narrations… ») et le bouton *Copier le prompt* permet de coller la demande dans claude.ai ;
+  - coller une narration → elle est enregistrée et un **retour** est rédigé par Claude dans le style de tes exemples, adapté à l'avancement et aux retours précédents (modifiable, boutons copier / régénérer) ;
+  - le retour ne révèle **jamais** le stade, le nombre de narrations ni la progression : le joueur ne sait pas où il en est ;
+  - sans clé API, le bouton *Copier le prompt* permet de coller la demande dans claude.ai, puis de coller le retour obtenu dans la case Réponse ;
   - ajouter une absence (dates + raison) ; si la personne revient d'absence, la réponse le mentionne ;
   - faire passer au stade suivant, voir l'historique.
 - **Tableau** : nombre de narrations (semaine / total), jours de narration, progression, absences et raisons. Tri par colonne, filtres village / stade.
-- **Compte rendu** : texte prêt à copier pour la semaine choisie, groupé par village, avec tous les retours de la semaine, les passages possibles, les absents et les personnes sans narration.
-- **Réglages** : seuils, unité de comptage, clé API / modèle / exemples de retours pour Claude, message de progression.
+- **Compte rendu** : texte prêt à copier pour la semaine choisie, groupé par village. Deux parties qu'on peut cocher séparément : le *suivi interne* (stades, progression, absences, passages possibles — pour toi seulement) et les *retours* de la semaine (sans aucune information de progression).
+- **Réglages** : seuils, unité de comptage, clé API / modèle / exemples de retours pour Claude.
 
 ## Retours rédigés par Claude
 
