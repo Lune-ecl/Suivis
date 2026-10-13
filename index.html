@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestion des suivis</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>📜 Suivis</h1>
+    <nav>
+      <button class="tab active" data-page="suivis">Casiers</button>
+      <button class="tab" data-page="tableau">Tableau</button>
+      <button class="tab" data-page="rapport">Compte rendu</button>
+      <button class="tab" data-page="reglages">Réglages</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===== CASIERS ===== -->
+    <section id="page-suivis" class="page active">
+      <div class="toolbar">
+        <input id="recherche" type="search" placeholder="Rechercher un nom…">
+        <select id="filtre-village"></select>
+        <select id="filtre-stade"></select>
+        <button id="btn-ajout" class="primary">+ Nouvelle personne</button>
+      </div>
+      <div id="casiers" class="grille"></div>
+    </section>
+
+    <!-- ===== TABLEAU ===== -->
+    <section id="page-tableau" class="page">
+      <div class="toolbar">
+        <label>Semaine du <input id="tab-semaine" type="date"></label>
+        <select id="tab-village"></select>
+        <select id="tab-stade"></select>
+      </div>
+      <div class="table-wrap"><table id="tableau"></table></div>
+    </section>
+
+    <!-- ===== COMPTE RENDU ===== -->
+    <section id="page-rapport" class="page">
+      <div class="toolbar">
+        <label>Semaine du <input id="rap-semaine" type="date"></label>
+        <button id="btn-rapport-copier" class="primary">📋 Copier le compte rendu</button>
+      </div>
+      <textarea id="rapport" rows="30" spellcheck="false"></textarea>
+    </section>
+
+    <!-- ===== RÉGLAGES ===== -->
+    <section id="page-reglages" class="page">
+      <h2>Stades &amp; seuils</h2>
+      <div id="reglages-stades"></div>
+
+      <h2>Modèles de réponse</h2>
+      <p class="aide">Variables disponibles : <code>{nom}</code> <code>{village}</code> <code>{stade}</code>
+        <code>{compte}</code> <code>{seuil}</code> <code>{restant}</code> <code>{unite}</code>
+        <code>{prochain}</code> <code>{total}</code> <code>{date}</code></p>
+      <div id="reglages-modeles"></div>
+      <button id="btn-modeles-defaut">Rétablir les modèles par défaut</button>
+
+      <h2>Sauvegarde</h2>
+      <p class="aide">Les données sont enregistrées dans ce navigateur. Exporte régulièrement une sauvegarde.</p>
+      <div class="toolbar">
+        <button id="btn-export">⬇️ Exporter (JSON)</button>
+        <label class="bouton">⬆️ Importer <input id="input-import" type="file" accept=".json" hidden></label>
+        <button id="btn-reset" class="danger">Tout effacer</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== FICHE D'UNE PERSONNE ===== -->
+  <dialog id="fiche"></dialog>
+  <!-- ===== FORMULAIRE PERSONNE ===== -->
+  <dialog id="form-personne">
+    <form method="dialog">
+      <h2 id="form-titre">Nouvelle personne</h2>
+      <label>Nom <input name="nom" required></label>
+      <label>Village <input name="village" list="liste-villages" required></label>
+      <datalist id="liste-villages"></datalist>
+      <label>Stade <select name="stade"></select></label>
+      <label>Notes <textarea name="notes" rows="3"></textarea></label>
+      <div class="actions">
+        <button value="annuler" formnovalidate>Annuler</button>
+        <button value="ok" class="primary">Enregistrer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
