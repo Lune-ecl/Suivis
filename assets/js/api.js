@@ -7,7 +7,6 @@ const url = String(config.supabaseUrl || '').trim().replace(/\/+$/, '');
 const cle = String(config.supabaseKey || '').trim();
 
 export const estConfigure = /^https:\/\/[^\s]+$/i.test(url) && cle.length > 20;
-export const connexionDiscord = Boolean(config.connexionDiscord);
 export const sb = estConfigure ? createClient(url, cle) : null;
 
 // Messages d'erreur compréhensibles.
@@ -45,7 +44,7 @@ async function req(requete) {
 export const api = {
   // Compte et membres
   moi: id => req(sb.from('membres').select('*').eq('id', id).maybeSingle()),
-  rejoindre: (nomRp, pseudo) => req(sb.rpc('rejoindre', { p_nom_rp: nomRp || '', p_pseudo: pseudo || '' })),
+  rejoindre: (nomRp, pseudo, equipe) => req(sb.rpc('rejoindre', { p_nom_rp: nomRp || '', p_pseudo: pseudo || '', p_equipe: Boolean(equipe) })),
   membres: () => req(sb.from('membres').select('*').order('nom_rp')),
   majMembre: (id, champs) => req(sb.from('membres').update(champs).eq('id', id).select().single()),
 
@@ -59,7 +58,9 @@ export const api = {
   // Journal
   entrees: dossierId => req(sb.from('entrees').select('*').eq('dossier_id', dossierId).order('created_at', { ascending: false })),
   toutesEntrees: () => req(sb.from('entrees').select('*').order('created_at', { ascending: true })),
-  rapportsIrs: () => req(sb.from('entrees').select('dossier_id,created_at').eq('type', 'rapport_irs')),
+  // Résumé du journal (sans les événements) : rapports reçus, derniers messages.
+  resumeJournal: () => req(sb.from('entrees').select('dossier_id,auteur_id,type,created_at').neq('type', 'evenement')
+    .order('created_at', { ascending: false })),
   creerEntree: champs => req(sb.from('entrees').insert(champs).select().single()),
   majEntree: (id, contenu) => req(sb.from('entrees').update({ contenu }).eq('id', id).select().single()),
   supprimerEntree: id => req(sb.from('entrees').delete().eq('id', id)),
@@ -83,7 +84,6 @@ export const auth = {
     password,
     options: { data: donnees, emailRedirectTo: adresseDuSite() },
   })),
-  connexionDiscord: () => req(sb.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: adresseDuSite() } })),
   motDePasseOublie: email => req(sb.auth.resetPasswordForEmail(email, { redirectTo: adresseDuSite() })),
   changerMotDePasse: password => req(sb.auth.updateUser({ password })),
   deconnexion: () => sb.auth.signOut(),

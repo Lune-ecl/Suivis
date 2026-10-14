@@ -172,6 +172,10 @@ function pointsDAttention(actifs) {
   const items = [];
   const ajouter = (d, niveau, emoji, c, detail) => items.push({ d, niveau, emoji, c, detail });
 
+  // Dernière entrée de chaque dossier (le résumé du journal est trié du plus récent au plus ancien).
+  const derniere = new Map();
+  for (const e of etat.journal) if (!derniere.has(e.dossier_id)) derniere.set(e.dossier_id, e);
+
   for (const d of actifs) {
     const inactif = joursDepuis(d.derniere_activite);
     if (d.statut === 'urgent') {
@@ -183,7 +187,15 @@ function pointsDAttention(actifs) {
       if (rapportRecu) ajouter(d, 1, '🔬', '#a78bfa', 'Rapport IRS reçu : résultats à présenter au patient');
       else if (moi.role === 'irs') ajouter(d, 1, '🔬', '#a78bfa', `Analyse attendue depuis ${ilYa(d.statut_depuis).replace('il y a ', '')}`);
     }
-    if (!d.medecin_id) ajouter(d, 2, '🟡', '#fbbf24', `Sans médecin référent, ouvert ${ilYa(d.created_at)}`);
+    const dernier = derniere.get(d.id);
+    if (d.patient_id && dernier?.type === 'note' && dernier.auteur_id === d.patient_id) {
+      ajouter(d, 1, '💬', '#f9a8d4', `Message du joueur ${ilYa(dernier.created_at)} : réponse attendue`);
+    }
+    if (!d.medecin_id) {
+      ajouter(d, 2, '🟡', '#fbbf24', d.patient_id && d.cree_par === d.patient_id
+        ? `Demande de suivi du joueur, reçue ${ilYa(d.created_at)} : à prendre en charge`
+        : `Sans médecin référent, ouvert ${ilYa(d.created_at)}`);
+    }
     if (d.prochain_rdv && joursDepuis(d.prochain_rdv) > 0) {
       ajouter(d, 3, '📅', '#fb7185', `Rendez-vous du ${dateCourte(d.prochain_rdv)} sans compte rendu`);
     }

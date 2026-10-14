@@ -36,9 +36,11 @@ export const ROLES = {
   medecin: { label: 'Médecin référent', groupe: 'Médecins référents', court: 'Médecin', couleur: '#34d399' },
   soignant: { label: 'Personnel soignant', groupe: 'Personnel soignant et de rééducation', court: 'Soignant', couleur: '#60a5fa' },
   irs: { label: 'Référent IRS', groupe: 'Référents IRS', court: 'IRS', couleur: '#a78bfa' },
+  patient: { label: 'Joueur', groupe: 'Joueurs', court: 'Joueur', couleur: '#f9a8d4' },
   en_attente: { label: 'En attente de validation', groupe: 'En attente', court: 'En attente', couleur: '#94a3b8' },
 };
 export const ORDRE_ROLES = ['responsable', 'medecin', 'soignant', 'irs'];
+export const ROLES_EQUIPE = ['responsable', 'medecin', 'soignant', 'irs'];
 
 export const TYPES_RDV = [
   'Premier rendez-vous', 'Examens', 'Résultats', 'Essai de traitement',

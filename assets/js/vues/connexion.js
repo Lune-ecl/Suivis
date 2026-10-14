@@ -1,6 +1,6 @@
 // Écrans hors application : configuration, connexion, attente de validation, mot de passe.
 
-import { auth, connexionDiscord } from '../api.js';
+import { auth } from '../api.js';
 import { esc, icone, toast } from '../ui.js';
 
 const fond = '<div class="kanji-fond" aria-hidden="true"><span>生</span><span>命</span></div>';
@@ -82,9 +82,9 @@ export function ecranConnexion(racine, { mode = 'connexion' } = {}) {
       <h1>Seimei</h1>
       <p>Suivi des pathologies</p>
     </header>
-    <div class="segmente" role="tablist" aria-label="Connexion ou demande d’accès">
+    <div class="segmente" role="tablist" aria-label="Connexion ou création de compte">
       <button type="button" role="tab" data-mode="connexion">Connexion</button>
-      <button type="button" role="tab" data-mode="inscription">Demander un accès</button>
+      <button type="button" role="tab" data-mode="inscription">Créer un compte</button>
     </div>
 
     <form class="form-connexion" data-form="connexion" novalidate>
@@ -97,21 +97,28 @@ export function ecranConnexion(racine, { mode = 'connexion' } = {}) {
     </form>
 
     <form class="form-connexion" data-form="inscription" novalidate hidden>
-      <label class="champ"><span class="etiquette">Nom de ton personnage <span class="requis">*</span></span>
+      <div class="choix-compte" role="radiogroup" aria-label="Type de compte">
+        <label class="choix-statut" style="--c:#f9a8d4">
+          <input type="radio" name="equipe" value="non" checked>
+          <span class="emoji" aria-hidden="true">🎭</span>
+          <span><strong>Je suis joueur</strong><small>Pour ouvrir et suivre le dossier médical de mon personnage.</small></span>
+        </label>
+        <label class="choix-statut" style="--c:#34d399">
+          <input type="radio" name="equipe" value="oui">
+          <span class="emoji" aria-hidden="true">🩺</span>
+          <span><strong>Je rejoins l’équipe</strong><small>Membre de la branche ou chercheur de l’IRS. Le responsable valide l’accès.</small></span>
+        </label>
+      </div>
+      <label class="champ"><span class="etiquette">Ton nom (personnage ou pseudo) <span class="requis">*</span></span>
         <input name="nom_rp" required maxlength="80" placeholder="ex. Akiyama Ren" autocomplete="nickname"></label>
-      <label class="champ"><span class="etiquette">Pseudo Discord</span>
-        <input name="pseudo_discord" maxlength="80" placeholder="ex. ren.akiyama"></label>
+      <label class="champ"><span class="etiquette">Pseudo du joueur</span>
+        <input name="pseudo" maxlength="80" placeholder="ex. ren.akiyama"></label>
       <label class="champ"><span class="etiquette">Adresse e-mail <span class="requis">*</span></span>
         <input type="email" name="email" autocomplete="email" required placeholder="nom@exemple.com"></label>
       <label class="champ"><span class="etiquette">Mot de passe <span class="requis">*</span></span>
         <input type="password" name="password" autocomplete="new-password" required minlength="6" placeholder="6 caractères minimum"></label>
-      <button type="submit" class="btn btn-primaire btn-large">Envoyer ma demande</button>
-      <p class="aide" style="text-align:center">Le responsable de la branche validera ton accès.</p>
+      <button type="submit" class="btn btn-primaire btn-large" data-texte-joueur="Créer mon compte" data-texte-equipe="Envoyer ma demande">Créer mon compte</button>
     </form>
-
-    ${connexionDiscord ? `
-      <div class="separateur" style="margin-top:18px">ou</div>
-      <button type="button" class="btn btn-large" style="margin-top:14px" data-action="discord">${icone('message')} Continuer avec Discord</button>` : ''}
     ${mention}`);
 
   const changerMode = m => {
@@ -133,9 +140,11 @@ export function ecranConnexion(racine, { mode = 'connexion' } = {}) {
         toast('Si un compte existe, un e-mail pour choisir un nouveau mot de passe vient d’être envoyé.', 'succes');
       } catch (err) { toast(err.message, 'erreur'); }
     }
-    if (action === 'discord') {
-      try { await auth.connexionDiscord(); } catch (err) { toast(err.message, 'erreur'); }
-    }
+  });
+  c.addEventListener('change', e => {
+    if (e.target.name !== 'equipe') return;
+    const bouton = c.querySelector('[data-form="inscription"] [type=submit]');
+    bouton.textContent = e.target.value === 'oui' ? bouton.dataset.texteEquipe : bouton.dataset.texteJoueur;
   });
 
   c.addEventListener('submit', async e => {
@@ -152,7 +161,8 @@ export function ecranConnexion(racine, { mode = 'connexion' } = {}) {
       } else {
         const r = await auth.inscription(d.email.trim(), d.password, {
           nom_rp: d.nom_rp.trim(),
-          pseudo_discord: d.pseudo_discord.trim(),
+          pseudo: d.pseudo.trim(),
+          equipe: d.equipe === 'oui',
         });
         if (!r.session) {
           carte(racine, `

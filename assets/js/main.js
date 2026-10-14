@@ -3,12 +3,15 @@
 import { estConfigure, auth, api } from './api.js';
 import { etat } from './etat.js';
 import { esc, icone, avatar, badgeRole, toast, activerInfobulles } from './ui.js';
+import { chargerVus, estNouveau } from './vus.js';
 import * as ecrans from './vues/connexion.js';
 import { rendreTableau } from './vues/tableau.js';
 import { rendreDossiers } from './vues/dossiers.js';
+import { rendreMesDossiers } from './vues/mes-dossiers.js';
 import { rendreDossier } from './vues/dossier.js';
 import { rendreFormulaire } from './vues/formulaire.js';
 import { rendreEquipe, ouvrirProfil } from './vues/equipe.js';
+import { rendreGuide } from './vues/guide.js';
 
 const racine = document.getElementById('app');
 
@@ -65,10 +68,7 @@ async function ouvrirSession(session) {
     let moi = await api.moi(session.user.id);
     if (!moi) {
       const meta = session.user.user_metadata || {};
-      moi = await api.rejoindre(
-        meta.nom_rp || meta.custom_claims?.global_name || meta.full_name || meta.name || '',
-        meta.pseudo_discord || meta.name || meta.user_name || '',
-      );
+      moi = await api.rejoindre(meta.nom_rp || '', meta.pseudo || '', meta.equipe === true);
     }
     if (enRecuperation || session.user.id !== utilisateur) return;
     etat.moi = moi;
@@ -81,6 +81,7 @@ async function ouvrirSession(session) {
     }
     await etat.chargerTout();
     dernierChargement = Date.now();
+    chargerVus();
     monterApplication();
   } catch (err) {
     ecrans.ecranErreur(racine, err.message, { reessayer: () => ouvrirSession(session), deconnecter });
@@ -95,23 +96,33 @@ async function deconnecter() {
 
 /* ---------------- Structure de l'application ---------------- */
 
+function navigation() {
+  if (etat.estJoueur) {
+    return `
+      <span class="nav-section">Mon suivi</span>
+      <a href="#/" data-nav="accueil">${icone('dossier')}<span>Mes dossiers</span><span class="compteur doux" data-compteur="nouveaux" hidden></span></a>
+      <a href="#/guide" data-nav="guide">${icone('bouclier')}<span>La branche</span></a>`;
+  }
+  return `
+    <span class="nav-section">Suivi</span>
+    <a href="#/" data-nav="tableau">${icone('tableau')}<span>Tableau de bord</span></a>
+    <a href="#/dossiers" data-nav="dossiers">${icone('dossier')}<span>Dossiers</span><span class="compteur" data-compteur="urgents" hidden></span></a>
+    <a href="#/archives" data-nav="archives">${icone('archive')}<span>Archives</span></a>
+    <span class="nav-section">Branche</span>
+    <a href="#/equipe" data-nav="equipe">${icone('equipe')}<span>Équipe</span><span class="compteur doux" data-compteur="demandes" hidden></span></a>
+    <a href="#/guide" data-nav="guide">${icone('bouclier')}<span>Guide</span></a>`;
+}
+
 function monterApplication() {
   const { moi } = etat;
   racine.innerHTML = `
     <div class="app">
       <aside class="barre">
-        <a class="marque" href="#/" aria-label="Seimei, tableau de bord">
+        <a class="marque" href="#/" aria-label="Seimei, accueil">
           <span class="sceau" aria-hidden="true"><span>生</span><span>命</span></span>
           <span><strong>Seimei</strong><small>Suivi des pathologies</small></span>
         </a>
-        <nav class="nav" aria-label="Navigation principale">
-          <span class="nav-section">Suivi</span>
-          <a href="#/" data-nav="tableau">${icone('tableau')}<span>Tableau de bord</span></a>
-          <a href="#/dossiers" data-nav="dossiers">${icone('dossier')}<span>Dossiers</span><span class="compteur" data-compteur="urgents" hidden></span></a>
-          <a href="#/archives" data-nav="archives">${icone('archive')}<span>Archives</span></a>
-          <span class="nav-section">Branche</span>
-          <a href="#/equipe" data-nav="equipe">${icone('equipe')}<span>Équipe</span><span class="compteur doux" data-compteur="demandes" hidden></span></a>
-        </nav>
+        <nav class="nav" aria-label="Navigation principale">${navigation()}</nav>
         <div class="carte-utilisateur">
           <button type="button" class="bouton-profil" data-action="profil" title="Mon profil">
             ${avatar(moi)}
@@ -148,10 +159,12 @@ function rafraichirStructure() {
 }
 
 function majCompteurs() {
-  const urgents = etat.dossiers.filter(d => d.statut === 'urgent').length;
-  const demandes = etat.moi?.role === 'responsable'
-    ? etat.membres.filter(m => m.actif && m.role === 'en_attente').length : 0;
-  for (const [nom, n] of [['urgents', urgents], ['demandes', demandes]]) {
+  const compteurs = {
+    urgents: etat.dossiers.filter(d => d.statut === 'urgent').length,
+    demandes: etat.moi?.role === 'responsable' ? etat.membres.filter(m => m.actif && m.role === 'en_attente').length : 0,
+    nouveaux: etat.estJoueur ? etat.dossiers.filter(estNouveau).length : 0,
+  };
+  for (const [nom, n] of Object.entries(compteurs)) {
     const el = racine.querySelector(`[data-compteur="${nom}"]`);
     if (el) { el.textContent = n; el.hidden = !n; }
   }
@@ -161,19 +174,23 @@ document.addEventListener('seimei:profil', rafraichirStructure);
 
 /* ---------------- Navigation ---------------- */
 
+// « equipe » : pages réservées à l'équipe ; « joueur » : pages des joueurs ; sinon pour tous.
 const ROUTES = [
-  { motif: /^\/?$/, nav: 'tableau', liste: true, vue: v => rendreTableau(v) },
-  { motif: /^\/dossiers$/, nav: 'dossiers', liste: true, vue: (v, _, q) => rendreDossiers(v, q) },
+  { motif: /^\/?$/, nav: 'tableau', liste: true, pour: 'equipe', vue: v => rendreTableau(v) },
+  { motif: /^\/?$/, nav: 'accueil', liste: true, toujoursFrais: true, pour: 'joueur', vue: v => rendreMesDossiers(v) },
+  { motif: /^\/dossiers$/, nav: 'dossiers', liste: true, pour: 'equipe', vue: (v, _, q) => rendreDossiers(v, q) },
   { motif: /^\/dossiers\/nouveau$/, nav: 'dossiers', vue: v => rendreFormulaire(v, null) },
   { motif: /^\/dossier\/([0-9a-f-]{36})$/, nav: 'dossiers', vue: (v, [id]) => rendreDossier(v, id) },
   { motif: /^\/dossier\/([0-9a-f-]{36})\/modifier$/, nav: 'dossiers', vue: (v, [id]) => rendreFormulaire(v, id) },
-  { motif: /^\/archives$/, nav: 'archives', liste: true, vue: (v, _, q) => rendreDossiers(v, q, { archives: true }) },
-  { motif: /^\/equipe$/, nav: 'equipe', liste: true, toujoursFrais: true, vue: v => rendreEquipe(v) },
+  { motif: /^\/archives$/, nav: 'archives', liste: true, pour: 'equipe', vue: (v, _, q) => rendreDossiers(v, q, { archives: true }) },
+  { motif: /^\/equipe$/, nav: 'equipe', liste: true, toujoursFrais: true, pour: 'equipe', vue: v => rendreEquipe(v) },
+  { motif: /^\/guide$/, nav: 'guide', vue: v => rendreGuide(v) },
 ];
 
 function lireAdresse() {
   const [chemin, requete = ''] = location.hash.replace(/^#/, '').split('?');
-  const route = ROUTES.find(r => r.motif.test(chemin));
+  const profil = etat.estJoueur ? 'joueur' : 'equipe';
+  const route = ROUTES.find(r => r.motif.test(chemin) && (!r.pour || r.pour === profil));
   return { route, params: (chemin.match(route?.motif) || []).slice(1), requete: new URLSearchParams(requete) };
 }
 
@@ -184,9 +201,11 @@ async function router() {
   const { route, params, requete } = lireAdresse();
   if (!route) { location.hash = '#/'; return; }
 
+  // Pour un joueur, les pages de dossier restent rattachées à « Mes dossiers ».
+  const nav = etat.estJoueur && route.nav === 'dossiers' ? 'accueil' : route.nav;
   racine.querySelectorAll('[data-nav]').forEach(a => {
-    a.classList.toggle('actif', a.dataset.nav === route.nav);
-    if (a.dataset.nav === route.nav) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    a.classList.toggle('actif', a.dataset.nav === nav);
+    if (a.dataset.nav === nav) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   });
   window.scrollTo({ top: 0 });
   await afficher(route, vue, params, requete);
@@ -223,7 +242,7 @@ async function afficher(route, vue, params, requete, { discret = false } = {}) {
   } catch (err) {
     vue.innerHTML = `<div class="page"><div class="vide"><span class="grande-icone" aria-hidden="true">⚠️</span>
       <strong>Impossible d’afficher cette page</strong><p>${esc(err.message)}</p>
-      <a class="btn" href="#/">Retour au tableau de bord</a></div></div>`;
+      <a class="btn" href="#/">Retour à l’accueil</a></div></div>`;
   }
 }
 

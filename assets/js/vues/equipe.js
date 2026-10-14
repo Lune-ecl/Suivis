@@ -5,16 +5,18 @@ import { etat, peut } from '../etat.js';
 import { ROLES, ORDRE_ROLES, role } from '../constantes.js';
 import { esc, icone, avatar, badgeRole, dateCourte, pluriel, toast, fenetre, confirmer, aujourdhui } from '../ui.js';
 
-const ROLES_ATTRIBUABLES = ['medecin', 'soignant', 'irs', 'responsable'];
+const ROLES_ATTRIBUABLES = ['medecin', 'soignant', 'irs', 'responsable', 'patient'];
 
 export function rendreEquipe(vue) {
   const gerer = peut.gererEquipe();
   const moi = etat.moi;
   const membres = [...etat.membres].sort((a, b) => a.nom_rp.localeCompare(b.nom_rp, 'fr'));
   const demandes = membres.filter(m => m.actif && m.role === 'en_attente');
-  const actifs = membres.filter(m => m.actif && m.role !== 'en_attente');
+  const actifs = membres.filter(m => m.actif && !['en_attente', 'patient'].includes(m.role));
+  const joueurs = membres.filter(m => m.actif && m.role === 'patient');
   const inactifs = membres.filter(m => !m.actif);
   const charge = id => etat.dossiers.filter(d => d.medecin_id === id && d.statut !== 'cloture').length;
+  const dossiersDuJoueur = id => etat.dossiers.filter(d => d.patient_id === id).length;
 
   const carte = (m, i, type = '') => {
     const n = charge(m.id);
@@ -23,12 +25,13 @@ export function rendreEquipe(vue) {
       <article class="carte-membre ${type}" style="--i:${i}">
         <div class="membre-tete">${avatar(m, 'grand')}
           <div><strong>${esc(m.nom_rp)}${estMoi ? ' <span class="aide">(toi)</span>' : ''}</strong>
-            <small>${m.pseudo_discord ? `@${esc(m.pseudo_discord)}` : 'Pseudo Discord non renseigné'}</small>
+            <small>${m.pseudo ? esc(m.pseudo) : 'Pseudo non renseigné'}</small>
             ${badgeRole(m.role)}</div>
         </div>
         ${type === 'attente'
           ? `<p class="aide">Demande envoyée le ${dateCourte(m.created_at)}</p>`
-          : ['medecin', 'responsable'].includes(m.role) ? `<div class="membre-chiffres"><span><strong>${n}</strong>${n > 1 ? 'patients suivis' : 'patient suivi'}</span></div>` : ''}
+          : ['medecin', 'responsable'].includes(m.role) ? `<div class="membre-chiffres"><span><strong>${n}</strong>${n > 1 ? 'patients suivis' : 'patient suivi'}</span></div>`
+          : m.role === 'patient' ? `<div class="membre-chiffres"><span><strong>${dossiersDuJoueur(m.id)}</strong>${dossiersDuJoueur(m.id) > 1 ? 'dossiers' : 'dossier'}</span></div>` : ''}
         ${gerer ? actionsMembre(m, type, n, estMoi) : ''}
       </article>`;
   };
@@ -64,6 +67,12 @@ export function rendreEquipe(vue) {
           </section>`;
       }).join('')}
 
+      ${joueurs.length ? `
+        <section class="pile">
+          <h2 class="titre-section">Joueurs <span class="nombre">${joueurs.length}</span></h2>
+          <div class="grille-membres">${joueurs.map((m, i) => carte(m, i)).join('')}</div>
+        </section>` : ''}
+
       ${gerer && inactifs.length ? `
         <section class="pile">
           <h2 class="titre-section">Comptes désactivés <span class="nombre">${inactifs.length}</span></h2>
@@ -71,10 +80,12 @@ export function rendreEquipe(vue) {
         </section>` : ''}
 
       <section class="panneau">
-        <div class="panneau-titre"><h2>${icone('bouclier')} Rejoindre la branche</h2></div>
-        <p class="aide">Chaque membre crée son compte avec « Demander un accès » sur la page de connexion.
-          ${gerer ? 'Tu valides ensuite sa demande ici en lui donnant un rôle.' : 'Le responsable de la branche valide ensuite la demande.'}
-          Les médecins, soignants et le responsable voient tous les dossiers ; les référents IRS ne voient que les dossiers dont le patient a donné son accord.</p>
+        <div class="panneau-titre"><h2>${icone('bouclier')} Comptes et accès</h2></div>
+        <p class="aide">Chacun crée son compte avec « Créer un compte » sur la page de connexion.
+          Les <strong>joueurs</strong> ont tout de suite accès à leurs propres dossiers, et à rien d’autre.
+          Les demandes pour rejoindre <strong>l’équipe</strong> doivent être validées
+          ${gerer ? 'ici, en choisissant un rôle' : 'par le responsable de la branche'}.
+          Les médecins, soignants et le responsable voient tous les dossiers ; les référents IRS ne voient que ceux dont le patient a donné son accord.</p>
       </section>
     </div>`;
 
@@ -219,8 +230,8 @@ export async function ouvrirProfil({ deconnecter } = {}) {
       <div class="grille-champs">
         <label class="champ"><span class="etiquette">Nom de ton personnage</span>
           <input name="nom_rp" required maxlength="80" value="${esc(moi.nom_rp)}"></label>
-        <label class="champ"><span class="etiquette">Pseudo Discord</span>
-          <input name="pseudo_discord" maxlength="80" value="${esc(moi.pseudo_discord)}"></label>
+        <label class="champ"><span class="etiquette">Pseudo du joueur</span>
+          <input name="pseudo" maxlength="80" value="${esc(moi.pseudo)}"></label>
         <label class="champ large"><span class="etiquette">Nouveau mot de passe</span>
           <input type="password" name="password" minlength="6" autocomplete="new-password" placeholder="Laisse vide pour le garder"></label>
       </div>`,
@@ -229,8 +240,8 @@ export async function ouvrirProfil({ deconnecter } = {}) {
       dlg.querySelector('[data-deconnecter]')?.addEventListener('click', () => { fermer(); deconnecter(); });
     },
     valider: async (_f, x) => {
-      const champs = { nom_rp: x.nom_rp.trim(), pseudo_discord: x.pseudo_discord.trim() };
-      if (champs.nom_rp !== moi.nom_rp || champs.pseudo_discord !== moi.pseudo_discord) {
+      const champs = { nom_rp: x.nom_rp.trim(), pseudo: x.pseudo.trim() };
+      if (champs.nom_rp !== moi.nom_rp || champs.pseudo !== moi.pseudo) {
         etat.garderMembre(await api.majMembre(moi.id, champs));
       }
       if (x.password) await auth.changerMotDePasse(x.password);

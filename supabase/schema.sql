@@ -1,14 +1,17 @@
 -- =====================================================================
 --  Seimei · Suivi des pathologies — schéma de la base Supabase
 --
---  À exécuter une fois dans Supabase :
+--  À exécuter dans Supabase :
 --    SQL Editor → New query → coller tout ce fichier → Run
---  Le script peut être relancé sans risque (il met le schéma à jour).
+--  Le script peut être relancé sans risque : il installe la base, ou met
+--  à jour une base déjà installée.
 --
 --  Accès :
---    · le tout premier compte créé devient responsable de la branche ;
---    · les comptes suivants arrivent « en attente » et ne voient rien
---      tant que le responsable ne leur a pas donné un rôle ;
+--    · les joueurs créent leur compte librement : ils ne voient que leurs
+--      propres dossiers, ouvrent leurs demandes de suivi, complètent leur
+--      fiche et échangent par messages avec l'équipe ;
+--    · les demandes pour rejoindre l'équipe sont validées par le
+--      responsable ; la toute première devient responsable de la branche ;
 --    · médecins, soignants et responsable voient tous les dossiers ;
 --    · les référents IRS ne voient que les dossiers dont le patient a
 --      donné son accord pour la transmission à l'IRS.
@@ -16,17 +19,28 @@
 
 
 -- ---------------------------------------------------------------------
--- 1. Membres de la branche
+-- 1. Membres : équipe de la branche, référents IRS et joueurs
 -- ---------------------------------------------------------------------
 create table if not exists public.membres (
-  id              uuid primary key references auth.users (id) on delete cascade,
-  nom_rp          text not null default '',
-  pseudo_discord  text not null default '',
-  role            text not null default 'en_attente'
-                  check (role in ('en_attente', 'responsable', 'medecin', 'soignant', 'irs')),
-  actif           boolean not null default true,
-  created_at      timestamptz not null default now()
+  id          uuid primary key references auth.users (id) on delete cascade,
+  nom_rp      text not null default '',
+  pseudo      text not null default '',
+  role        text not null default 'en_attente',
+  actif       boolean not null default true,
+  created_at  timestamptz not null default now()
 );
+
+-- Mise à jour d'une installation précédente.
+do $$
+begin
+  if exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'membres' and column_name = 'pseudo_discord') then
+    alter table public.membres rename column pseudo_discord to pseudo;
+  end if;
+end $$;
+alter table public.membres drop constraint if exists membres_role_check;
+alter table public.membres add constraint membres_role_check
+  check (role in ('en_attente', 'responsable', 'medecin', 'soignant', 'irs', 'patient'));
 
 -- Rôle de la personne connectée (null si le compte est inconnu ou désactivé).
 create or replace function public.role_actuel()
@@ -38,8 +52,11 @@ as $$
 $$;
 
 -- Appelée par le site à la première connexion : crée la fiche membre.
--- Le tout premier compte devient responsable, les suivants sont en attente.
-create or replace function public.rejoindre(p_nom_rp text default '', p_pseudo text default '')
+--   · un joueur devient directement « patient » ;
+--   · une demande pour l'équipe est « en attente », sauf s'il n'y a encore
+--     aucun responsable : elle devient alors responsable de la branche.
+drop function if exists public.rejoindre(text, text);
+create or replace function public.rejoindre(p_nom_rp text default '', p_pseudo text default '', p_equipe boolean default false)
 returns public.membres
 language plpgsql security definer
 set search_path = public
@@ -51,12 +68,16 @@ begin
     raise exception 'Connexion requise.';
   end if;
 
-  insert into public.membres (id, nom_rp, pseudo_discord, role)
+  insert into public.membres (id, nom_rp, pseudo, role)
   values (
     auth.uid(),
     left(coalesce(nullif(btrim(p_nom_rp), ''), 'Nouveau membre'), 80),
     left(coalesce(btrim(p_pseudo), ''), 80),
-    case when exists (select 1 from public.membres) then 'en_attente' else 'responsable' end
+    case
+      when not coalesce(p_equipe, false) then 'patient'
+      when not exists (select 1 from public.membres where role = 'responsable') then 'responsable'
+      else 'en_attente'
+    end
   )
   on conflict (id) do nothing;
 
@@ -142,10 +163,10 @@ create table if not exists public.dossiers (
                       check (parcours in ('maladie', 'readaptation')),
   etape               smallint not null default 1 check (etape between 1 and 7),
   medecin_id          uuid references public.membres (id) on delete set null,
+  patient_id          uuid references public.membres (id) on delete set null,
   consentement_irs    boolean not null default false,
   plan_suivi          text not null default '',
   prochain_rdv        date,
-  lien_discord        text not null default '',
   motif_cloture       text not null default '',
 
   cree_par            uuid references public.membres (id) on delete set null,
@@ -153,7 +174,12 @@ create table if not exists public.dossiers (
   derniere_activite   timestamptz not null default now()
 );
 
+-- Mise à jour d'une installation précédente.
+alter table public.dossiers add column if not exists patient_id uuid references public.membres (id) on delete set null;
+alter table public.dossiers drop column if exists lien_discord;
+
 create index if not exists dossiers_medecin_idx on public.dossiers (medecin_id);
+create index if not exists dossiers_patient_idx on public.dossiers (patient_id);
 create index if not exists dossiers_statut_idx on public.dossiers (statut);
 
 -- Règles de la branche, appliquées par la base elle-même.
@@ -164,7 +190,7 @@ set search_path = public
 as $$
 declare
   qui  uuid := auth.uid();
-  role text := public.role_actuel();
+  mon_role text := public.role_actuel();
 begin
   if new.parcours = 'readaptation' and new.etape > 4 then
     new.etape := 4;
@@ -176,14 +202,28 @@ begin
     new.statut_depuis := now();
     new.derniere_activite := now();
 
-    if qui is not null then
+    if qui is not null and mon_role = 'patient' then
+      -- Demande de suivi d'un joueur : le suivi médical reste à l'équipe.
+      new.patient_id := qui;
+      new.statut := 'attente';
+      new.medecin_id := null;
+      new.etape := 1;
+      new.plan_suivi := '';
+      new.prochain_rdv := null;
+      new.motif_cloture := '';
+    elsif qui is not null then
       if new.medecin_id is not null and new.medecin_id <> qui
-         and role is distinct from 'responsable' then
+         and mon_role is distinct from 'responsable' then
         raise exception 'Seul le responsable de la branche peut attribuer un dossier à un autre médecin.';
       end if;
-      if new.statut = 'cloture' and role is distinct from 'responsable' then
+      if new.statut = 'cloture' and mon_role is distinct from 'responsable' then
         raise exception 'Seul le responsable de la branche peut clôturer un dossier.';
       end if;
+    end if;
+
+    if new.patient_id is not null
+       and not exists (select 1 from public.membres where id = new.patient_id and role = 'patient') then
+      raise exception 'Le dossier ne peut être relié qu’au compte d’un joueur.';
     end if;
   else
     new.id := old.id;
@@ -196,22 +236,41 @@ begin
       new.statut_depuis := old.statut_depuis;
     end if;
 
-    if qui is not null then
+    if qui is not null and mon_role = 'patient' then
+      if old.statut = 'cloture' then
+        raise exception 'Ce dossier est clôturé.';
+      end if;
+      if new.statut is distinct from old.statut or new.medecin_id is distinct from old.medecin_id
+         or new.parcours is distinct from old.parcours or new.etape is distinct from old.etape
+         or new.plan_suivi is distinct from old.plan_suivi or new.prochain_rdv is distinct from old.prochain_rdv
+         or new.motif_cloture is distinct from old.motif_cloture or new.patient_id is distinct from old.patient_id then
+        raise exception 'Le suivi médical (statut, médecin, parcours, rendez-vous) est géré par l’équipe de la branche.';
+      end if;
+    elsif qui is not null then
       -- Un médecin peut prendre en charge un dossier libre ; le reste est réservé au responsable.
       if new.medecin_id is distinct from old.medecin_id
-         and role is distinct from 'responsable'
+         and mon_role is distinct from 'responsable'
          and not (old.medecin_id is null and new.medecin_id = qui) then
         raise exception 'Seul le responsable de la branche peut réattribuer un dossier.';
       end if;
       if (new.statut = 'cloture') <> (old.statut = 'cloture')
-         and role is distinct from 'responsable' then
+         and mon_role is distinct from 'responsable' then
         raise exception 'Seul le responsable de la branche peut clôturer ou rouvrir un dossier.';
       end if;
+    end if;
+
+    if new.patient_id is distinct from old.patient_id and new.patient_id is not null
+       and not exists (select 1 from public.membres where id = new.patient_id and role = 'patient') then
+      raise exception 'Le dossier ne peut être relié qu’au compte d’un joueur.';
+    end if;
+
+    if qui is not null and old.consentement_irs and not new.consentement_irs and new.statut = 'analyse_irs' then
+      raise exception 'L’analyse de l’IRS est en cours : l’accord ne peut pas être retiré pour l’instant.';
     end if;
   end if;
 
   if qui is not null and new.statut = 'analyse_irs' and not new.consentement_irs then
-    raise exception 'Le patient n''a pas donné son accord pour transmettre ses prélèvements à l''IRS.';
+    raise exception 'Le patient n’a pas donné son accord pour transmettre ses prélèvements à l’IRS.';
   end if;
 
   return new;
@@ -225,7 +284,7 @@ create trigger controler_dossier
 
 
 -- ---------------------------------------------------------------------
--- 3. Journal du dossier : comptes rendus, rapports IRS, notes, événements
+-- 3. Journal du dossier : comptes rendus, rapports IRS, messages, événements
 -- ---------------------------------------------------------------------
 create table if not exists public.entrees (
   id          uuid primary key default gen_random_uuid(),
@@ -300,6 +359,12 @@ begin
             jsonb_build_object('champ', 'consentement', 'vers', new.consentement_irs));
   end if;
 
+  if new.patient_id is distinct from old.patient_id then
+    insert into public.entrees (dossier_id, type, auteur_id, contenu)
+    values (new.id, 'evenement', auth.uid(),
+            jsonb_build_object('champ', 'joueur', 'vers', new.patient_id));
+  end if;
+
   return null;
 end;
 $$;
@@ -350,7 +415,7 @@ create trigger figer_traitement
 
 
 -- ---------------------------------------------------------------------
--- 5. Dernière activité (sert à repérer les dossiers inactifs)
+-- 5. Dernière activité (sert à repérer les dossiers inactifs et les nouveautés)
 -- ---------------------------------------------------------------------
 create or replace function public.noter_activite()
 returns trigger
@@ -400,16 +465,17 @@ revoke all on public.membres, public.dossiers, public.entrees, public.traitement
 
 revoke execute on function public.role_actuel() from public, anon;
 grant execute on function public.role_actuel() to authenticated;
-revoke execute on function public.rejoindre(text, text) from public, anon;
-grant execute on function public.rejoindre(text, text) to authenticated;
+revoke execute on function public.rejoindre(text, text, boolean) from public, anon;
+grant execute on function public.rejoindre(text, text, boolean) to authenticated;
 
--- Membres : chacun voit sa propre fiche ; les membres validés voient l'équipe.
+-- Membres : chacun voit sa fiche ; l'équipe voit tout le monde ; les joueurs voient l'équipe.
 drop policy if exists "membres : lecture" on public.membres;
 create policy "membres : lecture" on public.membres
   for select to authenticated
   using (
     id = (select auth.uid())
     or (select public.role_actuel()) in ('responsable', 'medecin', 'soignant', 'irs')
+    or ((select public.role_actuel()) = 'patient' and role in ('responsable', 'medecin', 'soignant', 'irs'))
   );
 
 drop policy if exists "membres : modification" on public.membres;
@@ -418,25 +484,35 @@ create policy "membres : modification" on public.membres
   using (id = (select auth.uid()) or (select public.role_actuel()) = 'responsable')
   with check (id = (select auth.uid()) or (select public.role_actuel()) = 'responsable');
 
--- Dossiers : la branche voit tout, l'IRS seulement les dossiers transmis avec accord.
+-- Dossiers : la branche voit tout, l'IRS les dossiers transmis avec accord, le joueur les siens.
 drop policy if exists "dossiers : lecture" on public.dossiers;
 create policy "dossiers : lecture" on public.dossiers
   for select to authenticated
   using (
     (select public.role_actuel()) in ('responsable', 'medecin', 'soignant')
     or ((select public.role_actuel()) = 'irs' and consentement_irs)
+    or ((select public.role_actuel()) = 'patient' and patient_id = (select auth.uid()))
   );
 
 drop policy if exists "dossiers : création" on public.dossiers;
 create policy "dossiers : création" on public.dossiers
   for insert to authenticated
-  with check ((select public.role_actuel()) in ('responsable', 'medecin'));
+  with check (
+    (select public.role_actuel()) in ('responsable', 'medecin')
+    or ((select public.role_actuel()) = 'patient' and patient_id = (select auth.uid()))
+  );
 
 drop policy if exists "dossiers : modification" on public.dossiers;
 create policy "dossiers : modification" on public.dossiers
   for update to authenticated
-  using ((select public.role_actuel()) in ('responsable', 'medecin'))
-  with check ((select public.role_actuel()) in ('responsable', 'medecin'));
+  using (
+    (select public.role_actuel()) in ('responsable', 'medecin')
+    or ((select public.role_actuel()) = 'patient' and patient_id = (select auth.uid()))
+  )
+  with check (
+    (select public.role_actuel()) in ('responsable', 'medecin')
+    or ((select public.role_actuel()) = 'patient' and patient_id = (select auth.uid()))
+  );
 
 drop policy if exists "dossiers : suppression" on public.dossiers;
 create policy "dossiers : suppression" on public.dossiers
@@ -458,7 +534,7 @@ create policy "entrées : création" on public.entrees
     and case type
           when 'compte_rendu' then (select public.role_actuel()) in ('responsable', 'medecin', 'soignant')
           when 'rapport_irs'  then (select public.role_actuel()) in ('responsable', 'irs')
-          when 'note'         then (select public.role_actuel()) in ('responsable', 'medecin', 'soignant', 'irs')
+          when 'note'         then (select public.role_actuel()) in ('responsable', 'medecin', 'soignant', 'irs', 'patient')
           else false
         end
   );
@@ -521,5 +597,5 @@ create policy "traitements : suppression" on public.traitements
 --    update public.membres set role = 'responsable', actif = true
 --    where id = (select id from auth.users where email = 'adresse@exemple.com');
 --
---  Rôles possibles : responsable, medecin, soignant, irs, en_attente
+--  Rôles possibles : responsable, medecin, soignant, irs, patient, en_attente
 -- =====================================================================

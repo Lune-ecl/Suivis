@@ -810,37 +810,6 @@ button.pill:hover { box-shadow: 0 0 24px -6px color-mix(in srgb, var(--c) 70%, t
 .bandeau.info-violet { background: rgba(167, 139, 250, 0.08); border-color: rgba(167, 139, 250, 0.35); color: #ddd6fe; }
 .bandeau .btn { margin-left: auto; }
 
-.menu-deroulant { position: relative; }
-.menu-deroulant > div {
-  position: absolute;
-  z-index: 40;
-  top: calc(100% + 6px);
-  left: 0;
-  min-width: 240px;
-  padding: 6px;
-  border-radius: 14px;
-  background: #121b2e;
-  border: 1px solid var(--bord-2);
-  box-shadow: 0 24px 50px -20px rgba(0, 0, 0, 0.9);
-  animation: surgir 0.2s var(--ease) both;
-}
-.menu-deroulant button.option {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 10px;
-  border: 0;
-  border-radius: 10px;
-  background: none;
-  color: var(--texte);
-  font: 500 13.5px var(--police);
-  text-align: left;
-  cursor: pointer;
-}
-.menu-deroulant button.option:hover { background: rgba(255, 255, 255, 0.06); }
-.menu-deroulant button.option .ic { color: var(--texte-2); }
-
 /* ---------- Parcours de soin ---------- */
 .parcours-tete { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
 .etapes { display: grid; grid-template-columns: repeat(var(--n, 7), minmax(88px, 1fr)); list-style: none; margin: 0; padding: 0 0 4px; overflow-x: auto; scrollbar-width: thin; }
@@ -936,6 +905,7 @@ button.etape-rond:hover { border-color: var(--jade); color: var(--texte); }
 .evenement-ligne { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--texte-2); }
 .evenement-ligne .quand-evt { color: var(--texte-3); font-size: 12px; }
 .entree.note .entree-carte { background: rgba(255, 255, 255, 0.03); border-left-color: rgba(148, 170, 205, 0.4); }
+.entree.note.du-joueur .entree-carte { background: rgba(249, 168, 212, 0.05); border-left-color: rgba(249, 168, 212, 0.65); }
 .note-texte { margin-top: 8px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; }
 .journal-filtres { display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -983,11 +953,6 @@ button.etape-rond:hover { border-color: var(--jade); color: var(--texte); }
   box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.9);
 }
 .barre-actions .aide { margin-right: auto; }
-.import-discord { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 18px; border: 1px dashed rgba(167, 139, 250, 0.45); background: rgba(167, 139, 250, 0.06); }
-.import-discord .ic { color: var(--violet); width: 22px; height: 22px; }
-.import-discord p { flex: 1; color: var(--texte-2); font-size: 14px; }
-.import-discord strong { color: var(--texte); display: block; }
-
 /* ---------- Fenêtres (dialog) ---------- */
 dialog.modale {
   width: min(640px, calc(100vw - 24px));
@@ -1042,27 +1007,6 @@ dialog.modale::backdrop { background: rgba(3, 6, 12, 0.62); backdrop-filter: blu
 .choix-statut strong { display: block; font-size: 14px; }
 .choix-statut small { display: block; font-size: 12.5px; color: var(--texte-2); line-height: 1.4; margin-top: 2px; }
 
-/* ---------- Aperçu Discord ---------- */
-.discord {
-  margin: 0;
-  padding: 16px 18px;
-  max-height: 46vh;
-  overflow: auto;
-  border-radius: 12px;
-  background: #1e1f22;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  color: #dbdee1;
-  font: 400 14px/1.5 'gg sans', 'Noto Sans', var(--police);
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-.ligne-copie { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.035); border: 1px solid var(--bord); }
-.ligne-copie .valeur { flex: 1; min-width: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ligne-copie .etiquette { min-width: 72px; }
-.compteur { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--texte-3); }
-.compteur.trop { color: #fda4af; }
-.morceaux { display: flex; flex-wrap: wrap; gap: 8px; }
-
 /* ---------- Équipe ---------- */
 .grille-membres { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px; }
 .carte-membre { display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 18px; background: var(--surface); border: 1px solid var(--bord); animation: monter 0.45s var(--ease) both; animation-delay: calc(min(var(--i, 0), 12) * 35ms); }
@@ -1080,6 +1024,66 @@ dialog.modale::backdrop { background: rgba(3, 6, 12, 0.62); backdrop-filter: blu
 .carte-membre.attente .membre-actions .btn { flex: 1; }
 .titre-section { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--texte-2); }
 .titre-section .nombre { font-size: 12px; letter-spacing: 0; padding: 1px 8px; border-radius: 99px; background: rgba(148, 170, 205, 0.14); }
+
+/* ---------- Choix du type de compte ---------- */
+.choix-compte { display: grid; gap: 8px; }
+
+/* ---------- Repère « Nouveau » ---------- */
+.badge-nouveau {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 99px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #03221a;
+  background: linear-gradient(135deg, #6ee7b7, #2dd4bf);
+  box-shadow: 0 0 18px -4px rgba(52, 211, 153, 0.85);
+}
+
+/* ---------- Étapes numérotées (accueil joueur, guide) ---------- */
+.liste-etapes { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.liste-etapes li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 14px; align-items: start; }
+.liste-etapes .num {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--jade);
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+.liste-etapes strong { display: block; font-size: 14.5px; }
+.liste-etapes p { color: var(--texte-2); font-size: 13.5px; margin-top: 2px; }
+.ligne-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ---------- Guide de la branche ---------- */
+.sommaire { position: sticky; top: 12px; z-index: 5; padding: 8px; border-radius: 16px; background: rgba(9, 14, 26, 0.82); border: 1px solid var(--bord); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.guide section[id] { scroll-margin-top: 80px; }
+.titre-guide { font-size: 16px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.titre-guide.grand { font-family: var(--police-titre); font-size: clamp(28px, 3.4vw, 36px); line-height: 1.1; margin: 8px 0 12px; }
+.texte-guide { color: var(--texte-2); font-size: 14.5px; line-height: 1.6; }
+.texte-guide strong { color: var(--texte); }
+.grille-guide { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.liste-guide { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.liste-guide li { display: flex; gap: 9px; align-items: flex-start; font-size: 14px; color: var(--texte-2); line-height: 1.5; }
+.liste-guide li .ic { color: var(--jade); margin-top: 3px; }
+.liste-guide strong { color: var(--texte); }
+.grille-categories { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
+.categorie-guide { display: flex; gap: 12px; padding: 12px 14px; border-radius: 14px; background: rgba(8, 13, 24, 0.45); border: 1px solid var(--bord); }
+.categorie-guide .emoji { font-size: 22px; line-height: 1.2; }
+.categorie-guide strong { font-size: 14px; }
+.categorie-guide p { font-size: 12.5px; color: var(--texte-2); margin-top: 2px; }
+.grille-statuts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 22px; }
+.statut-guide { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.statut-guide p { font-size: 13.5px; color: var(--texte-2); }
+.regle { border-left: 3px solid rgba(52, 211, 153, 0.5); }
 
 /* ---------- États vides ---------- */
 .vide {
@@ -1163,6 +1167,7 @@ dialog.modale::backdrop { background: rgba(3, 6, 12, 0.62); backdrop-filter: blu
 /* ---------- Écrans moyens ---------- */
 @media (max-width: 1100px) {
   .colonnes { grid-template-columns: minmax(0, 1fr); }
+  .grille-categories { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 /* ---------- Téléphone et tablette ---------- */
@@ -1211,6 +1216,8 @@ dialog.modale::backdrop { background: rgba(3, 6, 12, 0.62); backdrop-filter: blu
 @media (max-width: 640px) {
   .grille-champs, .grille-3 { grid-template-columns: minmax(0, 1fr); }
   .choix-statuts { grid-template-columns: minmax(0, 1fr); }
+  .grille-guide, .grille-categories, .grille-statuts { grid-template-columns: minmax(0, 1fr); }
+  .sommaire { top: 64px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .kpi { padding: 14px; gap: 10px; }
   .kpi-valeur { font-size: 30px; }

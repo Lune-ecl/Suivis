@@ -8,9 +8,14 @@ import {
 } from '../constantes.js';
 import {
   esc, icone, avatar, pastilleStatut, etiquetteCategorie, nomComplet, urlSure, dateLongue, dateCourte,
-  dateHeure, ilYa, echeance, joursDepuis, aujourdhui, pluriel, toast, fenetre, confirmer, apercuDiscord, copier, versDate,
+  dateHeure, dateNumerique, ilYa, echeance, joursDepuis, aujourdhui, pluriel, toast, fenetre, confirmer, versDate, badgeRole,
 } from '../ui.js';
-import { texteFiche, texteCompteRendu, texteRapport, titrePost, etiquettesDiscord, texteProchainRdv } from '../discord.js';
+import { marquerVu } from '../vus.js';
+
+function texteProchainRdv(c) {
+  const morceaux = [c.prochain_rdv ? dateNumerique(c.prochain_rdv) : '', c.prochain_precision || ''].filter(Boolean);
+  return morceaux.join(' — ') || 'À définir';
+}
 
 let courant = null; // { d, entrees, traitements, onglet, filtre, vue }
 
@@ -59,7 +64,7 @@ function dessiner({ animer = true } = {}) {
     </div>`;
   const page = vue.querySelector('.page');
   page.addEventListener('click', surClic);
-  page.addEventListener('keydown', e => { if (e.key === 'Escape') fermerMenus(page); });
+  marquerVu(courant.d);
 }
 
 function majOnglet() {
@@ -80,12 +85,14 @@ function htmlEnTete(d) {
   const s = statut(d.statut);
   const medecin = etat.membre(d.medecin_id);
   const rdv = d.prochain_rdv ? echeance(d.prochain_rdv) : null;
-  const modifiable = peut.modifierDossier(d);
-  const lien = urlSure(d.lien_discord);
+  const suivi = peut.gererSuivi(d);
   const patient = [d.age, d.grade, d.village].filter(Boolean).join(' · ');
+  const joueur = etat.estJoueur ? null : etat.membre(d.patient_id);
 
   return `
-    <a class="retour" href="${d.statut === 'cloture' ? '#/archives' : '#/dossiers'}">${icone('retour')} ${d.statut === 'cloture' ? 'Archives' : 'Dossiers'}</a>
+    ${etat.estJoueur
+      ? `<a class="retour" href="#/">${icone('retour')} Mes dossiers</a>`
+      : `<a class="retour" href="${d.statut === 'cloture' ? '#/archives' : '#/dossiers'}">${icone('retour')} ${d.statut === 'cloture' ? 'Archives' : 'Dossiers'}</a>`}
     <section class="hero" style="--c:${s.couleur}">
       <div class="hero-haut">
         <div style="min-width:0">
@@ -93,6 +100,7 @@ function htmlEnTete(d) {
           <h1 class="hero-nom">${esc(d.nom)} <span>${esc(d.prenom)}</span></h1>
           <p class="hero-patho">${esc(d.pathologie || 'Pathologie non renseignée')}</p>
           ${patient ? `<p class="hero-identite">${esc(patient)}</p>` : ''}
+          ${etat.estJoueur ? '' : `<p class="hero-identite">🎭 ${joueur ? `Compte joueur : ${esc(joueur.nom_rp)}${joueur.pseudo ? ` (${esc(joueur.pseudo)})` : ''}` : 'Aucun compte joueur relié'}</p>`}
           <div class="hero-tags">${(d.categories || []).map(etiquetteCategorie).join('')}</div>
         </div>
         <div class="hero-statut">
@@ -114,28 +122,19 @@ function htmlEnTete(d) {
         </dd></div>
         <div class="meta"><dt>Prochain rendez-vous</dt><dd>
           ${rdv ? `${icone('calendrier')}<span class="texte-tronque">${dateCourte(d.prochain_rdv)}</span><span class="quand ${rdv.classe}">${rdv.texte}</span>` : '<span class="texte-tronque" style="color:var(--texte-3)">Non planifié</span>'}
-          ${modifiable ? `<button type="button" class="btn btn-fantome btn-petit btn-icone lien-action" data-action="rdv" title="Planifier" aria-label="Planifier le prochain rendez-vous">${icone('crayon')}</button>` : ''}
+          ${suivi ? `<button type="button" class="btn btn-fantome btn-petit btn-icone lien-action" data-action="rdv" title="Planifier" aria-label="Planifier le prochain rendez-vous">${icone('crayon')}</button>` : ''}
         </dd></div>
         <div class="meta"><dt>Accord pour l’IRS</dt><dd>
           <span class="texte-tronque">${d.consentement_irs ? '🔬 Transmission autorisée' : '🔒 Non transmis'}</span>
-          ${modifiable ? `<button type="button" class="btn btn-fantome btn-petit btn-icone lien-action" data-action="consentement" title="Modifier l’accord" aria-label="Modifier l’accord IRS">${icone('crayon')}</button>` : ''}
+          ${peut.modifierAccord(d) ? `<button type="button" class="btn btn-fantome btn-petit btn-icone lien-action" data-action="consentement" title="Modifier l’accord" aria-label="Modifier l’accord IRS">${icone('crayon')}</button>` : ''}
         </dd></div>
       </dl>
 
       <div class="hero-actions">
         ${peut.compteRendu(d) ? `<button type="button" class="btn btn-primaire" data-action="compte-rendu">${icone('document')} Compte rendu</button>` : ''}
         ${peut.rapportIrs(d) ? `<button type="button" class="btn" data-action="rapport">${icone('fiole')} Rapport IRS</button>` : ''}
-        ${peut.note(d) ? `<button type="button" class="btn" data-action="note">${icone('message')} Note</button>` : ''}
-        <div class="menu-deroulant">
-          <button type="button" class="btn" data-action="menu" aria-haspopup="true" aria-expanded="false">${icone('copier')} Pour Discord</button>
-          <div hidden role="menu">
-            <button type="button" class="option" role="menuitem" data-action="discord-fiche">${icone('document')} Fiche patient et titre du post</button>
-            <button type="button" class="option" role="menuitem" data-action="discord-titre">${icone('copier')} Copier le titre du post</button>
-            <button type="button" class="option" role="menuitem" data-action="discord-etiquettes">${icone('copier')} Copier les étiquettes</button>
-          </div>
-        </div>
-        ${lien ? `<a class="btn" href="${esc(lien)}" target="_blank" rel="noopener noreferrer">${icone('lien')} Post du forum</a>` : ''}
-        ${modifiable ? `<a class="btn" href="#/dossier/${d.id}/modifier">${icone('crayon')} Modifier la fiche</a>` : ''}
+        ${peut.message(d) ? `<button type="button" class="btn ${etat.estJoueur ? 'btn-primaire' : ''}" data-action="message">${icone('message')} ${etat.estJoueur ? 'Écrire un message' : 'Message'}</button>` : ''}
+        ${peut.modifierDossier(d) ? `<a class="btn" href="#/dossier/${d.id}/modifier">${icone('crayon')} ${etat.estJoueur ? 'Modifier ma fiche' : 'Modifier la fiche'}</a>` : ''}
         ${d.statut === 'cloture' && peut.rouvrir() ? `<button type="button" class="btn" data-action="rouvrir">${icone('actualiser')} Rouvrir le dossier</button>` : ''}
         ${peut.supprimerDossier() ? `<button type="button" class="btn btn-fantome btn-icone" data-action="supprimer" title="Supprimer le dossier" aria-label="Supprimer le dossier">${icone('poubelle')}</button>` : ''}
       </div>
@@ -155,9 +154,11 @@ function htmlBandeaux(d) {
     b.push(`<div class="bandeau info-violet">🔬 Tu vois ce dossier car le patient a autorisé la transmission à l’IRS.${d.statut === 'analyse_irs' ? ' Publie ton rapport d’analyse ici une fois l’analyse terminée.' : ''}</div>`);
   }
   if (!d.medecin_id && d.statut !== 'cloture') {
-    b.push(`<div class="bandeau">🟡 Aucun médecin référent pour l’instant.${peut.prendreEnCharge(d) ? ` <button type="button" class="btn btn-petit btn-primaire" data-action="prendre">Prendre en charge</button>` : ''}</div>`);
+    b.push(etat.estJoueur
+      ? '<div class="bandeau">🟡 Ta demande a bien été reçue : un médecin de la branche va prendre en charge ton dossier et organiser le premier rendez-vous.</div>'
+      : `<div class="bandeau">🟡 Aucun médecin référent pour l’instant.${peut.prendreEnCharge(d) ? ` <button type="button" class="btn btn-petit btn-primaire" data-action="prendre">Prendre en charge</button>` : ''}</div>`);
   }
-  if (!['pause', 'stable', 'cloture'].includes(d.statut) && inactif >= DELAIS.inactivite) {
+  if (!etat.estJoueur && !['pause', 'stable', 'cloture'].includes(d.statut) && inactif >= DELAIS.inactivite) {
     b.push(`<div class="bandeau">⏳ Aucune activité depuis ${inactif} jours : selon les règles de la branche, le dossier peut passer « En pause ».${peut.changerStatut(d) ? ` <button type="button" class="btn btn-petit" data-action="pause">Mettre en pause</button>` : ''}</div>`);
   }
   return b.join('');
@@ -168,7 +169,7 @@ function htmlParcours(d) {
   const n = p.etapes.length;
   const courante = Math.min(Math.max(d.etape || 1, 1), n);
   const e = p.etapes[courante - 1];
-  const cliquable = peut.modifierDossier(d);
+  const cliquable = peut.gererSuivi(d);
 
   return `
     <section class="panneau">
@@ -207,7 +208,7 @@ function htmlJournal() {
   const { entrees, filtre } = courant;
   const filtres = [
     ['tout', 'Tout'], ['compte_rendu', '📋 Comptes rendus'], ['rapport_irs', '🔬 Rapports IRS'],
-    ['note', '💬 Notes'], ['evenement', '🧭 Historique'],
+    ['note', '💬 Messages'], ['evenement', '🧭 Historique'],
   ];
   const liste = filtre === 'tout' ? entrees : entrees.filter(e => e.type === filtre);
   return `
@@ -218,7 +219,7 @@ function htmlJournal() {
       }).join('')}</div>
       ${liste.length ? `<div class="journal">${liste.map(htmlEntree).join('')}</div>` : `
         <div class="vide"><span class="grande-icone" aria-hidden="true">📭</span><strong>Rien pour l’instant</strong>
-          <p>Les comptes rendus, rapports de l’IRS et notes du dossier apparaîtront ici.</p></div>`}
+          <p>Les comptes rendus, rapports de l’IRS et messages du dossier apparaîtront ici.</p></div>`}
     </div>`;
 }
 
@@ -229,6 +230,7 @@ function texteEvenement(c) {
     case 'medecin': return c.vers ? `🩺 Médecin référent : <strong>${esc(etat.membre(c.vers)?.nom_rp || 'un membre')}</strong>` : '🩺 Dossier désattribué';
     case 'etape': return `🧭 Parcours : étape ${esc(c.vers)} · <strong>${esc(etapesDu(c.parcours)[c.vers - 1]?.titre || '')}</strong>`;
     case 'consentement': return c.vers ? '🔬 Accord du patient pour l’IRS enregistré' : '🔒 Accord pour l’IRS retiré';
+    case 'joueur': return c.vers ? `🎭 Dossier relié au compte de <strong>${esc(etat.membre(c.vers)?.nom_rp || 'un joueur')}</strong>` : '🎭 Compte joueur détaché';
     default: return 'Modification du dossier';
   }
 }
@@ -243,7 +245,6 @@ function htmlEntree(e, i) {
   }
 
   const actions = `<div class="entree-actions">
-    ${e.type !== 'note' ? `<button type="button" class="btn btn-fantome btn-petit btn-icone" data-action="copier-entree" data-id="${e.id}" title="Copier pour Discord" aria-label="Copier pour Discord">${icone('copier')}</button>` : ''}
     ${peut.modifierEntree(e) ? `
       <button type="button" class="btn btn-fantome btn-petit btn-icone" data-action="modifier-entree" data-id="${e.id}" title="Modifier" aria-label="Modifier">${icone('crayon')}</button>
       <button type="button" class="btn btn-fantome btn-petit btn-icone" data-action="supprimer-entree" data-id="${e.id}" title="Supprimer" aria-label="Supprimer">${icone('poubelle')}</button>` : ''}
@@ -260,7 +261,7 @@ function htmlEntree(e, i) {
         <div class="entree-tete"><div>
           <div class="entree-titre">📋 Compte rendu — Rendez-vous n°${esc(c.numero)}</div>
           <div class="entree-sous">${esc(c.type_rdv || 'Rendez-vous')} · ${dateLongue(c.date)} · ${esc(c.medecin || auteur?.nom_rp || '')}${modifie}
-            ${lien ? ` · <a href="${esc(lien)}" target="_blank" rel="noopener noreferrer">Voir le RP</a>` : ''}</div>
+            ${lien ? ` · <a href="${esc(lien)}" target="_blank" rel="noopener noreferrer">Voir la scène RP</a>` : ''}</div>
         </div>${actions}</div>
         ${dl([
           ['Résumé', c.resume, 'large'],
@@ -291,10 +292,12 @@ function htmlEntree(e, i) {
       </div></article>`;
   }
 
+  const duJoueur = auteur?.role === 'patient';
   return `
-    <article class="entree note" style="--c:#94a3b8;--i:${i}"><div class="entree-carte">
+    <article class="entree note ${duJoueur ? 'du-joueur' : ''}" style="--c:${duJoueur ? '#f9a8d4' : '#94a3b8'};--i:${i}"><div class="entree-carte">
       <div class="entree-tete">
-        <div class="entree-sous">${avatar(auteur, 'petit')} <strong style="color:var(--texte)">${esc(auteur?.nom_rp || 'Membre')}</strong> · ${dateHeure(e.created_at)}${modifie}</div>
+        <div class="entree-sous">${avatar(auteur, 'petit')} <strong style="color:var(--texte)">${esc(auteur?.nom_rp || 'Membre')}</strong>
+          ${auteur ? badgeRole(auteur.role) : ''} · ${dateHeure(e.created_at)}${modifie}</div>
         ${actions}
       </div>
       <p class="note-texte">${esc(c.texte)}</p>
@@ -304,8 +307,8 @@ function htmlEntree(e, i) {
 /* ---------------- Fiche patient ---------------- */
 
 function htmlFiche(d) {
-  const lien = urlSure(d.lien_discord);
   const createur = etat.membre(d.cree_par);
+  const joueur = etat.membre(d.patient_id);
   const sections = [
     ['Identité', [['Nom', d.nom], ['Prénom', d.prenom], ['Âge', d.age], ['Grade', d.grade], ['Village / Clan', d.village]]],
     ['Pathologie', [
@@ -321,20 +324,17 @@ function htmlFiche(d) {
     ['Suivi', [
       ['Plan de suivi en cours', d.plan_suivi],
       ['Parcours', (PARCOURS[d.parcours] || PARCOURS.maladie).label],
-      ['Post du forum', lien ? { html: `<a href="${esc(lien)}" target="_blank" rel="noopener noreferrer">${esc(lien)}</a>` } : ''],
+      ['Compte joueur relié', joueur ? `${joueur.nom_rp}${joueur.pseudo ? ` (${joueur.pseudo})` : ''}` : ''],
       ['Dossier ouvert', `${dateLongue(d.created_at)}${createur ? ` par ${createur.nom_rp}` : ''}`],
     ]],
   ];
   return `
     <div class="pile">
-      <div class="actions-page">
-        <button type="button" class="btn" data-action="discord-fiche">${icone('copier')} Copier la fiche pour Discord</button>
-        ${peut.modifierDossier(d) ? `<a class="btn" href="#/dossier/${d.id}/modifier">${icone('crayon')} Modifier</a>` : ''}
-      </div>
+      ${peut.modifierDossier(d) ? `<div class="actions-page"><a class="btn" href="#/dossier/${d.id}/modifier">${icone('crayon')} Modifier</a></div>` : ''}
       <div class="fiche">${sections.map(([titre, lignes]) => `
         <section class="panneau fiche-section"><h3>${titre}</h3><dl>${lignes.map(([l, v]) => {
           const vide = !v || (typeof v === 'string' && !v.trim());
-          return `<div><dt>${l}</dt><dd class="${vide ? 'vide-champ' : ''}">${vide ? 'Non renseigné' : v.html || esc(v)}</dd></div>`;
+          return `<div><dt>${l}</dt><dd class="${vide ? 'vide-champ' : ''}">${vide ? 'Non renseigné' : esc(v)}</dd></div>`;
         }).join('')}</dl></section>`).join('')}
       </div>
     </div>`;
@@ -383,28 +383,14 @@ function htmlTraitements() {
    Actions
    ===================================================================== */
 
-function fermerMenus(page) {
-  page.querySelectorAll('.menu-deroulant > div').forEach(m => { m.hidden = true; });
-  page.querySelectorAll('[data-action="menu"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
-}
-
 async function surClic(e) {
-  const page = e.currentTarget;
-  if (!e.target.closest('.menu-deroulant')) fermerMenus(page);
   const bouton = e.target.closest('[data-action]');
   if (!bouton) return;
   const action = bouton.dataset.action;
-  if (action !== 'menu') fermerMenus(page);
   const id = bouton.dataset.id;
   const actions = {
     onglet: () => { courant.onglet = bouton.dataset.onglet; majOnglet(); },
     'filtre-journal': () => { courant.filtre = bouton.dataset.filtre; majOnglet(); },
-    menu: () => {
-      const menu = bouton.nextElementSibling;
-      menu.hidden = !menu.hidden;
-      bouton.setAttribute('aria-expanded', String(!menu.hidden));
-      if (!menu.hidden) menu.querySelector('button')?.focus();
-    },
     statut: changerStatut,
     pause: mettreEnPause,
     rouvrir,
@@ -415,12 +401,8 @@ async function surClic(e) {
     consentement: modifierAccord,
     'compte-rendu': () => composerCompteRendu(),
     rapport: () => composerRapport(),
-    note: () => composerNote(),
-    'discord-fiche': discordFiche,
-    'discord-titre': () => copier(titrePost(courant.d), 'Titre du post copié'),
-    'discord-etiquettes': () => copier(etiquettesDiscord(courant.d), 'Étiquettes copiées'),
+    message: () => composerMessage(),
     supprimer: supprimerDossier,
-    'copier-entree': () => copierEntree(id),
     'modifier-entree': () => modifierEntree(id),
     'supprimer-entree': () => supprimerEntree(id),
     'ajouter-traitement': () => composerTraitement(),
@@ -457,7 +439,7 @@ async function appliquerDossier(maj, message) {
   if (message) toast(message, 'succes');
 }
 
-const rappelEtiquette = d => `pense à mettre l’étiquette ${statut(d.statut).emoji} ${statut(d.statut).label} sur le post Discord.`;
+const nomStatut = d => `${statut(d.statut).emoji} ${statut(d.statut).label}`;
 
 /* ---------------- Statut, parcours, attribution ---------------- */
 
@@ -509,7 +491,7 @@ async function changerStatut() {
       return api.majDossier(d.id, champs);
     },
   });
-  if (maj && maj !== true) await appliquerDossier(maj, `Statut mis à jour : ${rappelEtiquette(maj)}`);
+  if (maj && maj !== true) await appliquerDossier(maj, `Statut mis à jour : ${nomStatut(maj)}`);
 }
 
 async function mettreEnPause() {
@@ -519,7 +501,7 @@ async function mettreEnPause() {
     texteValider: 'Mettre en pause',
   });
   if (!ok) return;
-  await appliquerDossier(await api.majDossier(courant.d.id, { statut: 'pause' }), `Dossier en pause : ${rappelEtiquette({ statut: 'pause' })}`);
+  await appliquerDossier(await api.majDossier(courant.d.id, { statut: 'pause' }), 'Dossier mis en pause');
 }
 
 async function rouvrir() {
@@ -533,7 +515,7 @@ async function rouvrir() {
     texteValider: 'Rouvrir',
     valider: (_f, x) => api.majDossier(d.id, { statut: x.statut, motif_cloture: '' }),
   });
-  if (maj) await appliquerDossier(maj, `Dossier rouvert : ${rappelEtiquette(maj)}`);
+  if (maj) await appliquerDossier(maj, `Dossier rouvert : ${nomStatut(maj)}`);
 }
 
 async function changerEtape(num) {
@@ -567,7 +549,7 @@ async function changerEtape(num) {
       return api.majDossier(d.id, champs);
     },
   });
-  if (maj) await appliquerDossier(maj, maj.statut !== d.statut ? `Parcours mis à jour : ${rappelEtiquette(maj)}` : 'Parcours mis à jour');
+  if (maj) await appliquerDossier(maj, maj.statut !== d.statut ? `Parcours mis à jour · ${nomStatut(maj)}` : 'Parcours mis à jour');
 }
 
 async function prendreEnCharge() {
@@ -667,7 +649,7 @@ async function composerCompteRendu(entree = null) {
       ${champ('Date du rendez-vous', `<input type="date" name="date" required value="${esc(c.date || aujourdhui())}">`)}
       ${champ('Type de rendez-vous', `<select name="type_rdv">${TYPES_RDV.map(t => `<option ${t === typeDefaut ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>`)}
       ${champ('Médecin', `<input name="medecin" required maxlength="120" value="${esc(c.medecin || etat.moi.nom_rp)}">`)}
-      ${champ('Lien du RP', `<input type="url" name="lien_rp" placeholder="https://discord.com/channels/…" value="${esc(c.lien_rp || '')}">`)}
+      ${champ('Lien de la scène RP (facultatif)', `<input type="url" name="lien_rp" placeholder="https://…" value="${esc(c.lien_rp || '')}">`)}
       ${champ('Résumé', zone('resume', c.resume, 3, 'required placeholder="Ce qui s’est passé pendant le rendez-vous"'), 'large')}
       ${champ('Observations et résultats', zone('observations', c.observations, 3), 'large')}
       ${champ('Traitement ou programme en cours', zone('traitement', c.traitement ?? enCours, 2), 'large')}
@@ -701,7 +683,7 @@ async function composerCompteRendu(entree = null) {
         prochain_precision: x.prochain_precision.trim(),
       };
       if (contenu.lien_rp && !urlSure(contenu.lien_rp)) {
-        toast('Le lien du RP doit commencer par https://', 'erreur');
+        toast('Le lien de la scène RP doit commencer par https://', 'erreur');
         return false;
       }
       const enregistree = entree
@@ -730,11 +712,6 @@ async function composerCompteRendu(entree = null) {
   courant.onglet = 'journal';
   await recharger({ dossier: !r.dossier, entrees: true });
   toast(entree ? 'Compte rendu modifié' : 'Compte rendu publié dans le journal', 'succes');
-  await apercuDiscord({
-    titre: `Compte rendu n°${numero} pour Discord`,
-    texte: texteCompteRendu(r.enregistree.contenu),
-    conseil: 'Publie ce compte rendu dans le post du patient, sur le forum de la branche.',
-  });
 }
 
 async function composerRapport(entree = null) {
@@ -766,38 +743,26 @@ async function composerRapport(entree = null) {
   courant.onglet = 'journal';
   await recharger({ entrees: true });
   toast(entree ? 'Rapport modifié' : 'Rapport publié dans le journal', 'succes');
-  await apercuDiscord({
-    titre: 'Rapport IRS pour Discord',
-    texte: texteRapport(r.contenu),
-    conseil: 'Publie ce rapport dans le post du patient, sur le forum de la branche.',
-  });
 }
 
-async function composerNote(entree = null) {
+async function composerMessage(entree = null) {
   const { d } = courant;
   const r = await fenetre({
-    titre: entree ? 'Modifier la note' : 'Nouvelle note',
-    sousTitre: esc(nomComplet(d)),
-    corps: champ('Message', zone('texte', entree?.contenu?.texte || '', 4, 'required maxlength="2000" placeholder="Court message HRP d’organisation : disponibilités, rappel, précision…"')),
-    texteValider: 'Enregistrer',
+    titre: entree ? 'Modifier le message' : 'Nouveau message',
+    sousTitre: etat.estJoueur ? 'Visible par toi et l’équipe qui suit ton dossier.' : `${esc(nomComplet(d))} · visible par le joueur et l’équipe.`,
+    corps: champ('Message', zone('texte', entree?.contenu?.texte || '', 5, `required maxlength="4000" placeholder="${etat.estJoueur
+      ? 'Une question, une précision sur ta pathologie, tes disponibilités…'
+      : 'Organisation HRP : disponibilités, rappel, précision…'}"`)),
+    texteValider: entree ? 'Enregistrer' : 'Envoyer',
     valider: (_f, x) => (entree
       ? api.majEntree(entree.id, { texte: x.texte.trim() })
       : api.creerEntree({ dossier_id: d.id, type: 'note', contenu: { texte: x.texte.trim() } })),
   });
   if (!r) return;
   courant.onglet = 'journal';
+  courant.filtre = 'tout';
   await recharger({ entrees: true });
-  toast('Note enregistrée', 'succes');
-}
-
-function copierEntree(id) {
-  const e = courant.entrees.find(x => x.id === id);
-  if (!e) return;
-  const cr = e.type === 'compte_rendu';
-  return apercuDiscord({
-    titre: cr ? `Compte rendu n°${e.contenu?.numero || ''} pour Discord` : 'Rapport IRS pour Discord',
-    texte: cr ? texteCompteRendu(e.contenu || {}) : texteRapport(e.contenu || {}),
-  });
+  toast(entree ? 'Message modifié' : 'Message envoyé', 'succes');
 }
 
 function modifierEntree(id) {
@@ -805,29 +770,18 @@ function modifierEntree(id) {
   if (!e) return;
   if (e.type === 'compte_rendu') return composerCompteRendu(e);
   if (e.type === 'rapport_irs') return composerRapport(e);
-  return composerNote(e);
+  return composerMessage(e);
 }
 
 async function supprimerEntree(id) {
   const e = courant.entrees.find(x => x.id === id);
   if (!e) return;
-  const nom = { compte_rendu: 'ce compte rendu', rapport_irs: 'ce rapport IRS', note: 'cette note' }[e.type];
+  const nom = { compte_rendu: 'ce compte rendu', rapport_irs: 'ce rapport IRS', note: 'ce message' }[e.type];
   const ok = await confirmer({ titre: `Supprimer ${nom} ?`, message: 'Il disparaîtra du journal du dossier.', texteValider: 'Supprimer', danger: true });
   if (!ok) return;
   await api.supprimerEntree(id);
   await recharger({ entrees: true });
   toast('Supprimé du journal', 'succes');
-}
-
-function discordFiche() {
-  const { d } = courant;
-  return apercuDiscord({
-    titre: 'Fiche patient pour le forum',
-    texte: texteFiche(d),
-    titrePost: titrePost(d),
-    etiquettes: etiquettesDiscord(d),
-    conseil: 'Crée un post dans le forum de la branche avec ce titre, colle la fiche dans le premier message, puis ajoute les étiquettes.',
-  });
 }
 
 /* ---------------- Traitements ---------------- */

@@ -1,5 +1,5 @@
 // Briques d'interface partagées : échappement, icônes, dates, notifications,
-// fenêtres, confirmation, aperçu Discord, infobulles.
+// fenêtres, confirmation, infobulles.
 
 import { statut, categorie, role } from './constantes.js';
 
@@ -42,7 +42,6 @@ const ICONES = {
   plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
   recherche: '<circle cx="11" cy="11" r="7.5"/><path d="m20.5 20.5-4.2-4.2"/>',
   sortie: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
-  copier: '<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
   crayon: '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
   poubelle: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
   retour: '<path d="m15 18-6-6 6-6"/>',
@@ -65,7 +64,6 @@ const ICONES = {
   utilisateur: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',
   bouclier: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
   telecharger: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
-  importer: '<path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>',
   points: '<circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/>',
   etoile: '<path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18.2 22 12 18.3 5.8 22l1.7-7.2L2 10l7.1-1.1z"/>',
 };
@@ -160,23 +158,6 @@ export function toast(message, type = 'info') {
   }, duree);
 }
 
-export async function copier(texte, message = 'Copié dans le presse-papiers') {
-  try {
-    await navigator.clipboard.writeText(texte);
-  } catch {
-    const zone = document.createElement('textarea');
-    zone.value = texte;
-    zone.setAttribute('readonly', '');
-    zone.style.position = 'fixed';
-    zone.style.opacity = '0';
-    document.body.append(zone);
-    zone.select();
-    document.execCommand('copy');
-    zone.remove();
-  }
-  toast(message, 'succes');
-}
-
 /* ---------------- Fenêtres ---------------- */
 
 /**
@@ -248,64 +229,6 @@ export function confirmer({ titre, message, texteValider = 'Confirmer', danger =
     texteValider,
     danger,
     valider: (_form, donnees) => donnees,
-  });
-}
-
-/* ---------------- Aperçu au format Discord ---------------- */
-
-const LIMITE_DISCORD = 2000;
-const longueur = texte => [...texte].length;
-
-// Découpe un texte en messages de moins de 2 000 caractères, aux paragraphes si possible.
-export function decouper(texte, max = 1900) {
-  if (longueur(texte) <= LIMITE_DISCORD) return [texte];
-  const morceaux = [];
-  let courant = '';
-  const pousser = bloc => {
-    const essai = courant ? courant + '\n' + bloc : bloc;
-    if (longueur(essai) <= max) { courant = essai; return; }
-    if (courant) morceaux.push(courant);
-    courant = '';
-    if (longueur(bloc) <= max) { courant = bloc; return; }
-    let reste = [...bloc];
-    while (reste.length > max) { morceaux.push(reste.slice(0, max).join('')); reste = reste.slice(max); }
-    courant = reste.join('');
-  };
-  texte.split('\n').forEach(pousser);
-  if (courant) morceaux.push(courant);
-  return morceaux;
-}
-
-export function apercuDiscord({ titre, texte, titrePost = '', etiquettes = '', conseil = '' }) {
-  const morceaux = decouper(texte);
-  const n = longueur(texte);
-  const corps = `
-    ${conseil ? `<p class="aide">${conseil}</p>` : ''}
-    ${titrePost ? `<div class="ligne-copie"><span class="etiquette">Titre du post</span><span class="valeur">${esc(titrePost)}</span>
-      <button type="button" class="btn btn-petit" data-copier-titre>${icone('copier')} Copier</button></div>` : ''}
-    ${etiquettes ? `<div class="ligne-copie"><span class="etiquette">Étiquettes</span><span class="valeur">${esc(etiquettes)}</span></div>` : ''}
-    <pre class="discord">${esc(texte)}</pre>
-    <div class="compteur ${n > LIMITE_DISCORD ? 'trop' : ''}">
-      <span>${n.toLocaleString('fr-FR')} / 2 000 caractères</span>
-      ${morceaux.length > 1 ? `<span>Trop long pour un seul message : copie-le en ${morceaux.length} fois.</span>` : ''}
-    </div>
-    ${morceaux.length > 1 ? `<div class="morceaux">${morceaux.map((_, i) =>
-      `<button type="button" class="btn btn-petit" data-morceau="${i}">${icone('copier')} Message ${i + 1}/${morceaux.length}</button>`).join('')}</div>` : ''}`;
-  return fenetre({
-    titre,
-    corps,
-    large: true,
-    texteAnnuler: 'Fermer',
-    pied: morceaux.length === 1
-      ? `<button type="button" class="btn btn-primaire gauche" data-copier-tout>${icone('copier')} Copier le message</button>` : '',
-    apresOuverture: d => {
-      d.addEventListener('click', e => {
-        if (e.target.closest('[data-copier-tout]')) copier(texte, 'Message copié : colle-le sur Discord');
-        if (e.target.closest('[data-copier-titre]')) copier(titrePost, 'Titre copié');
-        const m = e.target.closest('[data-morceau]');
-        if (m) copier(morceaux[Number(m.dataset.morceau)], `Message ${Number(m.dataset.morceau) + 1} copié`);
-      });
-    },
   });
 }
 

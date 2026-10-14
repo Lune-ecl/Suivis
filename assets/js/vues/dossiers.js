@@ -3,6 +3,7 @@
 import { etat, peut } from '../etat.js';
 import { STATUTS, CATEGORIES, PRIORITE_STATUT, statut, categorie, etapesDu } from '../constantes.js';
 import { esc, icone, avatar, pastilleStatut, nomComplet, ilYa, echeance, dateCourte, pluriel, versDate } from '../ui.js';
+import { estNouveau } from '../vus.js';
 
 // Les filtres sont gardés quand on navigue entre les pages.
 const filtres = {
@@ -38,7 +39,7 @@ export function rendreDossiers(vue, requete, { archives = false } = {}) {
           <h1 class="titre-page">${archives ? 'Archives' : 'Dossiers'}</h1>
           <p class="sous-titre">${archives
             ? 'Les dossiers clôturés restent consultables et peuvent être rouverts par le responsable.'
-            : 'Un dossier par patient, comme un post du forum de la branche.'}</p>
+            : 'Un dossier par patient : fiche, parcours de soin, journal et traitements.'}</p>
         </div>
         <div class="actions-page">
           <button type="button" class="btn" data-action="actualiser">${icone('actualiser')} Actualiser</button>
@@ -161,17 +162,19 @@ function dessinerResultats(page, f, archives) {
   zone.innerHTML = `<div class="grille-dossiers">${liste.map((d, i) => carteDossier(d, i, archives)).join('')}</div>`;
 }
 
-function carteDossier(d, i, archives) {
+export function carteDossier(d, i, archives = false) {
   const s = statut(d.statut);
   const medecin = etat.membre(d.medecin_id);
   const etapes = etapesDu(d.parcours);
   const etape = Math.min(d.etape || 1, etapes.length);
   const rdv = d.prochain_rdv ? echeance(d.prochain_rdv) : null;
+  const nouveau = estNouveau(d);
 
   return `
     <a class="carte-dossier ${d.statut === 'urgent' ? 'urgent' : ''}" href="#/dossier/${d.id}" style="--c:${s.couleur};--i:${i}">
       <div class="cd-haut">${pastilleStatut(d.statut)}
-        <span class="cd-activite" title="Dernière activité">${icone('horloge')} ${ilYa(d.derniere_activite)}</span></div>
+        ${nouveau ? '<span class="badge-nouveau">Nouveau</span>'
+          : `<span class="cd-activite" title="Dernière activité">${icone('horloge')} ${ilYa(d.derniere_activite)}</span>`}</div>
       <h3 class="cd-nom">${esc(d.nom)} <span>${esc(d.prenom)}</span></h3>
       <p class="cd-patho">${esc(d.pathologie || 'Pathologie non renseignée')}</p>
       <div class="tags">${(d.categories || []).map(c => `<span class="tag"><span aria-hidden="true">${categorie(c).emoji}</span>${esc(categorie(c).court)}</span>`).join('')}</div>
