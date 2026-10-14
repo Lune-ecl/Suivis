@@ -21,9 +21,9 @@ export function traduireErreur(erreur) {
   if (code === 'P0001') return m; // règles de la branche (message déjà en français)
   if (code === '23514') return 'Une valeur saisie n’est pas acceptée.';
   if (/Failed to fetch|NetworkError|Load failed|fetch failed/i.test(m)) return 'Impossible de joindre la base de données. Vérifie ta connexion.';
-  if (/Invalid login credentials/i.test(m)) return 'Nom RP ou code incorrect.';
+  if (/Invalid login credentials/i.test(m)) return 'Prénom, nom RP ou code incorrect.';
   if (/Email not confirmed|Email address .* is invalid|email_address_invalid|Error sending confirmation/i.test(m)) return CONFIRMATION_ACTIVE;
-  if (/already registered|already been registered|already exists/i.test(m)) return 'Ce nom RP a déjà un compte. Connecte-toi, ou demande au responsable de réinitialiser ton code.';
+  if (/already registered|already been registered|already exists/i.test(m)) return 'Ce prénom et ce nom RP ont déjà un compte. Connecte-toi, ou demande au responsable de réinitialiser ton code.';
   if (/Password should be|password.*(at least|characters)/i.test(m)) return 'Le code doit contenir au moins 6 caractères.';
   if (/rate limit|too many|security purposes/i.test(m)) return 'Trop de tentatives. Réessaie dans quelques minutes.';
   if (/Unable to validate email|invalid format|valid email/i.test(m)) return 'Ce nom RP ne peut pas servir d’identifiant : utilise des lettres.';
@@ -54,18 +54,6 @@ export const api = {
   reinitialiserCode: (id, code) => req(sb.rpc('reinitialiser_code', { p_membre: id, p_code: code })),
   supprimerCompte: id => req(sb.rpc('supprimer_compte', { p_membre: id })),
 
-  // Annuaire des joueurs et serveur Discord
-  personnages: () => req(sb.from('personnages').select('*')),
-  creerPersonnage: champs => req(sb.from('personnages').insert(champs).select().single()),
-  majPersonnage: (id, champs) => req(sb.from('personnages').update(champs).eq('id', id).select().single()),
-  supprimerPersonnage: id => req(sb.from('personnages').delete().eq('id', id)),
-  discordReglages: () => req(sb.from('discord_reglages').select('*').maybeSingle()),
-  discordRoles: () => req(sb.from('discord_roles').select('*').order('position', { ascending: false })),
-  majDiscordRole: (id, champs) => req(sb.from('discord_roles').update(champs).eq('id', id).select().single()),
-  discordRelier: (jeton, serveur = null) => req(sb.rpc('discord_relier', { p_jeton: jeton, p_serveur: serveur })),
-  discordDelier: () => req(sb.rpc('discord_delier')),
-  discordSynchroniser: () => req(sb.rpc('discord_synchroniser')),
-
   // Dossiers
   dossiers: () => req(sb.from('dossiers').select('*').order('derniere_activite', { ascending: false })),
   dossier: id => req(sb.from('dossiers').select('*').eq('id', id).maybeSingle()),
@@ -92,8 +80,8 @@ export const api = {
   supprimerTraitement: id => req(sb.from('traitements').delete().eq('id', id)),
 };
 
-// Connexion avec le nom RP et un code : Supabase demande une adresse e-mail,
-// on en déduit donc une du nom RP (« Hoki Ren » → hoki.ren@seimei.invalid).
+// Connexion avec le prénom et le nom RP, et un code : Supabase demande une adresse
+// e-mail, on en déduit donc une du nom RP (« Ren Hoki » → ren.hoki@seimei.invalid).
 // Aucun e-mail n'y est jamais envoyé. Un ancien compte se connecte avec son e-mail.
 const DOMAINE = 'seimei.invalid';
 export function adresseDuNomRp(nomRp) {

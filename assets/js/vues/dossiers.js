@@ -2,7 +2,7 @@
 
 import { etat, peut } from '../etat.js';
 import { STATUTS, CATEGORIES, PRIORITE_STATUT, statut, categorie, clan, etapesDu } from '../constantes.js';
-import { esc, icone, avatar, pastilleStatut, nomComplet, ilYa, echeance, dateCourte, pluriel, versDate, badgeClan } from '../ui.js';
+import { esc, icone, avatar, pastilleStatut, nomTitre, ilYa, echeance, dateCourte, pluriel, versDate, badgeClan } from '../ui.js';
 import { estNouveau } from '../vus.js';
 
 // Les filtres sont gardés quand on navigue entre les pages.
@@ -131,7 +131,9 @@ function dessinerResultats(page, f, archives) {
     return true;
   });
 
-  const parNom = (a, b) => nomComplet(a).localeCompare(nomComplet(b), 'fr');
+  // Tri par nom de famille, puis par prénom.
+  const cleNom = d => [d.nom, d.prenom].filter(Boolean).join(' ');
+  const parNom = (a, b) => cleNom(a).localeCompare(cleNom(b), 'fr');
   const tris = {
     priorite: (a, b) => PRIORITE_STATUT.indexOf(a.statut) - PRIORITE_STATUT.indexOf(b.statut)
       || versDate(b.derniere_activite) - versDate(a.derniere_activite),
@@ -175,7 +177,7 @@ export function carteDossier(d, i, archives = false) {
       <div class="cd-haut">${pastilleStatut(d.statut)}
         ${nouveau ? '<span class="badge-nouveau">Nouveau</span>'
           : `<span class="cd-activite" title="Dernière activité">${icone('horloge')} ${ilYa(d.derniere_activite)}</span>`}</div>
-      <h3 class="cd-nom">${esc(d.nom)} <span>${esc(d.prenom)}</span></h3>
+      <h3 class="cd-nom">${nomTitre(d)}</h3>
       <p class="cd-patho">${esc(d.pathologie || 'Pathologie non renseignée')}</p>
       <div class="tags">${badgeClan(d.clan)}${(d.categories || []).map(c => `<span class="tag"><span aria-hidden="true">${categorie(c).emoji}</span>${esc(categorie(c).court)}</span>`).join('')}</div>
       ${archives

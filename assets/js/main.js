@@ -1,13 +1,12 @@
 // Point d'entrée : session, structure de l'application et navigation.
 
 import { estConfigure, auth, api } from './api.js';
-import { etat, peut } from './etat.js';
-import { esc, icone, avatar, badgeRole, toast, activerInfobulles, activerPhotos } from './ui.js';
+import { etat } from './etat.js';
+import { esc, icone, avatar, badgeRole, toast, activerInfobulles } from './ui.js';
 import { chargerVus } from './vus.js';
 import * as ecrans from './vues/connexion.js';
 import { rendreTableau } from './vues/tableau.js';
 import { rendreDossiers } from './vues/dossiers.js';
-import { rendreJoueurs } from './vues/joueurs.js';
 import { rendreDossier } from './vues/dossier.js';
 import { rendreFormulaire } from './vues/formulaire.js';
 import { rendreEquipe, ouvrirProfil } from './vues/equipe.js';
@@ -22,7 +21,6 @@ demarrer();
 
 function demarrer() {
   activerInfobulles();
-  activerPhotos();
   if (!estConfigure) return ecrans.ecranConfiguration(racine);
   auth.surChangement((evenement, session) => {
     // Différé : on ne rappelle jamais Supabase depuis l'intérieur de l'écouteur.
@@ -78,7 +76,6 @@ function navigation() {
     <span class="nav-section">Suivi</span>
     <a href="#/" data-nav="tableau">${icone('tableau')}<span class="libelle-long">Tableau de bord</span><span class="libelle-court" aria-hidden="true">Accueil</span></a>
     <a href="#/dossiers" data-nav="dossiers">${icone('dossier')}<span>Dossiers</span><span class="compteur" data-compteur="urgents" hidden></span></a>
-    ${peut.voirAnnuaire() ? `<a href="#/joueurs" data-nav="joueurs">${icone('joueurs')}<span>Joueurs</span></a>` : ''}
     <a href="#/archives" data-nav="archives">${icone('archive')}<span>Archives</span></a>
     <span class="nav-section">Branche</span>
     <a href="#/equipe" data-nav="equipe">${icone('equipe')}<span>Équipe</span><span class="compteur doux" data-compteur="demandes" hidden></span></a>
@@ -148,10 +145,9 @@ document.addEventListener('seimei:profil', rafraichirStructure);
 const ROUTES = [
   { motif: /^\/?$/, nav: 'tableau', liste: true, vue: v => rendreTableau(v) },
   { motif: /^\/dossiers$/, nav: 'dossiers', liste: true, vue: (v, _, q) => rendreDossiers(v, q) },
-  { motif: /^\/dossiers\/nouveau$/, nav: 'dossiers', vue: (v, _, q) => rendreFormulaire(v, null, q) },
+  { motif: /^\/dossiers\/nouveau$/, nav: 'dossiers', vue: v => rendreFormulaire(v, null) },
   { motif: /^\/dossier\/([0-9a-f-]{36})$/, nav: 'dossiers', vue: (v, [id]) => rendreDossier(v, id) },
   { motif: /^\/dossier\/([0-9a-f-]{36})\/modifier$/, nav: 'dossiers', vue: (v, [id]) => rendreFormulaire(v, id) },
-  { motif: /^\/joueurs$/, nav: 'joueurs', liste: true, vue: v => rendreJoueurs(v) },
   { motif: /^\/archives$/, nav: 'archives', liste: true, vue: (v, _, q) => rendreDossiers(v, q, { archives: true }) },
   { motif: /^\/equipe$/, nav: 'equipe', liste: true, toujoursFrais: true, vue: v => rendreEquipe(v) },
   { motif: /^\/guide$/, nav: 'guide', vue: v => rendreGuide(v) },

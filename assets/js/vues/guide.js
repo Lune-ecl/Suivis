@@ -128,24 +128,15 @@ export function rendreGuide(vue) {
             <h3 class="titre-guide">🔐 Accès au site</h3>
             ${liste([
               'Le site est réservé à l’équipe de la branche et aux chercheurs de l’IRS : <strong>les joueurs n’y ont pas accès</strong>.',
-              'Chacun se connecte avec le <strong>nom de son personnage</strong> et un <strong>code</strong> choisi à l’inscription.',
+              'Chacun se connecte avec le <strong>prénom et le nom de son personnage</strong> et un <strong>code</strong> choisi à l’inscription.',
               'Le responsable valide chaque nouveau compte et lui donne son rôle.',
               'Code oublié : le responsable en choisit un nouveau depuis la page Équipe.',
             ])}
           </div>
           <div class="panneau">
-            <h3 class="titre-guide">🎭 Annuaire des joueurs</h3>
-            ${liste([
-              'La page <strong>Joueurs</strong> reprend les membres du serveur Discord : leur pseudo sur le serveur donne leur nom RP, leurs rôles donnent leur grade, leur section et leur clan.',
-              'Elle se met à jour toute seule, ou avec le bouton « Mettre à jour ».',
-              'Les joueurs absents du serveur, par exemple les <strong>Roran</strong>, s’ajoutent à la main.',
-              'Une information fausse sur Discord se corrige dans la fiche du joueur, sans toucher au serveur.',
-            ])}
-          </div>
-          <div class="panneau">
             <h3 class="titre-guide">🩺 Équipe de la branche</h3>
             ${liste([
-              'Ouvre un dossier en choisissant le joueur dans l’annuaire : son nom, son prénom, son grade, sa section et son clan sont remplis automatiquement.',
+              'Ouvre un dossier par patient : prénom, nom, grade, section, clan, puis sa pathologie.',
               'Prends en charge les dossiers sans médecin depuis le tableau de bord.',
               'Après chaque rendez-vous RP, publie un <strong>compte rendu</strong> dans le dossier.',
               'Fais avancer le parcours, mets à jour le statut et le prochain rendez-vous, et consigne chaque traitement essayé.',
