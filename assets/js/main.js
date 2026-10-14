@@ -59,7 +59,8 @@ async function ouvrirSession(session) {
     chargerVus();
     monterApplication();
   } catch (err) {
-    ecrans.ecranErreur(racine, err.message, { reessayer: () => ouvrirSession(session), deconnecter });
+    // « Réessayer » recharge la page : on profite ainsi d'une mise à jour du site entre-temps.
+    ecrans.ecranErreur(racine, err.message, { reessayer: () => location.reload(), deconnecter });
   }
 }
 
