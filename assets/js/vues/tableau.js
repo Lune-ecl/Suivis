@@ -41,7 +41,7 @@ export function rendreTableau(vue) {
 
   vue.innerHTML = `
     <div class="page">
-      <header class="entete-page">
+      <header class="entete-page accueil">
         <div>
           <p class="surtitre">${esc(new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }))}</p>
           <h1 class="titre-page">${salut}, ${esc(moi.nom_rp)}</h1>
