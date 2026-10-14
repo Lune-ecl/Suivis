@@ -51,7 +51,7 @@ export function rendreDossiers(vue, requete, { archives = false } = {}) {
         <div class="filtres-ligne">
           <label class="champ-icone">${icone('recherche')}
             <input type="search" data-filtre="recherche" value="${esc(f.recherche)}" aria-label="Rechercher"
-              placeholder="Rechercher un patient, une pathologie, un clan, un joueur…"></label>
+              placeholder="Rechercher un patient, une pathologie, un clan…"></label>
           <select data-filtre="medecin" aria-label="Médecin référent">
             <option value="">Tous les médecins</option>
             ${optionsMedecin.map(([v, l]) => `<option value="${esc(v)}" ${f.medecin === v ? 'selected' : ''}>${esc(l)}</option>`).join('')}
