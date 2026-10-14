@@ -29,7 +29,11 @@ export function traduireErreur(erreur) {
   if (/Unable to validate email|invalid format|valid email/i.test(m)) return 'Ce nom RP ne peut pas servir d’identifiant : utilise des lettres.';
   if (/Signups not allowed|signup.*disabled/i.test(m)) return 'Les inscriptions sont fermées dans Supabase (Authentication → Sign In / Providers → Allow new users to sign up).';
   if (/Email logins are disabled|provider is not enabled/i.test(m)) return 'Dans Supabase, active la connexion « Email » (Authentication → Sign In / Providers).';
-  if (/does not exist|Could not find the (table|function)|schema cache/i.test(m)) return 'La base n’est pas encore installée : exécute supabase/schema.sql dans Supabase.';
+  if (/does not exist|Could not find the (table|function)|schema cache/i.test(m)) {
+    // On indique ce qui manque, pour savoir si la base est absente ou seulement pas à jour.
+    const manque = m.match(/(?:relation|table|function)\s+["']?(?:public\.)?(\w+)/i)?.[1];
+    return `La base n’est pas installée ou pas à jour : exécute supabase/schema.sql dans Supabase (SQL Editor → Run), puis clique sur Réessayer.${manque ? ` Élément manquant : ${manque}.` : ''}`;
+  }
   if (/Invalid API key|No API key|JWT/i.test(m)) return 'Clé Supabase invalide : vérifie config.js.';
   if (/same.*password|different from the old/i.test(m)) return 'Le nouveau code doit être différent de l’ancien.';
   return m;
