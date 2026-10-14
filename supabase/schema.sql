@@ -1,10 +1,9 @@
 -- =====================================================================
 --  Seimei · Suivi des pathologies — schéma de la base Supabase
 --
---  À exécuter dans Supabase :
+--  À exécuter une fois dans Supabase :
 --    SQL Editor → New query → coller tout ce fichier → Run
---  Le script peut être relancé sans risque : il installe la base, ou met
---  à jour une base déjà installée.
+--  Le script peut être relancé sans risque.
 --
 --  Accès :
 --    · les joueurs créent leur compte librement : ils ne voient que leurs
@@ -25,22 +24,11 @@ create table if not exists public.membres (
   id          uuid primary key references auth.users (id) on delete cascade,
   nom_rp      text not null default '',
   pseudo      text not null default '',
-  role        text not null default 'en_attente',
+  role        text not null default 'en_attente'
+              check (role in ('en_attente', 'responsable', 'medecin', 'soignant', 'irs', 'patient')),
   actif       boolean not null default true,
   created_at  timestamptz not null default now()
 );
-
--- Mise à jour d'une installation précédente.
-do $$
-begin
-  if exists (select 1 from information_schema.columns
-             where table_schema = 'public' and table_name = 'membres' and column_name = 'pseudo_discord') then
-    alter table public.membres rename column pseudo_discord to pseudo;
-  end if;
-end $$;
-alter table public.membres drop constraint if exists membres_role_check;
-alter table public.membres add constraint membres_role_check
-  check (role in ('en_attente', 'responsable', 'medecin', 'soignant', 'irs', 'patient'));
 
 -- Rôle de la personne connectée (null si le compte est inconnu ou désactivé).
 create or replace function public.role_actuel()
@@ -55,7 +43,6 @@ $$;
 --   · un joueur devient directement « patient » ;
 --   · une demande pour l'équipe est « en attente », sauf s'il n'y a encore
 --     aucun responsable : elle devient alors responsable de la branche.
-drop function if exists public.rejoindre(text, text);
 create or replace function public.rejoindre(p_nom_rp text default '', p_pseudo text default '', p_equipe boolean default false)
 returns public.membres
 language plpgsql security definer
@@ -173,10 +160,6 @@ create table if not exists public.dossiers (
   created_at          timestamptz not null default now(),
   derniere_activite   timestamptz not null default now()
 );
-
--- Mise à jour d'une installation précédente.
-alter table public.dossiers add column if not exists patient_id uuid references public.membres (id) on delete set null;
-alter table public.dossiers drop column if exists lien_discord;
 
 create index if not exists dossiers_medecin_idx on public.dossiers (medecin_id);
 create index if not exists dossiers_patient_idx on public.dossiers (patient_id);

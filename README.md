@@ -47,7 +47,7 @@ Ces règles sont appliquées **par la base de données** : elles restent valable
 2. Dans le menu de gauche : **SQL Editor** → **New query**.
 3. Copie tout le contenu du fichier [`supabase/schema.sql`](supabase/schema.sql), colle-le, puis clique sur **Run**.
 
-Le script peut être relancé sans danger. Il met aussi à jour une base installée avec une version précédente.
+Le script peut être relancé sans danger.
 
 ### 2. Relier le site à Supabase
 
