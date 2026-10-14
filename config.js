@@ -12,6 +12,6 @@
 //  dossiers est assurée par les règles d'accès de supabase/schema.sql.
 // ─────────────────────────────────────────────────────────────────────
 export default {
-  supabaseUrl: '',
-  supabaseKey: '',
+  supabaseUrl: 'https://ftibfoytacwsksgfubjq.supabase.co',
+  supabaseKey: 'sb_publishable_slLBMoQFqfh3h6NfSixOmg_GsCPgIHf',
 };

@@ -3,7 +3,8 @@
 import { createClient } from '../vendor/supabase.js';
 import config from '../../config.js';
 
-const url = String(config.supabaseUrl || '').trim().replace(/\/+$/, '');
+// L'adresse est parfois copiée avec /rest/v1/ à la fin : on garde seulement celle du projet.
+const url = String(config.supabaseUrl || '').trim().replace(/\/+$/, '').replace(/\/(rest|auth)\/v1$/i, '');
 const cle = String(config.supabaseKey || '').trim();
 
 export const estConfigure = /^https:\/\/[^\s]+$/i.test(url) && cle.length > 20;
