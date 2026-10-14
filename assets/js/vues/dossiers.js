@@ -1,8 +1,8 @@
 // Liste des dossiers (actifs ou archivés) avec recherche, filtres et tri.
 
 import { etat, peut } from '../etat.js';
-import { STATUTS, CATEGORIES, PRIORITE_STATUT, statut, categorie, etapesDu } from '../constantes.js';
-import { esc, icone, avatar, pastilleStatut, nomComplet, ilYa, echeance, dateCourte, pluriel, versDate } from '../ui.js';
+import { STATUTS, CATEGORIES, PRIORITE_STATUT, statut, categorie, clan, etapesDu } from '../constantes.js';
+import { esc, icone, avatar, pastilleStatut, nomComplet, ilYa, echeance, dateCourte, pluriel, versDate, badgeClan } from '../ui.js';
 import { estNouveau } from '../vus.js';
 
 // Les filtres sont gardés quand on navigue entre les pages.
@@ -51,7 +51,7 @@ export function rendreDossiers(vue, requete, { archives = false } = {}) {
         <div class="filtres-ligne">
           <label class="champ-icone">${icone('recherche')}
             <input type="search" data-filtre="recherche" value="${esc(f.recherche)}" aria-label="Rechercher"
-              placeholder="Rechercher un patient, une pathologie, un joueur…"></label>
+              placeholder="Rechercher un patient, une pathologie, un clan, un joueur…"></label>
           <select data-filtre="medecin" aria-label="Médecin référent">
             <option value="">Tous les médecins</option>
             ${optionsMedecin.map(([v, l]) => `<option value="${esc(v)}" ${f.medecin === v ? 'selected' : ''}>${esc(l)}</option>`).join('')}
@@ -124,8 +124,8 @@ function dessinerResultats(page, f, archives) {
     if (f.medecin === 'aucun' && d.medecin_id) return false;
     if (f.medecin && !['moi', 'aucun'].includes(f.medecin) && d.medecin_id !== f.medecin) return false;
     if (terme) {
-      const texte = sansAccents([d.nom, d.prenom, d.pathologie, d.joueur, d.village, d.grade,
-        etat.membre(d.medecin_id)?.nom_rp].join(' '));
+      const texte = sansAccents([d.nom, d.prenom, d.pathologie, d.joueur, d.village, d.grade, d.section,
+        clan(d.clan)?.label, etat.membre(d.medecin_id)?.nom_rp].join(' '));
       if (!terme.split(/\s+/).every(mot => texte.includes(mot))) return false;
     }
     return true;
@@ -177,7 +177,7 @@ export function carteDossier(d, i, archives = false) {
           : `<span class="cd-activite" title="Dernière activité">${icone('horloge')} ${ilYa(d.derniere_activite)}</span>`}</div>
       <h3 class="cd-nom">${esc(d.nom)} <span>${esc(d.prenom)}</span></h3>
       <p class="cd-patho">${esc(d.pathologie || 'Pathologie non renseignée')}</p>
-      <div class="tags">${(d.categories || []).map(c => `<span class="tag"><span aria-hidden="true">${categorie(c).emoji}</span>${esc(categorie(c).court)}</span>`).join('')}</div>
+      <div class="tags">${badgeClan(d.clan)}${(d.categories || []).map(c => `<span class="tag"><span aria-hidden="true">${categorie(c).emoji}</span>${esc(categorie(c).court)}</span>`).join('')}</div>
       ${archives
         ? `<p class="aide">${icone('archive')} Clôturé le ${dateCourte(d.statut_depuis)}${d.motif_cloture ? ` · ${esc(d.motif_cloture)}` : ''}</p>`
         : `<div class="cd-progression">

@@ -1,71 +1,64 @@
 # 生命 Seimei · Suivi des pathologies
 
 Site confidentiel de la branche **Suivi des pathologies** de la Seimei, en lien avec l'IRS.
-Tout le suivi se fait sur le site : les joueurs y ouvrent le dossier médical de leur personnage, l'équipe y consigne chaque rendez-vous, l'IRS y publie ses analyses.
+Il est réservé à l'équipe de la branche et aux chercheurs de l'IRS : **les joueurs n'y ont pas accès**.
+L'annuaire des joueurs est lu directement sur le serveur Discord.
 
 ## Ce que fait le site
 
-**Pour les joueurs**
-- Création de compte immédiate, sans validation : chaque joueur n'a accès qu'à **ses propres dossiers**.
-- **Demande de suivi** : le joueur remplit la fiche patient de son personnage (identité, pathologie, HRP).
-- Suivi de son dossier : médecin référent, prochain rendez-vous, parcours de soin, comptes rendus, rapports de l'IRS, traitements.
-- **Messages** avec l'équipe dans chaque dossier, et accord (ou refus) pour la transmission à l'IRS.
-- Repère **« Nouveau »** quand quelque chose a changé depuis sa dernière visite.
-
-**Pour l'équipe**
-- **Tableau de bord** : urgences, nouvelles demandes, messages des joueurs en attente de réponse, rapports de l'IRS reçus, rendez-vous à venir ou en retard, dossiers inactifs depuis 3 semaines, essais de traitement de plus de 2 semaines, suivis stables sans contrôle depuis 1 mois.
-- **Dossiers** : recherche, filtres par statut, catégorie et médecin.
+- **Connexion avec le nom RP et un code**, sans adresse e-mail. Le responsable valide chaque compte.
+- **Annuaire des joueurs** (page *Joueurs*) :
+  - lu sur le serveur Discord par un bot : le pseudo sur le serveur donne le nom RP, les rôles donnent le grade, la section et le clan (Hoki, Sabaku, Hakumei, Roran, Shirogane / Chikatsume, ou sans clan) ;
+  - les joueurs absents du serveur, par exemple les **Roran**, s'ajoutent à la main ;
+  - une information fausse sur Discord se corrige dans la fiche du joueur.
+- **Ouverture d'un dossier** : on choisit le joueur dans l'annuaire, et son nom, son prénom, son grade, sa section et son clan se remplissent tout seuls.
+- **Tableau de bord** : urgences, rapports de l'IRS reçus, rendez-vous à venir ou en retard, dossiers sans médecin, dossiers inactifs depuis 3 semaines, essais de traitement de plus de 2 semaines, suivis stables sans contrôle depuis 1 mois.
+- **Dossiers** : recherche (y compris par clan), filtres par statut, catégorie et médecin, repère « Nouveau » quand un dossier a changé.
 - **Fiche dossier** :
-  - parcours de soin étape par étape (maladie en 7 étapes, réadaptation en 4), avec ce qu'il faut vérifier à chaque étape ;
-  - journal : comptes rendus, rapports de l'IRS, messages et historique automatique ;
+  - parcours de soin étape par étape (maladie en 7 étapes, réadaptation en 4) ;
+  - journal : comptes rendus, rapports de l'IRS, notes de l'équipe et historique automatique ;
   - historique des traitements et de leurs effets.
 - **Archives** des dossiers clôturés, qui peuvent être rouverts.
-- **Équipe** : validation des demandes d'accès, rôles, réattribution des dossiers d'un médecin inactif, liste des joueurs, sauvegarde des données.
-
-**Pour tout le monde** : un **guide de la branche** (fonctionnement, parcours, statuts, règles et garde-fous).
+- **Équipe** : validation des demandes d'accès (avec vérification du nom RP sur le serveur Discord), rôles, nouveau code en cas d'oubli, réattribution des dossiers d'un médecin inactif, sauvegarde des données.
+- **Guide de la branche** : fonctionnement, parcours, statuts, règles et garde-fous.
 
 ## Qui voit quoi
 
 | Rôle | Voit | Peut |
 |---|---|---|
-| Responsable de la branche | tous les dossiers | tout : attribuer, clôturer, rouvrir, supprimer, gérer les comptes |
-| Médecin référent | tous les dossiers | ouvrir et modifier des dossiers, prendre en charge un dossier libre, comptes rendus, traitements |
-| Personnel soignant | tous les dossiers | comptes rendus et messages |
-| Référent IRS | **seulement les dossiers dont le patient a donné son accord** | rapports d'analyse et messages |
-| Joueur | **seulement ses propres dossiers** | ouvrir une demande, compléter sa fiche, donner son accord pour l'IRS, écrire des messages |
-| Demande d'équipe en attente | rien | attendre la validation du responsable |
+| Responsable de la branche | tous les dossiers, l'annuaire | tout : attribuer, clôturer, rouvrir, supprimer, gérer les comptes, relier Discord |
+| Médecin référent | tous les dossiers, l'annuaire | ouvrir et modifier des dossiers, prendre en charge un dossier libre, comptes rendus, traitements, compléter l'annuaire |
+| Personnel soignant | tous les dossiers, l'annuaire | comptes rendus et notes |
+| Référent IRS | **seulement les dossiers dont le patient a donné son accord** | rapports d'analyse et notes |
+| Demande en attente | rien | attendre la validation du responsable |
+| Joueurs | **aucun accès au site** | — |
 
 Ces règles sont appliquées **par la base de données** : elles restent valables même si quelqu'un contourne le site.
 
 ---
 
-## Mise en route (environ 10 minutes)
+## Mise en route
 
-### 1. Installer la base dans Supabase
+### 1. Installer ou mettre à jour la base dans Supabase
 
 1. Ouvre ton projet sur [supabase.com/dashboard](https://supabase.com/dashboard).
 2. Dans le menu de gauche : **SQL Editor** → **New query**.
 3. Copie tout le contenu du fichier [`supabase/schema.sql`](supabase/schema.sql), colle-le, puis clique sur **Run**.
 
-Le script peut être relancé sans danger.
+Le script peut être relancé sans danger. Sur une base installée avec la version précédente, il conserve les dossiers et supprime les comptes joueurs.
 
 ### 2. Relier le site à Supabase
 
-1. Dans Supabase, clique sur **Connect** en haut de ton projet, ou va dans **Project Settings** → **API Keys** / **Data API**.
-2. Copie :
-   - l'**URL du projet** (`https://xxxx.supabase.co`) ;
-   - la **clé publique** : `anon` ou `publishable` (`sb_publishable_…`).
-3. Sur GitHub, ouvre le fichier [`config.js`](config.js), clique sur le crayon ✏️, colle les deux valeurs entre les guillemets, puis **Commit changes**.
+Le fichier [`config.js`](config.js) contient l'adresse du projet et la clé publique (`publishable` ou `anon`).
 
 > ⚠️ Ne mets **jamais** la clé `service_role` ou `secret` dans ce fichier : elle donne tous les droits sur la base.
 > La clé publique, elle, peut être visible : la confidentialité repose sur les règles d'accès de la base.
 
-### 3. Réglages de connexion dans Supabase
+### 3. Réglage de connexion dans Supabase (obligatoire)
 
-Dans **Authentication** :
+**Authentication** → **Sign In / Providers** → **Email** : laisse ce fournisseur activé, mais **désactive « Confirm email »**, puis enregistre.
 
-- **URL Configuration** → **Site URL** : mets l'adresse du site, par exemple `https://lune-ecl.github.io/Suivis/`. Sinon les liens reçus par e-mail (confirmation, mot de passe oublié) ne ramènent pas au site.
-- **Sign In / Providers** → **Email** → désactive **Confirm email** (conseillé). Le service d'e-mails gratuit de Supabase n'envoie que quelques e-mails par heure, ce qui bloquerait les inscriptions.
+Le site n'utilise aucune adresse e-mail : il en fabrique une à partir du nom RP (`hoki.ren@seimei.invalid`), à laquelle rien n'est jamais envoyé.
 
 ### 4. Mettre le site en ligne
 
@@ -74,29 +67,48 @@ Le site est disponible à l'adresse `https://lune-ecl.github.io/Suivis/` après 
 
 ### 5. Créer ton compte de responsable
 
-Ouvre le site → **Créer un compte** → choisis **« Je rejoins l'équipe »**. **La première demande d'équipe devient automatiquement responsable de la branche**, alors fais-le dès que le site est en ligne.
+Ouvre le site → **Créer un compte** → le nom de ton personnage et un code d'au moins 6 caractères.
+**Le premier compte devient automatiquement responsable de la branche.**
+
+Si tu avais déjà créé un compte avec une adresse e-mail (version précédente du site), connecte-toi en tapant cette adresse dans le champ « Nom Prénom RP ».
 
 Si besoin, tu peux donner le rôle de responsable à un compte depuis le **SQL Editor** :
 
 ```sql
 update public.membres set role = 'responsable', actif = true
-where id = (select id from auth.users where email = 'adresse@exemple.com');
+where nom_rp = 'Nom Prénom';
 ```
 
-### 6. Faire venir tout le monde
+### 6. Relier le serveur Discord
 
-- **Les joueurs** créent leur compte avec « Je suis joueur » : ils ont tout de suite accès à leur espace.
-- **Les membres de l'équipe et de l'IRS** choisissent « Je rejoins l'équipe » : tu valides leur demande dans **Équipe** en choisissant leur rôle.
+Le site lit les joueurs de ton serveur grâce à un bot, à créer une seule fois :
+
+1. Sur [discord.com/developers/applications](https://discord.com/developers/applications), clique sur **New Application** et donne-lui un nom (par exemple « Seimei »).
+2. Onglet **Bot** :
+   - active **Server Members Intent** et enregistre ;
+   - clique sur **Reset Token** et copie le token.
+3. Onglet **OAuth2** → **URL Generator** : coche **bot**, ouvre le lien généré en bas de la page et ajoute le bot à ton serveur.
+4. Sur le site, page **Joueurs** : colle le token et clique sur **Relier**. L'annuaire se remplit tout de suite.
+5. Bouton **Discord** de la page Joueurs : vérifie quels rôles correspondent à un grade, une section ou un clan. Les clans, les sections et les grades courants sont reconnus automatiquement.
+
+Le token reste dans une partie privée de la base : il n'est jamais renvoyé au site, même au responsable. Le bot ne fait que lire la liste des membres et des rôles.
+L'annuaire se met à jour tout seul quand il date de plus d'une heure, ou avec le bouton « Mettre à jour ».
+
+### 7. Faire venir l'équipe
+
+Chaque membre de la branche et de l'IRS crée son compte avec son nom RP et un code. Tu valides sa demande dans **Équipe** en choisissant son rôle. La carte de la demande indique si ce nom RP existe bien sur le serveur Discord.
+
+Code oublié : bouton **Code** sur la carte du membre, dans **Équipe**. Chacun peut aussi changer son code depuis **Mon profil**.
 
 ---
 
 ## Au quotidien
 
-1. **Nouvelle demande** : un joueur ouvre une demande de suivi. Elle apparaît sur le tableau de bord ; un médecin clique sur **Prendre en charge** et devient médecin référent. L'équipe peut aussi ouvrir elle-même un dossier et le **relier au compte du joueur**.
-2. **Après chaque rendez-vous RP** : **Compte rendu** sur la fiche du dossier. Le prochain rendez-vous et le nouveau statut se mettent à jour ; le joueur le voit dans son dossier.
+1. **Nouveau patient** : bouton **Ouvrir un suivi** sur la fiche du joueur (page Joueurs), ou **Nouveau dossier** puis recherche du joueur. Un médecin clique sur **Prendre en charge** et devient médecin référent.
+2. **Après chaque rendez-vous RP** : **Compte rendu** sur la fiche du dossier. Le prochain rendez-vous et le nouveau statut se mettent à jour.
 3. **Parcours** : clique sur l'étape suivante, le site propose le statut correspondant.
 4. **IRS** : avec l'accord du patient, passe le dossier en « Analyse IRS en cours ». Le référent IRS publie son rapport, et le tableau de bord signale le rapport reçu.
-5. **Messages** : le joueur et l'équipe échangent dans le dossier. Le tableau de bord signale les messages des joueurs qui attendent une réponse.
+5. **Notes** : l'équipe s'organise dans le journal du dossier (disponibilités du joueur, rappels…).
 6. **Clôture** (responsable) : statut « Dossier clôturé » avec le motif. Le dossier passe dans les archives.
 
 ## Sauvegarde
@@ -109,6 +121,6 @@ Le plan gratuit de Supabase ne fait pas de sauvegarde automatique. Le responsabl
 |---|---|
 | `index.html`, `assets/` | le site (aucune installation nécessaire) |
 | `config.js` | l'adresse et la clé publique de ta base Supabase |
-| `supabase/schema.sql` | tables, règles d'accès et automatismes de la base |
+| `supabase/schema.sql` | tables, règles d'accès, automatismes et lecture du serveur Discord |
 | `assets/vendor/supabase.js` | bibliothèque officielle Supabase (supabase-js 2.117.2, licence MIT) |
 | `narrations/` | l'ancien outil de suivi des narrations, toujours utilisable à l'adresse `…/Suivis/narrations/` |

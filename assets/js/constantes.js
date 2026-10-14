@@ -36,11 +36,20 @@ export const ROLES = {
   medecin: { label: 'Médecin référent', groupe: 'Médecins référents', court: 'Médecin', couleur: '#34d399' },
   soignant: { label: 'Personnel soignant', groupe: 'Personnel soignant et de rééducation', court: 'Soignant', couleur: '#60a5fa' },
   irs: { label: 'Référent IRS', groupe: 'Référents IRS', court: 'IRS', couleur: '#a78bfa' },
-  patient: { label: 'Joueur', groupe: 'Joueurs', court: 'Joueur', couleur: '#f9a8d4' },
   en_attente: { label: 'En attente de validation', groupe: 'En attente', court: 'En attente', couleur: '#94a3b8' },
 };
 export const ORDRE_ROLES = ['responsable', 'medecin', 'soignant', 'irs'];
 export const ROLES_EQUIPE = ['responsable', 'medecin', 'soignant', 'irs'];
+
+// Clans du serveur. « Shirogane / Chikatsume » est un seul clan.
+export const CLANS = [
+  { id: 'hoki', label: 'Hoki', couleur: '#fb923c' },
+  { id: 'sabaku', label: 'Sabaku', couleur: '#facc15' },
+  { id: 'hakumei', label: 'Hakumei', couleur: '#a5b4fc' },
+  { id: 'roran', label: 'Roran', couleur: '#f472b6' },
+  { id: 'shirogane', label: 'Shirogane / Chikatsume', couleur: '#e2e8f0' },
+  { id: 'sans_clan', label: 'Sans clan', couleur: '#94a3b8' },
+];
 
 export const TYPES_RDV = [
   'Premier rendez-vous', 'Examens', 'Résultats', 'Essai de traitement',
@@ -175,6 +184,7 @@ export const STATUT = index(STATUTS);
 export const statut = id => STATUT[id] || STATUT.attente;
 export const categorie = id => CATEGORIE[id] || { id, emoji: '•', label: id, court: id };
 export const role = id => ROLES[id] || ROLES.en_attente;
+export const clan = id => CLANS.find(c => c.id === id) || null;
 
 // Parcours proposé selon les catégories du dossier.
 export function parcoursConseille(categories = []) {

@@ -1,13 +1,13 @@
 // Point d'entrée : session, structure de l'application et navigation.
 
 import { estConfigure, auth, api } from './api.js';
-import { etat } from './etat.js';
-import { esc, icone, avatar, badgeRole, toast, activerInfobulles } from './ui.js';
-import { chargerVus, estNouveau } from './vus.js';
+import { etat, peut } from './etat.js';
+import { esc, icone, avatar, badgeRole, toast, activerInfobulles, activerPhotos } from './ui.js';
+import { chargerVus } from './vus.js';
 import * as ecrans from './vues/connexion.js';
 import { rendreTableau } from './vues/tableau.js';
 import { rendreDossiers } from './vues/dossiers.js';
-import { rendreMesDossiers } from './vues/mes-dossiers.js';
+import { rendreJoueurs } from './vues/joueurs.js';
 import { rendreDossier } from './vues/dossier.js';
 import { rendreFormulaire } from './vues/formulaire.js';
 import { rendreEquipe, ouvrirProfil } from './vues/equipe.js';
@@ -15,23 +15,15 @@ import { rendreGuide } from './vues/guide.js';
 
 const racine = document.getElementById('app');
 
-// Lu avant que Supabase ne nettoie l'adresse : lien « mot de passe oublié » ?
-let lienRecuperation = /type=recovery/.test(location.hash);
-const erreurLien = new URLSearchParams(location.hash.replace(/^#/, '')).get('error_description');
-
 let utilisateur = null; // id de la personne dont la session est ouverte
-let enRecuperation = false;
 let dernierChargement = 0;
 
 demarrer();
 
 function demarrer() {
   activerInfobulles();
+  activerPhotos();
   if (!estConfigure) return ecrans.ecranConfiguration(racine);
-  if (erreurLien) {
-    history.replaceState(null, '', location.pathname);
-    setTimeout(() => toast(`Lien invalide ou expiré (${erreurLien}). Recommence la démarche.`, 'erreur'), 300);
-  }
   auth.surChangement((evenement, session) => {
     // Différé : on ne rappelle jamais Supabase depuis l'intérieur de l'écouteur.
     setTimeout(() => surSession(evenement, session), 0);
@@ -40,18 +32,6 @@ function demarrer() {
 
 function surSession(evenement, session) {
   etat.session = session;
-  if (session && (evenement === 'PASSWORD_RECOVERY' || (lienRecuperation && !utilisateur && !enRecuperation))) {
-    enRecuperation = true;
-    return ecrans.ecranNouveauMotDePasse(racine, {
-      termine: () => {
-        enRecuperation = false;
-        lienRecuperation = false;
-        utilisateur = null;
-        surSession('SIGNED_IN', etat.session);
-      },
-    });
-  }
-  if (enRecuperation) return;
   if (!session) {
     utilisateur = null;
     etat.vider();
@@ -66,11 +46,8 @@ async function ouvrirSession(session) {
   ecrans.ecranChargement(racine, 'Ouverture des dossiers…');
   try {
     let moi = await api.moi(session.user.id);
-    if (!moi) {
-      const meta = session.user.user_metadata || {};
-      moi = await api.rejoindre(meta.nom_rp || '', meta.pseudo || '', meta.equipe === true);
-    }
-    if (enRecuperation || session.user.id !== utilisateur) return;
+    if (!moi) moi = await api.rejoindre(session.user.user_metadata?.nom_rp || '');
+    if (session.user.id !== utilisateur) return;
     etat.moi = moi;
     if (!moi.actif || moi.role === 'en_attente') {
       return ecrans.ecranAttente(racine, moi, {
@@ -97,16 +74,11 @@ async function deconnecter() {
 /* ---------------- Structure de l'application ---------------- */
 
 function navigation() {
-  if (etat.estJoueur) {
-    return `
-      <span class="nav-section">Mon suivi</span>
-      <a href="#/" data-nav="accueil">${icone('dossier')}<span>Mes dossiers</span><span class="compteur doux" data-compteur="nouveaux" hidden></span></a>
-      <a href="#/guide" data-nav="guide">${icone('bouclier')}<span>La branche</span></a>`;
-  }
   return `
     <span class="nav-section">Suivi</span>
-    <a href="#/" data-nav="tableau">${icone('tableau')}<span>Tableau de bord</span></a>
+    <a href="#/" data-nav="tableau">${icone('tableau')}<span class="libelle-long">Tableau de bord</span><span class="libelle-court" aria-hidden="true">Accueil</span></a>
     <a href="#/dossiers" data-nav="dossiers">${icone('dossier')}<span>Dossiers</span><span class="compteur" data-compteur="urgents" hidden></span></a>
+    ${peut.voirAnnuaire() ? `<a href="#/joueurs" data-nav="joueurs">${icone('joueurs')}<span>Joueurs</span></a>` : ''}
     <a href="#/archives" data-nav="archives">${icone('archive')}<span>Archives</span></a>
     <span class="nav-section">Branche</span>
     <a href="#/equipe" data-nav="equipe">${icone('equipe')}<span>Équipe</span><span class="compteur doux" data-compteur="demandes" hidden></span></a>
@@ -162,7 +134,6 @@ function majCompteurs() {
   const compteurs = {
     urgents: etat.dossiers.filter(d => d.statut === 'urgent').length,
     demandes: etat.moi?.role === 'responsable' ? etat.membres.filter(m => m.actif && m.role === 'en_attente').length : 0,
-    nouveaux: etat.estJoueur ? etat.dossiers.filter(estNouveau).length : 0,
   };
   for (const [nom, n] of Object.entries(compteurs)) {
     const el = racine.querySelector(`[data-compteur="${nom}"]`);
@@ -174,35 +145,31 @@ document.addEventListener('seimei:profil', rafraichirStructure);
 
 /* ---------------- Navigation ---------------- */
 
-// « equipe » : pages réservées à l'équipe ; « joueur » : pages des joueurs ; sinon pour tous.
 const ROUTES = [
-  { motif: /^\/?$/, nav: 'tableau', liste: true, pour: 'equipe', vue: v => rendreTableau(v) },
-  { motif: /^\/?$/, nav: 'accueil', liste: true, toujoursFrais: true, pour: 'joueur', vue: v => rendreMesDossiers(v) },
-  { motif: /^\/dossiers$/, nav: 'dossiers', liste: true, pour: 'equipe', vue: (v, _, q) => rendreDossiers(v, q) },
-  { motif: /^\/dossiers\/nouveau$/, nav: 'dossiers', vue: v => rendreFormulaire(v, null) },
+  { motif: /^\/?$/, nav: 'tableau', liste: true, vue: v => rendreTableau(v) },
+  { motif: /^\/dossiers$/, nav: 'dossiers', liste: true, vue: (v, _, q) => rendreDossiers(v, q) },
+  { motif: /^\/dossiers\/nouveau$/, nav: 'dossiers', vue: (v, _, q) => rendreFormulaire(v, null, q) },
   { motif: /^\/dossier\/([0-9a-f-]{36})$/, nav: 'dossiers', vue: (v, [id]) => rendreDossier(v, id) },
   { motif: /^\/dossier\/([0-9a-f-]{36})\/modifier$/, nav: 'dossiers', vue: (v, [id]) => rendreFormulaire(v, id) },
-  { motif: /^\/archives$/, nav: 'archives', liste: true, pour: 'equipe', vue: (v, _, q) => rendreDossiers(v, q, { archives: true }) },
-  { motif: /^\/equipe$/, nav: 'equipe', liste: true, toujoursFrais: true, pour: 'equipe', vue: v => rendreEquipe(v) },
+  { motif: /^\/joueurs$/, nav: 'joueurs', liste: true, vue: v => rendreJoueurs(v) },
+  { motif: /^\/archives$/, nav: 'archives', liste: true, vue: (v, _, q) => rendreDossiers(v, q, { archives: true }) },
+  { motif: /^\/equipe$/, nav: 'equipe', liste: true, toujoursFrais: true, vue: v => rendreEquipe(v) },
   { motif: /^\/guide$/, nav: 'guide', vue: v => rendreGuide(v) },
 ];
 
 function lireAdresse() {
   const [chemin, requete = ''] = location.hash.replace(/^#/, '').split('?');
-  const profil = etat.estJoueur ? 'joueur' : 'equipe';
-  const route = ROUTES.find(r => r.motif.test(chemin) && (!r.pour || r.pour === profil));
+  const route = ROUTES.find(r => r.motif.test(chemin));
   return { route, params: (chemin.match(route?.motif) || []).slice(1), requete: new URLSearchParams(requete) };
 }
 
 async function router() {
   const vue = document.getElementById('vue');
   if (!vue || !etat.moi) return;
-  if (/access_token|error_description/.test(location.hash)) return; // lien d'authentification en cours
   const { route, params, requete } = lireAdresse();
   if (!route) { location.hash = '#/'; return; }
 
-  // Pour un joueur, les pages de dossier restent rattachées à « Mes dossiers ».
-  const nav = etat.estJoueur && route.nav === 'dossiers' ? 'accueil' : route.nav;
+  const { nav } = route;
   racine.querySelectorAll('[data-nav]').forEach(a => {
     a.classList.toggle('actif', a.dataset.nav === nav);
     if (a.dataset.nav === nav) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
