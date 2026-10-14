@@ -12,7 +12,7 @@ const zone = (nom, v, lignes = 3, attributs = '') => `<textarea name="${nom}" ro
 const requis = '<span class="requis" aria-hidden="true">*</span>';
 
 const CHAMPS_FICHE = ['prenom', 'nom', 'age', 'grade', 'section', 'clan', 'village', 'pathologie', 'origine', 'apparition',
-  'symptomes', 'antecedents', 'traitements_essayes', 'suivi_a_realiser', 'joueur', 'souhaits_rp', 'limites', 'disponibilites'];
+  'symptomes', 'antecedents', 'traitements_essayes', 'suivi_a_realiser'];
 
 export async function rendreFormulaire(vue, id) {
   let d = null;
@@ -75,17 +75,6 @@ export async function rendreFormulaire(vue, id) {
             ${champ('Suivi à réaliser pour la pathologie', zone('suivi_a_realiser', v.suivi_a_realiser, 2), 'large')}
           </div>
           <datalist id="origines">${ORIGINES.map(o => `<option value="${o}">`).join('')}</datalist>
-        </section>
-
-        <section class="section-form">
-          <h2><span class="numero">03</span> HRP</h2>
-          <div class="grille-champs">
-            ${champ('Joueur', texte('joueur', v.joueur, 'maxlength="80" placeholder="pseudo Discord du joueur"'))}
-            ${champ('Disponibilités', texte('disponibilites', v.disponibilites, 'maxlength="200"'))}
-            ${champ('Ce que le joueur souhaite développer en RP', zone('souhaits_rp', v.souhaits_rp, 3), 'large')}
-            ${champ('Limites / éléments à éviter', zone('limites', v.limites, 2), 'large',
-              'Aucune aggravation, complication ou séquelle majeure ne peut être imposée sans l’accord HRP du joueur.')}
-          </div>
         </section>
 
         ${sectionSuivi(v, d)}
@@ -176,7 +165,7 @@ function sectionSuivi(v, d) {
 
   return `
     <section class="section-form">
-      <h2><span class="numero">04</span> Suivi</h2>
+      <h2><span class="numero">03</span> Suivi</h2>
       <div class="grille-champs">
         ${d ? '' : champ('Statut', `<select name="statut">${STATUTS.filter(s => s.id !== 'cloture').map(s =>
           `<option value="${s.id}" ${s.id === v.statut ? 'selected' : ''}>${s.emoji} ${esc(s.label)}</option>`).join('')}</select>`)}

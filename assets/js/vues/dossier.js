@@ -97,7 +97,6 @@ function htmlEnTete(d) {
           <h1 class="hero-nom">${nomTitre(d)}</h1>
           <p class="hero-patho">${esc(d.pathologie || 'Pathologie non renseignée')}</p>
           ${patient ? `<p class="hero-identite">${esc(patient)}</p>` : ''}
-          ${d.joueur ? `<p class="hero-identite">🎭 Joueur : ${esc(d.joueur)}</p>` : ''}
           <div class="hero-tags">${badgeClan(d.clan)}${(d.categories || []).map(etiquetteCategorie).join('')}</div>
         </div>
         <div class="hero-statut">
@@ -310,10 +309,6 @@ function htmlFiche(d) {
       ['Pathologie', d.pathologie], ['Origine', d.origine], ['Apparition', d.apparition],
       ['Symptômes / séquelles', d.symptomes], ['Antécédents familiaux', d.antecedents],
       ['Traitements déjà essayés', d.traitements_essayes], ['Suivi à réaliser pour la pathologie', d.suivi_a_realiser],
-    ]],
-    ['HRP', [
-      ['Joueur', d.joueur], ['Ce que le joueur souhaite développer en RP', d.souhaits_rp],
-      ['Limites / éléments à éviter', d.limites], ['Disponibilités', d.disponibilites],
     ]],
     ['Suivi', [
       ['Plan de suivi en cours', d.plan_suivi],
