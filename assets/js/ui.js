@@ -265,6 +265,34 @@ function montrerBulle(cible) {
 }
 const cacherBulle = () => { if (bulle) bulle.hidden = true; };
 
+// Halo de lumière qui suit la souris sur les cartes et les panneaux.
+export function activerLumiere() {
+  const SURFACES = '.panneau, .kpi, .carte-dossier, .carte-membre, .section-form, .alerte, .filtres, .entree-carte, .traitement';
+  let cible = null;
+  let x = 0;
+  let y = 0;
+  let prevu = false;
+  const peindre = () => {
+    prevu = false;
+    if (!cible?.isConnected) return;
+    const r = cible.getBoundingClientRect();
+    cible.style.setProperty('--mx', `${x - r.left}px`);
+    cible.style.setProperty('--my', `${y - r.top}px`);
+  };
+  document.addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse') return;
+    const surface = e.target.closest?.(SURFACES) || null;
+    if (surface !== cible) {
+      cible?.style.removeProperty('--mx');
+      cible?.style.removeProperty('--my');
+      cible = surface;
+    }
+    x = e.clientX;
+    y = e.clientY;
+    if (cible && !prevu) { prevu = true; requestAnimationFrame(peindre); }
+  }, { passive: true });
+}
+
 export function activerInfobulles() {
   const suivre = e => {
     const cible = e.target.closest?.('[data-bulle]');

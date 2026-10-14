@@ -1172,6 +1172,351 @@ dialog.modale::backdrop { background: rgba(3, 6, 12, 0.62); backdrop-filter: blu
   50% { box-shadow: 0 0 0 9px rgba(52, 211, 153, 0.06), 0 0 32px rgba(52, 211, 153, 0.6); }
 }
 
+/* =====================================================================
+   Finitions visuelles : motif seigaiha, lumière, verre, ornements
+   ===================================================================== */
+@property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+
+:root {
+  --vagues: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40'%3E%3Cdefs%3E%3Cg id='v'%3E%3Ccircle r='40' fill='%23070b14'/%3E%3Cg fill='none' stroke='%2334d399' stroke-width='1.1'%3E%3Ccircle r='38.5'/%3E%3Ccircle r='29.5'/%3E%3Ccircle r='20.5'/%3E%3Ccircle r='11.5'/%3E%3Ccircle r='3.5'/%3E%3C/g%3E%3C/g%3E%3C/defs%3E%3Cuse href='%23v' x='40' y='-20'/%3E%3Cuse href='%23v' x='0' y='0'/%3E%3Cuse href='%23v' x='80' y='0'/%3E%3Cuse href='%23v' x='40' y='20'/%3E%3Cuse href='%23v' x='0' y='40'/%3E%3Cuse href='%23v' x='80' y='40'/%3E%3Cuse href='%23v' x='40' y='60'/%3E%3C/svg%3E");
+  --reflet: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --or-clair: #f3dc9a;
+}
+
+html { scrollbar-color: rgba(148, 170, 205, 0.28) transparent; scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: rgba(148, 170, 205, 0.22); border-radius: 99px; border: 3px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: rgba(148, 170, 205, 0.38); }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Vagues seigaiha très discrètes, surtout dans les coins */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.075;
+  background-image: var(--vagues);
+  background-size: 64px 32px;
+  -webkit-mask-image: radial-gradient(120% 90% at 100% 0%, #000 0%, transparent 55%), radial-gradient(90% 80% at 0% 100%, #000 0%, transparent 50%);
+  mask-image: radial-gradient(120% 90% at 100% 0%, #000 0%, transparent 55%), radial-gradient(90% 80% at 0% 100%, #000 0%, transparent 50%);
+}
+
+/* Lueurs supplémentaires de l'aurore */
+.aurore {
+  background:
+    radial-gradient(60vmax 50vmax at 8% -12%, rgba(52, 211, 153, 0.17), transparent 60%),
+    radial-gradient(50vmax 45vmax at 102% 0%, rgba(167, 139, 250, 0.14), transparent 60%),
+    radial-gradient(40vmax 34vmax at 55% 48%, rgba(233, 196, 106, 0.035), transparent 70%),
+    radial-gradient(55vmax 50vmax at 78% 112%, rgba(56, 189, 248, 0.1), transparent 60%),
+    linear-gradient(180deg, #060a13 0%, #0a1020 55%, #060a13 100%);
+}
+
+/* ---------- Titres ---------- */
+.titre-page, .hero-nom, .connexion-tete h1, .marque strong {
+  background: linear-gradient(180deg, #ffffff 15%, #cdeee2 70%, #9ee6c9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.titre-page { font-weight: 700; letter-spacing: 0.01em; text-shadow: 0 0 40px rgba(52, 211, 153, 0.12); }
+.hero-nom span, .cd-nom span { -webkit-text-fill-color: var(--texte-2); }
+.surtitre { display: inline-flex; align-items: center; gap: 10px; }
+.surtitre::before { content: ''; width: 22px; height: 1px; background: linear-gradient(90deg, transparent, var(--jade)); }
+.entete-page { position: relative; padding-bottom: 20px; }
+.entete-page::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(52, 211, 153, 0.45), rgba(233, 196, 106, 0.22) 35%, rgba(148, 170, 205, 0.08) 70%, transparent);
+}
+.entete-page::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  background: var(--jade);
+  box-shadow: 0 0 12px var(--jade);
+}
+.titre-section { gap: 12px; color: #b9c8db; }
+.titre-section::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--bord-2), transparent); }
+.panneau-titre h2 .ic { filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.6)); }
+
+/* ---------- Verre et lumière qui suit la souris ---------- */
+.panneau, .kpi, .carte-dossier, .carte-membre, .section-form, .alerte, .filtres, .entree-carte, .traitement {
+  --lumiere: radial-gradient(520px circle at var(--mx, 50%) var(--my, -600px), rgba(255, 255, 255, 0.06), transparent 42%);
+}
+.panneau { background: var(--lumiere), linear-gradient(180deg, rgba(20, 30, 50, 0.74), rgba(13, 20, 36, 0.7)); box-shadow: var(--reflet), var(--ombre); }
+.section-form, .filtres { background: var(--lumiere), linear-gradient(180deg, rgba(20, 30, 50, 0.72), rgba(13, 20, 36, 0.68)); box-shadow: var(--reflet); }
+.entree-carte, .traitement { background: var(--lumiere), var(--surface); box-shadow: var(--reflet); }
+.carte-membre { background: var(--lumiere), linear-gradient(180deg, rgba(21, 31, 52, 0.78), rgba(13, 20, 36, 0.76)); box-shadow: var(--reflet); transition: transform 0.3s var(--ease), border-color 0.3s, box-shadow 0.3s; }
+.carte-membre:hover { transform: translateY(-2px); border-color: var(--bord-2); box-shadow: var(--reflet), 0 22px 44px -26px rgba(0, 0, 0, 0.9); }
+.carte-membre.attente { background: var(--lumiere), linear-gradient(180deg, rgba(251, 191, 36, 0.08), rgba(16, 24, 41, 0.76)); }
+.alerte { background: var(--lumiere), rgba(255, 255, 255, 0.025); }
+.alerte:hover { background: var(--lumiere), rgba(255, 255, 255, 0.05); }
+
+/* ---------- Chiffres clés ---------- */
+.kpi {
+  background: var(--lumiere), radial-gradient(130% 120% at 0% 0%, color-mix(in srgb, var(--c) 9%, transparent), transparent 55%), linear-gradient(180deg, rgba(21, 31, 52, 0.8), rgba(13, 20, 36, 0.76));
+  box-shadow: var(--reflet);
+}
+.kpi::before {
+  content: '';
+  position: absolute;
+  inset: 0 22% auto 22%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--c) 80%, white), transparent);
+  opacity: 0.7;
+}
+.kpi-icone {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--c) 30%, transparent), color-mix(in srgb, var(--c) 10%, transparent));
+  border: 1px solid color-mix(in srgb, var(--c) 35%, transparent);
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--c) 80%, transparent);
+}
+.kpi-valeur {
+  font-size: 40px;
+  background: linear-gradient(180deg, #ffffff 30%, color-mix(in srgb, var(--c) 55%, white));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Cartes de dossier ---------- */
+.carte-dossier {
+  background: var(--lumiere), radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, var(--c) 8%, transparent), transparent 60%), linear-gradient(180deg, rgba(21, 31, 52, 0.8), rgba(13, 20, 36, 0.8));
+  box-shadow: var(--reflet);
+}
+.carte-dossier::before { height: 2px; background: linear-gradient(90deg, var(--c), color-mix(in srgb, var(--c) 30%, transparent) 60%, transparent); box-shadow: 0 0 16px color-mix(in srgb, var(--c) 70%, transparent); }
+.carte-dossier:hover { box-shadow: var(--reflet), 0 30px 60px -28px color-mix(in srgb, var(--c) 65%, transparent); }
+.cd-nom { font-size: 27px; }
+.piste-fine span { box-shadow: 0 0 10px rgba(52, 211, 153, 0.6); }
+
+/* ---------- Fiche d'un dossier ---------- */
+.hero {
+  background:
+    radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--c) 20%, transparent), transparent 55%),
+    radial-gradient(70% 90% at 100% 100%, rgba(233, 196, 106, 0.05), transparent 60%),
+    linear-gradient(180deg, rgba(21, 31, 52, 0.88), rgba(11, 17, 30, 0.86));
+  box-shadow: var(--reflet), 0 40px 80px -40px rgba(0, 0, 0, 0.9), 0 0 60px -30px color-mix(in srgb, var(--c) 60%, transparent);
+}
+.hero::before {
+  content: '生';
+  position: absolute;
+  right: 5%;
+  top: -34px;
+  font-family: var(--police-kanji);
+  font-weight: 700;
+  font-size: 230px;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--c) 24%, transparent);
+  -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 85%);
+  mask-image: linear-gradient(180deg, #000 45%, transparent 85%);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---------- Bannière d'accueil du tableau de bord ---------- */
+.entete-page.accueil {
+  align-items: center;
+  padding: 28px 30px;
+  border-radius: 26px;
+  border: 1px solid var(--bord-2);
+  overflow: hidden;
+  background:
+    radial-gradient(90% 150% at 0% 0%, rgba(52, 211, 153, 0.17), transparent 55%),
+    radial-gradient(60% 130% at 100% 100%, rgba(233, 196, 106, 0.08), transparent 60%),
+    linear-gradient(180deg, rgba(21, 31, 52, 0.84), rgba(12, 18, 32, 0.8));
+  box-shadow: var(--reflet), 0 40px 80px -40px rgba(0, 0, 0, 0.9);
+}
+.entete-page.accueil > * { position: relative; z-index: 1; }
+.entete-page.accueil::before {
+  content: '命';
+  left: auto;
+  right: 3%;
+  bottom: auto;
+  top: 50%;
+  width: auto;
+  height: auto;
+  transform: translateY(-50%);
+  background: none;
+  box-shadow: none;
+  font-family: var(--police-kanji);
+  font-weight: 700;
+  font-size: 150px;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(52, 211, 153, 0.13);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 60%);
+  mask-image: linear-gradient(90deg, transparent, #000 60%);
+  pointer-events: none;
+}
+.entete-page.accueil::after {
+  left: auto;
+  top: 0;
+  width: 55%;
+  height: auto;
+  opacity: 0.1;
+  background: var(--vagues);
+  background-size: 56px 28px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 70%);
+  mask-image: linear-gradient(90deg, transparent, #000 70%);
+}
+.hero-nom { font-weight: 700; font-size: clamp(38px, 5.4vw, 60px); }
+.meta { background: linear-gradient(180deg, rgba(8, 13, 24, 0.55), rgba(8, 13, 24, 0.35)); box-shadow: var(--reflet); }
+
+/* ---------- Boutons : reflet au survol ---------- */
+.btn-primaire { position: relative; overflow: hidden; isolation: isolate; }
+.btn-primaire::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.45) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.7s var(--ease);
+}
+.btn-primaire:hover::before { transform: translateX(120%); }
+.btn:not(.btn-primaire):not(.btn-fantome):not(.btn-danger) { box-shadow: var(--reflet); }
+
+/* ---------- Navigation ---------- */
+.barre { background: linear-gradient(180deg, rgba(10, 16, 30, 0.82), rgba(7, 11, 20, 0.7)); }
+.barre::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 220px;
+  pointer-events: none;
+  opacity: 0.09;
+  background-image: var(--vagues);
+  background-size: 48px 24px;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000);
+  mask-image: linear-gradient(180deg, transparent, #000);
+}
+.barre > * { position: relative; z-index: 1; }
+.marque .sceau { box-shadow: 0 0 0 1px rgba(233, 196, 106, 0.35), 0 0 0 5px rgba(52, 211, 153, 0.08), 0 14px 32px -12px rgba(45, 212, 191, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.55); }
+.nav a.actif { background: linear-gradient(90deg, rgba(52, 211, 153, 0.18), rgba(52, 211, 153, 0.03)); box-shadow: var(--reflet); }
+.nav a.actif .ic { color: var(--jade); filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.7)); }
+.nav a:hover:not(.actif) { transform: translateX(2px); }
+.nav a { transition: background 0.2s, color 0.2s, transform 0.2s var(--ease); }
+.carte-utilisateur { background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)); box-shadow: var(--reflet); }
+
+/* ---------- Écran de connexion ---------- */
+.ecran-centre::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.6;
+  background-image:
+    radial-gradient(3px 3px at 12% 78%, rgba(110, 231, 183, 0.9), transparent),
+    radial-gradient(2.5px 2.5px at 24% 32%, rgba(243, 220, 154, 0.85), transparent),
+    radial-gradient(3px 3px at 38% 88%, rgba(110, 231, 183, 0.7), transparent),
+    radial-gradient(2.5px 2.5px at 64% 18%, rgba(196, 181, 253, 0.85), transparent),
+    radial-gradient(3px 3px at 74% 70%, rgba(110, 231, 183, 0.8), transparent),
+    radial-gradient(2.5px 2.5px at 86% 40%, rgba(243, 220, 154, 0.75), transparent),
+    radial-gradient(3px 3px at 92% 86%, rgba(110, 231, 183, 0.6), transparent),
+    radial-gradient(2.5px 2.5px at 50% 60%, rgba(196, 181, 253, 0.6), transparent),
+    radial-gradient(2px 2px at 6% 22%, rgba(243, 220, 154, 0.7), transparent),
+    radial-gradient(2px 2px at 30% 8%, rgba(110, 231, 183, 0.6), transparent);
+  animation: lucioles 16s ease-in-out infinite alternate;
+}
+.ecran-centre::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image: var(--vagues);
+  background-size: 72px 36px;
+  -webkit-mask-image: radial-gradient(70% 60% at 0% 100%, #000, transparent 70%);
+  mask-image: radial-gradient(70% 60% at 0% 100%, #000, transparent 70%);
+}
+.kanji-fond {
+  -webkit-text-stroke: 1px rgba(52, 211, 153, 0.16);
+  background: linear-gradient(180deg, rgba(52, 211, 153, 0.06), rgba(167, 139, 250, 0.03));
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: flotter 12s ease-in-out infinite;
+}
+.carte-connexion { z-index: 1; box-shadow: var(--reflet), 0 50px 100px -40px rgba(0, 0, 0, 0.95), 0 0 80px -40px rgba(52, 211, 153, 0.5); }
+.carte-connexion::before {
+  background: conic-gradient(from var(--angle), rgba(52, 211, 153, 0.15), rgba(52, 211, 153, 0.85) 12%, rgba(243, 220, 154, 0.75) 20%, rgba(52, 211, 153, 0.15) 32%,
+    rgba(167, 139, 250, 0.15) 55%, rgba(167, 139, 250, 0.7) 68%, rgba(52, 211, 153, 0.15) 80%);
+  animation: tour-bordure 9s linear infinite;
+}
+.connexion-tete .sceau {
+  position: relative;
+  width: 66px;
+  height: 66px;
+  border-radius: 20px;
+  font-size: 22px;
+  box-shadow: 0 0 0 1px rgba(243, 220, 154, 0.45), 0 18px 40px -14px rgba(45, 212, 191, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.connexion-tete .sceau::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: 26px;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  animation: halo 3.2s ease-out infinite;
+}
+.connexion-tete h1 {
+  font-size: 46px;
+  background: linear-gradient(180deg, #ffffff 20%, var(--or-clair) 120%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.connexion-tete p { color: #b7c6d8; }
+.segmente button[aria-selected='true'] { background: linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.05)); }
+
+/* ---------- Fenêtres et notifications ---------- */
+.modale-boite { position: relative; background: radial-gradient(90% 60% at 0% 0%, rgba(52, 211, 153, 0.07), transparent 60%), linear-gradient(180deg, #141f34, #0c1424); box-shadow: var(--reflet), 0 60px 120px -40px rgba(0, 0, 0, 0.95), 0 0 70px -40px rgba(52, 211, 153, 0.45); }
+.modale-tete h2 {
+  background: linear-gradient(180deg, #ffffff 20%, #cdeee2);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.toast { box-shadow: var(--reflet), 0 24px 48px -20px rgba(0, 0, 0, 0.85); }
+.toast.succes { box-shadow: var(--reflet), 0 24px 48px -20px rgba(0, 0, 0, 0.85), 0 0 32px -14px rgba(52, 211, 153, 0.8); }
+.toast.erreur { box-shadow: var(--reflet), 0 24px 48px -20px rgba(0, 0, 0, 0.85), 0 0 32px -14px rgba(251, 113, 133, 0.8); }
+
+/* ---------- Divers ---------- */
+.vide { background: radial-gradient(60% 80% at 50% 0%, rgba(52, 211, 153, 0.06), transparent 70%); }
+.vide .grande-icone {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.14), transparent 70%);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+}
+.section-form > h2 .numero { box-shadow: 0 0 14px -4px rgba(52, 211, 153, 0.7); border: 1px solid rgba(52, 211, 153, 0.3); }
+.etape.faite .etape-rond { box-shadow: 0 0 14px -2px rgba(52, 211, 153, 0.6); }
+.guide-etape { background: radial-gradient(80% 120% at 0% 0%, rgba(52, 211, 153, 0.09), transparent 60%), rgba(52, 211, 153, 0.03); }
+.badge-nouveau { animation: luire 2.4s ease-in-out infinite; }
+
+@media (max-width: 900px) {
+  .barre::after { display: none; }
+  .nav a:hover:not(.actif) { transform: none; }
+  .nav a.actif { box-shadow: none; }
+}
+
+@keyframes tour-bordure { to { --angle: 360deg; } }
+@keyframes halo { 0% { opacity: 0.9; transform: scale(0.92); } 100% { opacity: 0; transform: scale(1.18); } }
+@keyframes flotter { 0%, 100% { transform: translateY(-50%); } 50% { transform: translateY(calc(-50% - 14px)); } }
+@keyframes lucioles { from { transform: translateY(0); opacity: 0.45; } to { transform: translateY(-26px); opacity: 0.8; } }
+@keyframes luire { 0%, 100% { box-shadow: 0 0 14px -4px rgba(52, 211, 153, 0.75); } 50% { box-shadow: 0 0 22px -2px rgba(52, 211, 153, 1); } }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

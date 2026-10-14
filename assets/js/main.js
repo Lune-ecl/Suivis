@@ -2,7 +2,7 @@
 
 import { estConfigure, auth, api } from './api.js';
 import { etat } from './etat.js';
-import { esc, icone, avatar, badgeRole, toast, activerInfobulles } from './ui.js';
+import { esc, icone, avatar, badgeRole, toast, activerInfobulles, activerLumiere } from './ui.js';
 import { chargerVus } from './vus.js';
 import * as ecrans from './vues/connexion.js';
 import { rendreTableau } from './vues/tableau.js';
@@ -21,6 +21,7 @@ demarrer();
 
 function demarrer() {
   activerInfobulles();
+  activerLumiere();
   if (!estConfigure) return ecrans.ecranConfiguration(racine);
   auth.surChangement((evenement, session) => {
     // Différé : on ne rappelle jamais Supabase depuis l'intérieur de l'écouteur.
