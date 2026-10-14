@@ -88,8 +88,8 @@ export function ecranConnexion(racine, { mode = 'connexion' } = {}) {
     </div>
 
     <form class="form-connexion" data-form="connexion" novalidate>
-      <label class="champ"><span class="etiquette">Nom Prénom RP</span>
-        <input name="nom_rp" required maxlength="80" autocomplete="username" placeholder="ex. Hoki Ren" autocapitalize="words"></label>
+      <label class="champ"><span class="etiquette">Prénom Nom RP</span>
+        <input name="nom_rp" required maxlength="80" autocomplete="username" placeholder="ex. Ren Hoki" autocapitalize="words"></label>
       <label class="champ"><span class="etiquette">Code</span>
         <input type="password" name="code" autocomplete="current-password" required placeholder="••••••"></label>
       <button type="submit" class="btn btn-primaire btn-large">Se connecter</button>
@@ -98,9 +98,9 @@ export function ecranConnexion(racine, { mode = 'connexion' } = {}) {
 
     <form class="form-connexion" data-form="inscription" novalidate hidden>
       <p class="aide">Réservé à l’équipe de la branche et aux chercheurs de l’IRS. Le responsable valide chaque compte.</p>
-      <label class="champ"><span class="etiquette">Nom Prénom RP <span class="requis">*</span></span>
-        <input name="nom_rp" required maxlength="80" autocomplete="username" placeholder="ex. Hoki Ren" autocapitalize="words">
-        <span class="aide">Le nom de ton personnage, comme sur Discord. Il te servira pour te connecter.</span></label>
+      <label class="champ"><span class="etiquette">Prénom Nom RP <span class="requis">*</span></span>
+        <input name="nom_rp" required maxlength="80" autocomplete="username" placeholder="ex. Ren Hoki" autocapitalize="words">
+        <span class="aide">Le prénom puis le nom de ton personnage. Ils te serviront pour te connecter.</span></label>
       <label class="champ"><span class="etiquette">Code <span class="requis">*</span></span>
         <input type="password" name="code" autocomplete="new-password" required minlength="6" placeholder="6 caractères minimum"></label>
       <label class="champ"><span class="etiquette">Confirme ton code <span class="requis">*</span></span>
@@ -127,7 +127,7 @@ export function ecranConnexion(racine, { mode = 'connexion' } = {}) {
     if (!form.reportValidity()) return;
     const d = Object.fromEntries(new FormData(form));
     const nomRp = d.nom_rp.trim().replace(/\s+/g, ' ');
-    if (!/\p{L}/u.test(nomRp)) return toast('Écris le nom de ton personnage.', 'erreur');
+    if (!/\p{L}/u.test(nomRp)) return toast('Écris le prénom et le nom de ton personnage.', 'erreur');
     if (form.dataset.form === 'inscription' && d.code !== d.confirmation) {
       return toast('Les deux codes ne correspondent pas.', 'erreur');
     }

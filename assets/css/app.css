@@ -318,7 +318,7 @@ button.pill:hover { box-shadow: 0 0 24px -6px color-mix(in srgb, var(--c) 70%, t
   box-shadow: 0 0 8px var(--c);
 }
 
-/* Clan d'un joueur */
+/* Clan du patient */
 .clan {
   --c: var(--texte-2);
   display: inline-flex;
@@ -355,9 +355,7 @@ button.pill:hover { box-shadow: 0 0 24px -6px color-mix(in srgb, var(--c) 70%, t
 .avatar.petit { width: 24px; height: 24px; font-size: 10px; }
 .avatar.grand { width: 46px; height: 46px; font-size: 16px; }
 .avatar.avatar-vide { background: rgba(148, 170, 205, 0.14); color: var(--texte-3); }
-.avatar { position: relative; overflow: hidden; }
 .libelle-court { display: none; }
-.avatar-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 
 /* ---------- Contrôle segmenté (connexion / demande d'accès) ---------- */
 .segmente { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 14px; background: var(--surface-creuse); border: 1px solid var(--bord); }
@@ -1045,92 +1043,7 @@ dialog.modale::backdrop { background: rgba(3, 6, 12, 0.62); backdrop-filter: blu
 .titre-section { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--texte-2); }
 .titre-section .nombre { font-size: 12px; letter-spacing: 0; padding: 1px 8px; border-radius: 99px; background: rgba(148, 170, 205, 0.14); }
 
-/* ---------- Annuaire des joueurs ---------- */
-.grille-joueurs { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
-.carte-joueur {
-  --c: #64748b;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px 16px 14px;
-  border-radius: 18px;
-  background: linear-gradient(160deg, color-mix(in srgb, var(--c) 9%, transparent), transparent 55%), var(--surface);
-  border: 1px solid var(--bord);
-  overflow: hidden;
-  animation: monter 0.45s var(--ease) both;
-  animation-delay: calc(min(var(--i, 0), 12) * 30ms);
-  transition: border-color 0.2s, transform 0.2s var(--ease);
-}
-.carte-joueur::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--c); opacity: 0.8; }
-.carte-joueur:hover { border-color: var(--bord-2); transform: translateY(-2px); }
-.carte-joueur.parti { opacity: 0.6; }
-.cj-tete { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.cj-nom { min-width: 0; }
-.cj-nom strong { display: block; font-family: var(--police-titre); font-size: 21px; font-weight: 700; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cj-nom strong span { font-weight: 500; color: var(--texte-2); }
-.cj-nom small { display: block; margin-top: 3px; font-size: 12.5px; color: var(--texte-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cj-infos { display: flex; flex-wrap: wrap; gap: 6px; min-height: 24px; }
-.cj-bas { display: flex; align-items: center; gap: 8px; margin-top: auto; }
-.cj-bas .btn-icone { margin-left: auto; }
-
-.encart-discord { display: flex; flex-direction: column; gap: 12px; border-color: rgba(129, 140, 248, 0.35); background: linear-gradient(160deg, rgba(88, 101, 242, 0.12), transparent 60%), var(--surface); }
-.etapes-discord { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; color: var(--texte-2); font-size: 14px; line-height: 1.55; }
-.etapes-discord strong { color: var(--texte); }
-.etapes-discord a { color: #a5b4fc; }
-.form-jeton { display: flex; gap: 10px; flex-wrap: wrap; }
-.form-jeton input { flex: 1 1 260px; min-width: 0; }
-
-.liste-roles { display: flex; flex-direction: column; gap: 6px; max-height: 46vh; overflow-y: auto; padding-right: 4px; }
-.ligne-role { display: grid; grid-template-columns: 12px minmax(0, 1fr) minmax(150px, 210px); align-items: center; gap: 12px; padding: 8px 10px; border-radius: 12px; background: var(--surface-creuse); border: 1px solid var(--bord); }
-.ligne-role[hidden] { display: none; }
-.pastille-role { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px -2px var(--c); }
-.ligne-role-nom { min-width: 0; font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ligne-role-nom small { margin-left: 8px; font-size: 12px; font-weight: 400; color: var(--texte-3); }
-.ligne-role select { height: 34px; padding-top: 4px; padding-bottom: 4px; font-size: 13px; }
-.pile.separe { padding-top: 18px; border-top: 1px solid var(--bord); }
-
-.verif-discord { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; font-size: 12.5px; color: #a7f3d0; }
-.verif-discord .ic { width: 14px; height: 14px; }
-.verif-discord.absent { color: #fde68a; }
-
-/* Choix du patient dans l'annuaire (formulaire de dossier) */
-.choix-joueur { margin-bottom: 16px; }
-.recherche-joueur { position: relative; }
-.choix-joueur > .aide { margin: 8px 2px 0; }
-.suggestions {
-  position: absolute;
-  z-index: 20;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 6px;
-  border-radius: 16px;
-  background: rgba(13, 20, 36, 0.97);
-  border: 1px solid var(--bord-2);
-  box-shadow: var(--ombre);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
-.suggestions[hidden] { display: none; }
-.suggestion { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 0; border-radius: 11px; background: none; color: var(--texte); font: inherit; text-align: left; cursor: pointer; }
-.suggestion:hover, .suggestion:focus-visible { background: rgba(52, 211, 153, 0.1); outline: none; }
-.sg-texte { flex: 1; min-width: 0; }
-.sg-texte strong { display: block; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sg-texte small { display: block; font-size: 12px; color: var(--texte-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sans-resultat { padding: 8px 10px; margin: 0; }
-.joueur-choisi { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; background: rgba(52, 211, 153, 0.07); border: 1px solid rgba(52, 211, 153, 0.3); }
-.jc-texte { flex: 1; min-width: 0; }
-.jc-texte strong { display: block; font-family: var(--police-titre); font-size: 20px; line-height: 1.15; }
-.jc-texte small { display: block; font-size: 12.5px; color: var(--texte-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.rempli { animation: rempli 1.2s var(--ease); }
-@keyframes rempli { from { box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.45); border-color: var(--jade); } to { box-shadow: 0 0 0 3px transparent; } }
-
-.aide.centre, .actions-page.centre { text-align: center; justify-content: center; }
-.lien-discret.danger { color: #fda4af; }
+.aide.centre { text-align: center; }
 
 /* ---------- Repère « Nouveau » ---------- */
 .badge-nouveau {
@@ -1148,7 +1061,7 @@ dialog.modale::backdrop { background: rgba(3, 6, 12, 0.62); backdrop-filter: blu
   box-shadow: 0 0 18px -4px rgba(52, 211, 153, 0.85);
 }
 
-/* ---------- Étapes numérotées (accueil joueur, guide) ---------- */
+/* ---------- Étapes numérotées (guide) ---------- */
 .liste-etapes { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-direction: column; gap: 14px; }
 .liste-etapes li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 14px; align-items: start; }
 .liste-etapes .num {
@@ -1353,8 +1266,4 @@ dialog.modale::backdrop { background: rgba(3, 6, 12, 0.62); backdrop-filter: blu
   .journal::before { left: 7px; }
   .modale-tete, .modale-corps, .modale-pied { padding-left: 16px; padding-right: 16px; }
   .carte-connexion { padding: 28px 20px 22px; }
-  .grille-joueurs { grid-template-columns: minmax(0, 1fr); }
-  .ligne-role { grid-template-columns: 12px minmax(0, 1fr); }
-  .ligne-role select { grid-column: 1 / -1; }
-  .joueur-choisi { flex-wrap: wrap; }
 }

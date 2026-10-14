@@ -6,9 +6,8 @@ import {
   STATUTS, PARCOURS, TYPES_RDV, MOTIFS_CLOTURE, TYPES_TRAITEMENT, ETATS_TRAITEMENT,
   RESULTATS_TRAITEMENT, DELAIS, statut, categorie, role, clan, etapesDu,
 } from '../constantes.js';
-import { infosPersonnage, nomAffiche } from '../annuaire.js';
 import {
-  esc, icone, avatar, pastilleStatut, etiquetteCategorie, nomComplet, urlSure, dateLongue, dateCourte,
+  esc, icone, avatar, pastilleStatut, etiquetteCategorie, nomComplet, nomTitre, urlSure, dateLongue, dateCourte,
   dateHeure, dateNumerique, ilYa, echeance, joursDepuis, aujourdhui, pluriel, toast, fenetre, confirmer, versDate, badgeRole, badgeClan,
 } from '../ui.js';
 import { marquerVu } from '../vus.js';
@@ -95,7 +94,7 @@ function htmlEnTete(d) {
       <div class="hero-haut">
         <div style="min-width:0">
           <p class="surtitre">${icone('cadenas')} Dossier médical · confidentiel</p>
-          <h1 class="hero-nom">${esc(d.nom)} <span>${esc(d.prenom)}</span></h1>
+          <h1 class="hero-nom">${nomTitre(d)}</h1>
           <p class="hero-patho">${esc(d.pathologie || 'Pathologie non renseignée')}</p>
           ${patient ? `<p class="hero-identite">${esc(patient)}</p>` : ''}
           ${d.joueur ? `<p class="hero-identite">🎭 Joueur : ${esc(d.joueur)}</p>` : ''}
@@ -303,9 +302,8 @@ function htmlEntree(e, i) {
 
 function htmlFiche(d) {
   const createur = etat.membre(d.cree_par);
-  const fiche = infosPersonnage(etat.personnage(d.personnage_id));
   const sections = [
-    ['Identité', [['Nom', d.nom], ['Prénom', d.prenom], ['Grade', d.grade], ['Section', d.section],
+    ['Identité', [['Prénom', d.prenom], ['Nom', d.nom], ['Grade', d.grade], ['Section', d.section],
       ['Clan', clan(d.clan)?.label], ['Âge', d.age], ['Village', d.village]]],
     ['Pathologie', [
       ['Catégorie de suivi', (d.categories || []).map(c => `${categorie(c).emoji} ${categorie(c).label}`).join(', ')],
@@ -320,7 +318,6 @@ function htmlFiche(d) {
     ['Suivi', [
       ['Plan de suivi en cours', d.plan_suivi],
       ['Parcours', (PARCOURS[d.parcours] || PARCOURS.maladie).label],
-      ['Annuaire des joueurs', fiche ? `${nomAffiche(fiche)}${fiche.pseudo ? ` (@${fiche.pseudo})` : ''}` : ''],
       ['Dossier ouvert', `${dateLongue(d.created_at)}${createur ? ` par ${createur.nom_rp}` : ''}`],
     ]],
   ];
@@ -609,11 +606,11 @@ async function supprimerDossier() {
     titre: 'Supprimer définitivement ?',
     sousTitre: esc(nomComplet(d)),
     corps: `<p style="color:var(--texte-2)">Le dossier, son journal et ses traitements seront effacés. Pour simplement archiver un dossier terminé, utilise plutôt le statut « Dossier clôturé ».</p>
-      ${champ(`Pour confirmer, tape le nom du patient : <strong>${esc(d.nom)}</strong>`, '<input name="confirmation" autocomplete="off">')}`,
+      ${champ(`Pour confirmer, tape le nom du patient : <strong>${esc(nomComplet(d))}</strong>`, '<input name="confirmation" autocomplete="off">')}`,
     texteValider: 'Supprimer définitivement',
     danger: true,
     valider: async (_f, x) => {
-      if (x.confirmation.trim().toLowerCase() !== d.nom.trim().toLowerCase()) {
+      if (x.confirmation.trim().replace(/\s+/g, ' ').toLowerCase() !== nomComplet(d).toLowerCase()) {
         toast('Le nom saisi ne correspond pas.', 'erreur');
         return false;
       }

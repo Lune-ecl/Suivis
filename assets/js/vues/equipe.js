@@ -3,8 +3,7 @@
 import { api, auth } from '../api.js';
 import { etat, peut } from '../etat.js';
 import { ROLES, ORDRE_ROLES, role } from '../constantes.js';
-import { joueurNomme } from '../annuaire.js';
-import { esc, icone, avatar, badgeRole, badgeClan, dateCourte, pluriel, toast, fenetre, confirmer, aujourdhui } from '../ui.js';
+import { esc, icone, avatar, badgeRole, dateCourte, pluriel, toast, fenetre, confirmer, aujourdhui } from '../ui.js';
 
 const ROLES_ATTRIBUABLES = ['medecin', 'soignant', 'irs', 'responsable'];
 
@@ -24,10 +23,10 @@ export function rendreEquipe(vue) {
       <article class="carte-membre ${type}" style="--i:${i}">
         <div class="membre-tete">${avatar(m, 'grand')}
           <div><strong>${esc(m.nom_rp)}${estMoi ? ' <span class="aide">(toi)</span>' : ''}</strong>
-            <small>${esc(pseudoDiscord(m)) || 'Pseudo Discord non renseigné'}</small>
+            <small>${m.pseudo ? esc(m.pseudo) : 'Pseudo Discord non renseigné'}</small>
             ${badgeRole(m.role)}</div>
         </div>
-        ${type === 'attente' ? `<p class="aide">Demande envoyée le ${dateCourte(m.created_at)}</p>${verificationDiscord(m)}`
+        ${type === 'attente' ? `<p class="aide">Demande envoyée le ${dateCourte(m.created_at)}</p>`
           : ['medecin', 'responsable'].includes(m.role) ? `<div class="membre-chiffres"><span><strong>${n}</strong>${n > 1 ? 'patients suivis' : 'patient suivi'}</span></div>` : ''}
         ${gerer ? actionsMembre(m, type, n, estMoi) : ''}
       </article>`;
@@ -73,7 +72,7 @@ export function rendreEquipe(vue) {
       <section class="panneau">
         <div class="panneau-titre"><h2>${icone('bouclier')} Comptes et accès</h2></div>
         <p class="aide">Le site est réservé à l’équipe de la branche et aux chercheurs de l’IRS : les joueurs n’y ont pas accès.
-          Chacun crée son compte avec le <strong>nom de son personnage</strong> et un <strong>code</strong>, puis
+          Chacun crée son compte avec le <strong>prénom et le nom de son personnage</strong> et un <strong>code</strong>, puis
           ${gerer ? 'tu valides la demande ici en choisissant un rôle' : 'le responsable valide la demande'}.
           Les médecins, soignants et le responsable voient tous les dossiers ; les référents IRS ne voient que ceux dont le patient a donné son accord.
           ${gerer ? 'Si quelqu’un oublie son code, choisis-en un nouveau avec le bouton « Code ».' : 'Code oublié ? Le responsable peut t’en donner un nouveau.'}</p>
@@ -117,22 +116,6 @@ export function rendreEquipe(vue) {
       rendreEquipe(vue);
     }
   });
-}
-
-// Pseudo Discord : celui du profil, sinon celui du joueur du serveur qui porte ce nom RP.
-function pseudoDiscord(m) {
-  if (m.pseudo) return m.pseudo;
-  const pseudo = etat.discord?.relie ? joueurNomme(m.nom_rp)?.i.pseudo : '';
-  return pseudo ? `@${pseudo}` : '';
-}
-
-// Le nom RP de la demande correspond-il à un joueur du serveur Discord ?
-function verificationDiscord(m) {
-  if (!etat.discord?.relie) return '';
-  const trouve = joueurNomme(m.nom_rp);
-  if (!trouve) return '<p class="verif-discord absent">⚠️ Introuvable sur le serveur Discord : vérifie le nom avant de valider.</p>';
-  const { i } = trouve;
-  return `<p class="verif-discord">${icone('coche')} Sur le serveur Discord${i.pseudo ? ` · @${esc(i.pseudo)}` : ''}${i.grade ? ` · ${esc(i.grade)}` : ''} ${badgeClan(i.clan)}</p>`;
 }
 
 function actionsMembre(m, type, charge, estMoi) {
@@ -251,10 +234,10 @@ async function reattribuer(id) {
 async function exporter(bouton) {
   bouton.classList.add('charge');
   try {
-    const [membres, dossiers, entrees, traitements, personnages] = await Promise.all([
-      api.membres(), api.dossiers(), api.toutesEntrees(), api.tousTraitements(), api.personnages(),
+    const [membres, dossiers, entrees, traitements] = await Promise.all([
+      api.membres(), api.dossiers(), api.toutesEntrees(), api.tousTraitements(),
     ]);
-    const donnees = { exporte_le: new Date().toISOString(), membres, dossiers, entrees, traitements, personnages };
+    const donnees = { exporte_le: new Date().toISOString(), membres, dossiers, entrees, traitements };
     const lien = document.createElement('a');
     lien.href = URL.createObjectURL(new Blob([JSON.stringify(donnees, null, 2)], { type: 'application/json' }));
     lien.download = `seimei-sauvegarde-${aujourdhui()}.json`;
@@ -275,7 +258,7 @@ export async function ouvrirProfil({ deconnecter } = {}) {
     sousTitre: esc(role(moi.role).label),
     corps: `
       <div class="grille-champs">
-        <label class="champ large"><span class="etiquette">Nom Prénom RP</span>
+        <label class="champ large"><span class="etiquette">Prénom Nom RP</span>
           <input value="${esc(moi.nom_rp)}" readonly aria-readonly="true" data-pas-de-focus>
           <span class="aide">Il te sert à te connecter : il ne peut pas être changé.</span></label>
         <label class="champ large"><span class="etiquette">Pseudo Discord</span>
