@@ -10,6 +10,8 @@ const cle = String(config.supabaseKey || '').trim();
 export const estConfigure = /^https:\/\/[^\s]+$/i.test(url) && cle.length > 20;
 export const sb = estConfigure ? createClient(url, cle) : null;
 
+export const CONFIRMATION_ACTIVE = 'Dans Supabase, désactive « Confirm email » (Authentication → Sign In / Providers → Email), puis recommence.';
+
 // Messages d'erreur compréhensibles.
 export function traduireErreur(erreur) {
   const m = erreur?.message || String(erreur || 'Erreur inconnue');
@@ -19,16 +21,17 @@ export function traduireErreur(erreur) {
   if (code === 'P0001') return m; // règles de la branche (message déjà en français)
   if (code === '23514') return 'Une valeur saisie n’est pas acceptée.';
   if (/Failed to fetch|NetworkError|Load failed|fetch failed/i.test(m)) return 'Impossible de joindre la base de données. Vérifie ta connexion.';
-  if (/Invalid login credentials/i.test(m)) return 'E-mail ou mot de passe incorrect.';
-  if (/Email not confirmed/i.test(m)) return 'Adresse e-mail pas encore confirmée : clique sur le lien reçu par e-mail.';
-  if (/already registered|already been registered|already exists/i.test(m)) return 'Un compte existe déjà avec cette adresse e-mail.';
-  if (/Password should be|password.*(at least|characters)/i.test(m)) return 'Le mot de passe doit contenir au moins 6 caractères.';
+  if (/Invalid login credentials/i.test(m)) return 'Nom RP ou code incorrect.';
+  if (/Email not confirmed|Email address .* is invalid|email_address_invalid|Error sending confirmation/i.test(m)) return CONFIRMATION_ACTIVE;
+  if (/already registered|already been registered|already exists/i.test(m)) return 'Ce nom RP a déjà un compte. Connecte-toi, ou demande au responsable de réinitialiser ton code.';
+  if (/Password should be|password.*(at least|characters)/i.test(m)) return 'Le code doit contenir au moins 6 caractères.';
   if (/rate limit|too many|security purposes/i.test(m)) return 'Trop de tentatives. Réessaie dans quelques minutes.';
-  if (/Unable to validate email|invalid format|valid email/i.test(m)) return 'Adresse e-mail invalide.';
-  if (/Signups not allowed|signup.*disabled/i.test(m)) return 'Les inscriptions sont fermées : demande au responsable de te créer un compte.';
+  if (/Unable to validate email|invalid format|valid email/i.test(m)) return 'Ce nom RP ne peut pas servir d’identifiant : utilise des lettres.';
+  if (/Signups not allowed|signup.*disabled/i.test(m)) return 'Les inscriptions sont fermées dans Supabase (Authentication → Sign In / Providers → Allow new users to sign up).';
+  if (/Email logins are disabled|provider is not enabled/i.test(m)) return 'Dans Supabase, active la connexion « Email » (Authentication → Sign In / Providers).';
   if (/does not exist|Could not find the (table|function)|schema cache/i.test(m)) return 'La base n’est pas encore installée : exécute supabase/schema.sql dans Supabase.';
   if (/Invalid API key|No API key|JWT/i.test(m)) return 'Clé Supabase invalide : vérifie config.js.';
-  if (/same.*password|different from the old/i.test(m)) return 'Le nouveau mot de passe doit être différent de l’ancien.';
+  if (/same.*password|different from the old/i.test(m)) return 'Le nouveau code doit être différent de l’ancien.';
   return m;
 }
 
@@ -45,9 +48,23 @@ async function req(requete) {
 export const api = {
   // Compte et membres
   moi: id => req(sb.from('membres').select('*').eq('id', id).maybeSingle()),
-  rejoindre: (nomRp, pseudo, equipe) => req(sb.rpc('rejoindre', { p_nom_rp: nomRp || '', p_pseudo: pseudo || '', p_equipe: Boolean(equipe) })),
+  rejoindre: nomRp => req(sb.rpc('rejoindre', { p_nom_rp: nomRp || '' })),
   membres: () => req(sb.from('membres').select('*').order('nom_rp')),
   majMembre: (id, champs) => req(sb.from('membres').update(champs).eq('id', id).select().single()),
+  reinitialiserCode: (id, code) => req(sb.rpc('reinitialiser_code', { p_membre: id, p_code: code })),
+  supprimerCompte: id => req(sb.rpc('supprimer_compte', { p_membre: id })),
+
+  // Annuaire des joueurs et serveur Discord
+  personnages: () => req(sb.from('personnages').select('*')),
+  creerPersonnage: champs => req(sb.from('personnages').insert(champs).select().single()),
+  majPersonnage: (id, champs) => req(sb.from('personnages').update(champs).eq('id', id).select().single()),
+  supprimerPersonnage: id => req(sb.from('personnages').delete().eq('id', id)),
+  discordReglages: () => req(sb.from('discord_reglages').select('*').maybeSingle()),
+  discordRoles: () => req(sb.from('discord_roles').select('*').order('position', { ascending: false })),
+  majDiscordRole: (id, champs) => req(sb.from('discord_roles').update(champs).eq('id', id).select().single()),
+  discordRelier: (jeton, serveur = null) => req(sb.rpc('discord_relier', { p_jeton: jeton, p_serveur: serveur })),
+  discordDelier: () => req(sb.rpc('discord_delier')),
+  discordSynchroniser: () => req(sb.rpc('discord_synchroniser')),
 
   // Dossiers
   dossiers: () => req(sb.from('dossiers').select('*').order('derniere_activite', { ascending: false })),
@@ -75,21 +92,28 @@ export const api = {
   supprimerTraitement: id => req(sb.from('traitements').delete().eq('id', id)),
 };
 
-// Authentification
+// Connexion avec le nom RP et un code : Supabase demande une adresse e-mail,
+// on en déduit donc une du nom RP (« Hoki Ren » → hoki.ren@seimei.invalid).
+// Aucun e-mail n'y est jamais envoyé. Un ancien compte se connecte avec son e-mail.
+const DOMAINE = 'seimei.invalid';
+export function adresseDuNomRp(nomRp) {
+  const texte = String(nomRp || '').trim();
+  if (texte.includes('@')) return texte;
+  const simple = texte.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  let local = simple.replace(/[^a-z0-9]+/g, '.').replace(/^\.+|\.+$/g, '');
+  if (!local) local = 'u' + [...new TextEncoder().encode(simple)].map(o => o.toString(16).padStart(2, '0')).join('');
+  return `${local.slice(0, 60).replace(/\.+$/, '')}@${DOMAINE}`;
+}
+
 export const auth = {
   session: async () => (await sb.auth.getSession()).data.session,
   surChangement: rappel => sb.auth.onAuthStateChange(rappel),
-  connexion: (email, password) => req(sb.auth.signInWithPassword({ email, password })),
-  inscription: (email, password, donnees) => req(sb.auth.signUp({
-    email,
-    password,
-    options: { data: donnees, emailRedirectTo: adresseDuSite() },
+  connexion: (nomRp, code) => req(sb.auth.signInWithPassword({ email: adresseDuNomRp(nomRp), password: code })),
+  inscription: (nomRp, code) => req(sb.auth.signUp({
+    email: adresseDuNomRp(nomRp),
+    password: code,
+    options: { data: { nom_rp: nomRp.trim() } },
   })),
-  motDePasseOublie: email => req(sb.auth.resetPasswordForEmail(email, { redirectTo: adresseDuSite() })),
-  changerMotDePasse: password => req(sb.auth.updateUser({ password })),
+  changerCode: code => req(sb.auth.updateUser({ password: code })),
   deconnexion: () => sb.auth.signOut(),
 };
-
-export function adresseDuSite() {
-  return location.origin + location.pathname;
-}

@@ -4,11 +4,12 @@ import { api } from '../api.js';
 import { etat, peut } from '../etat.js';
 import {
   STATUTS, PARCOURS, TYPES_RDV, MOTIFS_CLOTURE, TYPES_TRAITEMENT, ETATS_TRAITEMENT,
-  RESULTATS_TRAITEMENT, DELAIS, statut, categorie, role, etapesDu,
+  RESULTATS_TRAITEMENT, DELAIS, statut, categorie, role, clan, etapesDu,
 } from '../constantes.js';
+import { infosPersonnage, nomAffiche } from '../annuaire.js';
 import {
   esc, icone, avatar, pastilleStatut, etiquetteCategorie, nomComplet, urlSure, dateLongue, dateCourte,
-  dateHeure, dateNumerique, ilYa, echeance, joursDepuis, aujourdhui, pluriel, toast, fenetre, confirmer, versDate, badgeRole,
+  dateHeure, dateNumerique, ilYa, echeance, joursDepuis, aujourdhui, pluriel, toast, fenetre, confirmer, versDate, badgeRole, badgeClan,
 } from '../ui.js';
 import { marquerVu } from '../vus.js';
 
@@ -86,13 +87,10 @@ function htmlEnTete(d) {
   const medecin = etat.membre(d.medecin_id);
   const rdv = d.prochain_rdv ? echeance(d.prochain_rdv) : null;
   const suivi = peut.gererSuivi(d);
-  const patient = [d.age, d.grade, d.village].filter(Boolean).join(' · ');
-  const joueur = etat.estJoueur ? null : etat.membre(d.patient_id);
+  const patient = [d.grade, d.section, d.age, d.village].filter(Boolean).join(' · ');
 
   return `
-    ${etat.estJoueur
-      ? `<a class="retour" href="#/">${icone('retour')} Mes dossiers</a>`
-      : `<a class="retour" href="${d.statut === 'cloture' ? '#/archives' : '#/dossiers'}">${icone('retour')} ${d.statut === 'cloture' ? 'Archives' : 'Dossiers'}</a>`}
+    <a class="retour" href="${d.statut === 'cloture' ? '#/archives' : '#/dossiers'}">${icone('retour')} ${d.statut === 'cloture' ? 'Archives' : 'Dossiers'}</a>
     <section class="hero" style="--c:${s.couleur}">
       <div class="hero-haut">
         <div style="min-width:0">
@@ -100,8 +98,8 @@ function htmlEnTete(d) {
           <h1 class="hero-nom">${esc(d.nom)} <span>${esc(d.prenom)}</span></h1>
           <p class="hero-patho">${esc(d.pathologie || 'Pathologie non renseignée')}</p>
           ${patient ? `<p class="hero-identite">${esc(patient)}</p>` : ''}
-          ${etat.estJoueur ? '' : `<p class="hero-identite">🎭 ${joueur ? `Compte joueur : ${esc(joueur.nom_rp)}${joueur.pseudo ? ` (${esc(joueur.pseudo)})` : ''}` : 'Aucun compte joueur relié'}</p>`}
-          <div class="hero-tags">${(d.categories || []).map(etiquetteCategorie).join('')}</div>
+          ${d.joueur ? `<p class="hero-identite">🎭 Joueur : ${esc(d.joueur)}</p>` : ''}
+          <div class="hero-tags">${badgeClan(d.clan)}${(d.categories || []).map(etiquetteCategorie).join('')}</div>
         </div>
         <div class="hero-statut">
           ${pastilleStatut(d.statut, {
@@ -133,8 +131,8 @@ function htmlEnTete(d) {
       <div class="hero-actions">
         ${peut.compteRendu(d) ? `<button type="button" class="btn btn-primaire" data-action="compte-rendu">${icone('document')} Compte rendu</button>` : ''}
         ${peut.rapportIrs(d) ? `<button type="button" class="btn" data-action="rapport">${icone('fiole')} Rapport IRS</button>` : ''}
-        ${peut.message(d) ? `<button type="button" class="btn ${etat.estJoueur ? 'btn-primaire' : ''}" data-action="message">${icone('message')} ${etat.estJoueur ? 'Écrire un message' : 'Message'}</button>` : ''}
-        ${peut.modifierDossier(d) ? `<a class="btn" href="#/dossier/${d.id}/modifier">${icone('crayon')} ${etat.estJoueur ? 'Modifier ma fiche' : 'Modifier la fiche'}</a>` : ''}
+        ${peut.note(d) ? `<button type="button" class="btn" data-action="note">${icone('message')} Note</button>` : ''}
+        ${peut.modifierDossier(d) ? `<a class="btn" href="#/dossier/${d.id}/modifier">${icone('crayon')} Modifier la fiche</a>` : ''}
         ${d.statut === 'cloture' && peut.rouvrir() ? `<button type="button" class="btn" data-action="rouvrir">${icone('actualiser')} Rouvrir le dossier</button>` : ''}
         ${peut.supprimerDossier() ? `<button type="button" class="btn btn-fantome btn-icone" data-action="supprimer" title="Supprimer le dossier" aria-label="Supprimer le dossier">${icone('poubelle')}</button>` : ''}
       </div>
@@ -154,11 +152,9 @@ function htmlBandeaux(d) {
     b.push(`<div class="bandeau info-violet">🔬 Tu vois ce dossier car le patient a autorisé la transmission à l’IRS.${d.statut === 'analyse_irs' ? ' Publie ton rapport d’analyse ici une fois l’analyse terminée.' : ''}</div>`);
   }
   if (!d.medecin_id && d.statut !== 'cloture') {
-    b.push(etat.estJoueur
-      ? '<div class="bandeau">🟡 Ta demande a bien été reçue : un médecin de la branche va prendre en charge ton dossier et organiser le premier rendez-vous.</div>'
-      : `<div class="bandeau">🟡 Aucun médecin référent pour l’instant.${peut.prendreEnCharge(d) ? ` <button type="button" class="btn btn-petit btn-primaire" data-action="prendre">Prendre en charge</button>` : ''}</div>`);
+    b.push(`<div class="bandeau">🟡 Aucun médecin référent pour l’instant.${peut.prendreEnCharge(d) ? ` <button type="button" class="btn btn-petit btn-primaire" data-action="prendre">Prendre en charge</button>` : ''}</div>`);
   }
-  if (!etat.estJoueur && !['pause', 'stable', 'cloture'].includes(d.statut) && inactif >= DELAIS.inactivite) {
+  if (!['pause', 'stable', 'cloture'].includes(d.statut) && inactif >= DELAIS.inactivite) {
     b.push(`<div class="bandeau">⏳ Aucune activité depuis ${inactif} jours : selon les règles de la branche, le dossier peut passer « En pause ».${peut.changerStatut(d) ? ` <button type="button" class="btn btn-petit" data-action="pause">Mettre en pause</button>` : ''}</div>`);
   }
   return b.join('');
@@ -208,7 +204,7 @@ function htmlJournal() {
   const { entrees, filtre } = courant;
   const filtres = [
     ['tout', 'Tout'], ['compte_rendu', '📋 Comptes rendus'], ['rapport_irs', '🔬 Rapports IRS'],
-    ['note', '💬 Messages'], ['evenement', '🧭 Historique'],
+    ['note', '💬 Notes'], ['evenement', '🧭 Historique'],
   ];
   const liste = filtre === 'tout' ? entrees : entrees.filter(e => e.type === filtre);
   return `
@@ -219,7 +215,7 @@ function htmlJournal() {
       }).join('')}</div>
       ${liste.length ? `<div class="journal">${liste.map(htmlEntree).join('')}</div>` : `
         <div class="vide"><span class="grande-icone" aria-hidden="true">📭</span><strong>Rien pour l’instant</strong>
-          <p>Les comptes rendus, rapports de l’IRS et messages du dossier apparaîtront ici.</p></div>`}
+          <p>Les comptes rendus, rapports de l’IRS et notes du dossier apparaîtront ici.</p></div>`}
     </div>`;
 }
 
@@ -292,11 +288,10 @@ function htmlEntree(e, i) {
       </div></article>`;
   }
 
-  const duJoueur = auteur?.role === 'patient';
   return `
-    <article class="entree note ${duJoueur ? 'du-joueur' : ''}" style="--c:${duJoueur ? '#f9a8d4' : '#94a3b8'};--i:${i}"><div class="entree-carte">
+    <article class="entree note" style="--c:#94a3b8;--i:${i}"><div class="entree-carte">
       <div class="entree-tete">
-        <div class="entree-sous">${avatar(auteur, 'petit')} <strong style="color:var(--texte)">${esc(auteur?.nom_rp || 'Membre')}</strong>
+        <div class="entree-sous">${avatar(auteur, 'petit')} <strong style="color:var(--texte)">${esc(auteur?.nom_rp || 'Ancien membre')}</strong>
           ${auteur ? badgeRole(auteur.role) : ''} · ${dateHeure(e.created_at)}${modifie}</div>
         ${actions}
       </div>
@@ -308,9 +303,10 @@ function htmlEntree(e, i) {
 
 function htmlFiche(d) {
   const createur = etat.membre(d.cree_par);
-  const joueur = etat.membre(d.patient_id);
+  const fiche = infosPersonnage(etat.personnage(d.personnage_id));
   const sections = [
-    ['Identité', [['Nom', d.nom], ['Prénom', d.prenom], ['Âge', d.age], ['Grade', d.grade], ['Village / Clan', d.village]]],
+    ['Identité', [['Nom', d.nom], ['Prénom', d.prenom], ['Grade', d.grade], ['Section', d.section],
+      ['Clan', clan(d.clan)?.label], ['Âge', d.age], ['Village', d.village]]],
     ['Pathologie', [
       ['Catégorie de suivi', (d.categories || []).map(c => `${categorie(c).emoji} ${categorie(c).label}`).join(', ')],
       ['Pathologie', d.pathologie], ['Origine', d.origine], ['Apparition', d.apparition],
@@ -318,13 +314,13 @@ function htmlFiche(d) {
       ['Traitements déjà essayés', d.traitements_essayes], ['Suivi à réaliser pour la pathologie', d.suivi_a_realiser],
     ]],
     ['HRP', [
-      ['Joueur', d.joueur], ['Ce que je souhaite développer en RP', d.souhaits_rp],
+      ['Joueur', d.joueur], ['Ce que le joueur souhaite développer en RP', d.souhaits_rp],
       ['Limites / éléments à éviter', d.limites], ['Disponibilités', d.disponibilites],
     ]],
     ['Suivi', [
       ['Plan de suivi en cours', d.plan_suivi],
       ['Parcours', (PARCOURS[d.parcours] || PARCOURS.maladie).label],
-      ['Compte joueur relié', joueur ? `${joueur.nom_rp}${joueur.pseudo ? ` (${joueur.pseudo})` : ''}` : ''],
+      ['Annuaire des joueurs', fiche ? `${nomAffiche(fiche)}${fiche.pseudo ? ` (@${fiche.pseudo})` : ''}` : ''],
       ['Dossier ouvert', `${dateLongue(d.created_at)}${createur ? ` par ${createur.nom_rp}` : ''}`],
     ]],
   ];
@@ -401,7 +397,7 @@ async function surClic(e) {
     consentement: modifierAccord,
     'compte-rendu': () => composerCompteRendu(),
     rapport: () => composerRapport(),
-    message: () => composerMessage(),
+    note: () => composerNote(),
     supprimer: supprimerDossier,
     'modifier-entree': () => modifierEntree(id),
     'supprimer-entree': () => supprimerEntree(id),
@@ -745,15 +741,14 @@ async function composerRapport(entree = null) {
   toast(entree ? 'Rapport modifié' : 'Rapport publié dans le journal', 'succes');
 }
 
-async function composerMessage(entree = null) {
+async function composerNote(entree = null) {
   const { d } = courant;
   const r = await fenetre({
-    titre: entree ? 'Modifier le message' : 'Nouveau message',
-    sousTitre: etat.estJoueur ? 'Visible par toi et l’équipe qui suit ton dossier.' : `${esc(nomComplet(d))} · visible par le joueur et l’équipe.`,
-    corps: champ('Message', zone('texte', entree?.contenu?.texte || '', 5, `required maxlength="4000" placeholder="${etat.estJoueur
-      ? 'Une question, une précision sur ta pathologie, tes disponibilités…'
-      : 'Organisation HRP : disponibilités, rappel, précision…'}"`)),
-    texteValider: entree ? 'Enregistrer' : 'Envoyer',
+    titre: entree ? 'Modifier la note' : 'Nouvelle note',
+    sousTitre: `${esc(nomComplet(d))} · visible par l’équipe qui suit le dossier.`,
+    corps: champ('Note', zone('texte', entree?.contenu?.texte || '', 5,
+      'required maxlength="4000" placeholder="Organisation HRP, disponibilités du joueur, rappel, précision…"')),
+    texteValider: entree ? 'Enregistrer' : 'Ajouter la note',
     valider: (_f, x) => (entree
       ? api.majEntree(entree.id, { texte: x.texte.trim() })
       : api.creerEntree({ dossier_id: d.id, type: 'note', contenu: { texte: x.texte.trim() } })),
@@ -762,7 +757,7 @@ async function composerMessage(entree = null) {
   courant.onglet = 'journal';
   courant.filtre = 'tout';
   await recharger({ entrees: true });
-  toast(entree ? 'Message modifié' : 'Message envoyé', 'succes');
+  toast(entree ? 'Note modifiée' : 'Note ajoutée au journal', 'succes');
 }
 
 function modifierEntree(id) {
@@ -770,13 +765,13 @@ function modifierEntree(id) {
   if (!e) return;
   if (e.type === 'compte_rendu') return composerCompteRendu(e);
   if (e.type === 'rapport_irs') return composerRapport(e);
-  return composerMessage(e);
+  return composerNote(e);
 }
 
 async function supprimerEntree(id) {
   const e = courant.entrees.find(x => x.id === id);
   if (!e) return;
-  const nom = { compte_rendu: 'ce compte rendu', rapport_irs: 'ce rapport IRS', note: 'ce message' }[e.type];
+  const nom = { compte_rendu: 'ce compte rendu', rapport_irs: 'ce rapport IRS', note: 'cette note' }[e.type];
   const ok = await confirmer({ titre: `Supprimer ${nom} ?`, message: 'Il disparaîtra du journal du dossier.', texteValider: 'Supprimer', danger: true });
   if (!ok) return;
   await api.supprimerEntree(id);

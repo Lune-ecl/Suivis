@@ -1,7 +1,7 @@
 // Briques d'interface partagées : échappement, icônes, dates, notifications,
 // fenêtres, confirmation, infobulles.
 
-import { statut, categorie, role } from './constantes.js';
+import { statut, categorie, role, clan } from './constantes.js';
 
 /* ---------------- Utilitaires ---------------- */
 
@@ -37,6 +37,9 @@ export const pluriel = (n, singulier, pluriel = singulier + 's') => `${n} ${n > 
 const ICONES = {
   tableau: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
   dossier: '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  joueurs: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2.2"/><path d="M5.5 16.5a3.6 3.6 0 0 1 7 0"/><path d="M15 9h3"/><path d="M15 13h3"/>',
+  discord: '<path d="M8.5 7.5c-1.4.3-2.6.8-3.6 1.5-1.6 2.5-2.1 5-1.8 7.4 1.4 1 2.8 1.7 4.2 2.1l1-1.6"/><path d="M15.5 7.5c1.4.3 2.6.8 3.6 1.5 1.6 2.5 2.1 5 1.8 7.4-1.4 1-2.8 1.7-4.2 2.1l-1-1.6"/><path d="M7.6 16.2c2.9 1.2 5.9 1.2 8.8 0"/><path d="M8.3 7.4C10.7 6.8 13.3 6.8 15.7 7.4"/><circle cx="9.3" cy="12.8" r="1.1"/><circle cx="14.7" cy="12.8" r="1.1"/>',
+  cle: '<circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.8-9.8"/><path d="m17 6 3 3"/><path d="m14.5 8.5 2 2"/>',
   archive: '<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
   equipe: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
   plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
@@ -91,6 +94,19 @@ export function avatar(membre, taille = '') {
   if (!membre) return `<span class="avatar avatar-vide ${taille}" aria-hidden="true">?</span>`;
   const nom = membre.nom_rp || 'Membre';
   return `<span class="avatar ${taille}" style="--h:${teinte(membre.id || nom)}" aria-hidden="true">${esc(initiales(nom))}</span>`;
+}
+
+// Avatar d'un joueur de l'annuaire : photo Discord, sinon ses initiales.
+export function avatarJoueur(infos, taille = '') {
+  const nom = [infos?.nom, infos?.prenom].filter(Boolean).join(' ') || '?';
+  const photo = urlSure(infos?.avatar);
+  return `<span class="avatar ${taille}" style="--h:${teinte(nom)}" aria-hidden="true">${esc(initiales(nom))}${photo
+    ? `<img class="avatar-photo" src="${esc(photo)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}</span>`;
+}
+
+export function badgeClan(id) {
+  const c = clan(id);
+  return c ? `<span class="clan" style="--c:${c.couleur}">${esc(c.label)}</span>` : '';
 }
 
 /* ---------------- Dates ---------------- */
@@ -252,6 +268,13 @@ function montrerBulle(cible) {
   bulle.hidden = false;
 }
 const cacherBulle = () => { if (bulle) bulle.hidden = true; };
+
+// Une photo Discord qui ne se charge pas laisse place aux initiales.
+export function activerPhotos() {
+  document.addEventListener('error', e => {
+    if (e.target instanceof HTMLImageElement && e.target.classList.contains('avatar-photo')) e.target.remove();
+  }, true);
+}
 
 export function activerInfobulles() {
   const suivre = e => {

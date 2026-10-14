@@ -1,6 +1,6 @@
-// Écrans hors application : configuration, connexion, attente de validation, mot de passe.
+// Écrans hors application : configuration, connexion, attente de validation.
 
-import { auth } from '../api.js';
+import { auth, CONFIRMATION_ACTIVE } from '../api.js';
 import { esc, icone, toast } from '../ui.js';
 
 const fond = '<div class="kanji-fond" aria-hidden="true"><span>生</span><span>命</span></div>';
@@ -26,7 +26,7 @@ export function ecranConfiguration(racine) {
       <p>Le site n’est pas encore relié à ta base Supabase. Trois étapes :</p>
       <ol class="etapes-config">
         <li>Dans Supabase, exécute le fichier <code>supabase/schema.sql</code> (SQL Editor → Run).</li>
-        <li>Copie l’URL du projet et la clé publique <code>anon</code> dans <code>config.js</code>.</li>
+        <li>Copie l’URL du projet et la clé publique (<code>publishable</code> ou <code>anon</code>) dans <code>config.js</code>.</li>
         <li>Enregistre le fichier, puis recharge cette page.</li>
       </ol>
     </div>
@@ -88,36 +88,24 @@ export function ecranConnexion(racine, { mode = 'connexion' } = {}) {
     </div>
 
     <form class="form-connexion" data-form="connexion" novalidate>
-      <label class="champ"><span class="etiquette">Adresse e-mail</span>
-        <input type="email" name="email" autocomplete="email" required placeholder="nom@exemple.com"></label>
-      <label class="champ"><span class="etiquette">Mot de passe</span>
-        <input type="password" name="password" autocomplete="current-password" required placeholder="••••••••"></label>
+      <label class="champ"><span class="etiquette">Nom Prénom RP</span>
+        <input name="nom_rp" required maxlength="80" autocomplete="username" placeholder="ex. Hoki Ren" autocapitalize="words"></label>
+      <label class="champ"><span class="etiquette">Code</span>
+        <input type="password" name="code" autocomplete="current-password" required placeholder="••••••"></label>
       <button type="submit" class="btn btn-primaire btn-large">Se connecter</button>
-      <button type="button" class="lien-discret" data-action="oubli">Mot de passe oublié ?</button>
+      <p class="aide centre">Code oublié ? Le responsable de la branche peut t’en donner un nouveau.</p>
     </form>
 
     <form class="form-connexion" data-form="inscription" novalidate hidden>
-      <div class="choix-compte" role="radiogroup" aria-label="Type de compte">
-        <label class="choix-statut" style="--c:#f9a8d4">
-          <input type="radio" name="equipe" value="non" checked>
-          <span class="emoji" aria-hidden="true">🎭</span>
-          <span><strong>Je suis joueur</strong><small>Pour ouvrir et suivre le dossier médical de mon personnage.</small></span>
-        </label>
-        <label class="choix-statut" style="--c:#34d399">
-          <input type="radio" name="equipe" value="oui">
-          <span class="emoji" aria-hidden="true">🩺</span>
-          <span><strong>Je rejoins l’équipe</strong><small>Membre de la branche ou chercheur de l’IRS. Le responsable valide l’accès.</small></span>
-        </label>
-      </div>
-      <label class="champ"><span class="etiquette">Ton nom (personnage ou pseudo) <span class="requis">*</span></span>
-        <input name="nom_rp" required maxlength="80" placeholder="ex. Akiyama Ren" autocomplete="nickname"></label>
-      <label class="champ"><span class="etiquette">Pseudo du joueur</span>
-        <input name="pseudo" maxlength="80" placeholder="ex. ren.akiyama"></label>
-      <label class="champ"><span class="etiquette">Adresse e-mail <span class="requis">*</span></span>
-        <input type="email" name="email" autocomplete="email" required placeholder="nom@exemple.com"></label>
-      <label class="champ"><span class="etiquette">Mot de passe <span class="requis">*</span></span>
-        <input type="password" name="password" autocomplete="new-password" required minlength="6" placeholder="6 caractères minimum"></label>
-      <button type="submit" class="btn btn-primaire btn-large" data-texte-joueur="Créer mon compte" data-texte-equipe="Envoyer ma demande">Créer mon compte</button>
+      <p class="aide">Réservé à l’équipe de la branche et aux chercheurs de l’IRS. Le responsable valide chaque compte.</p>
+      <label class="champ"><span class="etiquette">Nom Prénom RP <span class="requis">*</span></span>
+        <input name="nom_rp" required maxlength="80" autocomplete="username" placeholder="ex. Hoki Ren" autocapitalize="words">
+        <span class="aide">Le nom de ton personnage, comme sur Discord. Il te servira pour te connecter.</span></label>
+      <label class="champ"><span class="etiquette">Code <span class="requis">*</span></span>
+        <input type="password" name="code" autocomplete="new-password" required minlength="6" placeholder="6 caractères minimum"></label>
+      <label class="champ"><span class="etiquette">Confirme ton code <span class="requis">*</span></span>
+        <input type="password" name="confirmation" autocomplete="new-password" required minlength="6"></label>
+      <button type="submit" class="btn btn-primaire btn-large">Créer mon compte</button>
     </form>
     ${mention}`);
 
@@ -128,23 +116,9 @@ export function ecranConnexion(racine, { mode = 'connexion' } = {}) {
   };
   changerMode(mode);
 
-  c.addEventListener('click', async e => {
+  c.addEventListener('click', e => {
     const onglet = e.target.closest('[data-mode]');
-    if (onglet) return changerMode(onglet.dataset.mode);
-    const action = e.target.closest('[data-action]')?.dataset.action;
-    if (action === 'oubli') {
-      const email = c.querySelector('[data-form="connexion"] [name=email]').value.trim();
-      if (!email) return toast('Saisis d’abord ton adresse e-mail.', 'erreur');
-      try {
-        await auth.motDePasseOublie(email);
-        toast('Si un compte existe, un e-mail pour choisir un nouveau mot de passe vient d’être envoyé.', 'succes');
-      } catch (err) { toast(err.message, 'erreur'); }
-    }
-  });
-  c.addEventListener('change', e => {
-    if (e.target.name !== 'equipe') return;
-    const bouton = c.querySelector('[data-form="inscription"] [type=submit]');
-    bouton.textContent = e.target.value === 'oui' ? bouton.dataset.texteEquipe : bouton.dataset.texteJoueur;
+    if (onglet) changerMode(onglet.dataset.mode);
   });
 
   c.addEventListener('submit', async e => {
@@ -152,64 +126,22 @@ export function ecranConnexion(racine, { mode = 'connexion' } = {}) {
     const form = e.target;
     if (!form.reportValidity()) return;
     const d = Object.fromEntries(new FormData(form));
+    const nomRp = d.nom_rp.trim().replace(/\s+/g, ' ');
+    if (!/\p{L}/u.test(nomRp)) return toast('Écris le nom de ton personnage.', 'erreur');
+    if (form.dataset.form === 'inscription' && d.code !== d.confirmation) {
+      return toast('Les deux codes ne correspondent pas.', 'erreur');
+    }
     const bouton = form.querySelector('[type=submit]');
     bouton.classList.add('charge');
     try {
       if (form.dataset.form === 'connexion') {
-        await auth.connexion(d.email.trim(), d.password);
-        // La suite est gérée par l'écouteur de session (main.js).
+        await auth.connexion(nomRp, d.code);
       } else {
-        const r = await auth.inscription(d.email.trim(), d.password, {
-          nom_rp: d.nom_rp.trim(),
-          pseudo: d.pseudo.trim(),
-          equipe: d.equipe === 'oui',
-        });
-        if (!r.session) {
-          carte(racine, `
-            <div class="message-ecran">
-              <div class="grande-icone" aria-hidden="true">✉️</div>
-              <h2>Confirme ton e-mail</h2>
-              <p>Un lien de confirmation vient d’être envoyé à <strong>${esc(d.email)}</strong>. Clique dessus, puis connecte-toi.</p>
-              <button class="btn btn-primaire" data-retour>Retour à la connexion</button>
-            </div>`).querySelector('[data-retour]').addEventListener('click', () => ecranConnexion(racine));
-        }
+        const r = await auth.inscription(nomRp, d.code);
+        // Sans session, Supabase attend une confirmation par e-mail, impossible ici.
+        if (!r.session) toast(CONFIRMATION_ACTIVE, 'erreur');
       }
-    } catch (err) {
-      toast(err.message, 'erreur');
-    } finally {
-      bouton.classList.remove('charge');
-    }
-  });
-}
-
-export function ecranNouveauMotDePasse(racine, { termine }) {
-  const c = carte(racine, `
-    <header class="connexion-tete">
-      ${sceau}
-      <h1>Seimei</h1>
-      <p>Nouveau mot de passe</p>
-    </header>
-    <form class="form-connexion" novalidate>
-      <label class="champ"><span class="etiquette">Nouveau mot de passe</span>
-        <input type="password" name="password" autocomplete="new-password" required minlength="6" placeholder="6 caractères minimum"></label>
-      <label class="champ"><span class="etiquette">Confirmation</span>
-        <input type="password" name="confirmation" autocomplete="new-password" required minlength="6"></label>
-      <button type="submit" class="btn btn-primaire btn-large">Enregistrer</button>
-    </form>
-    ${mention}`);
-  c.querySelector('input').focus();
-  c.querySelector('form').addEventListener('submit', async e => {
-    e.preventDefault();
-    const form = e.target;
-    if (!form.reportValidity()) return;
-    const { password, confirmation } = Object.fromEntries(new FormData(form));
-    if (password !== confirmation) return toast('Les deux mots de passe ne correspondent pas.', 'erreur');
-    const bouton = form.querySelector('[type=submit]');
-    bouton.classList.add('charge');
-    try {
-      await auth.changerMotDePasse(password);
-      toast('Mot de passe enregistré.', 'succes');
-      termine();
+      // La suite est gérée par l'écouteur de session (main.js).
     } catch (err) {
       toast(err.message, 'erreur');
     } finally {

@@ -1,6 +1,5 @@
 // Guide de la branche : fonctionnement, parcours, statuts et règles (repris du projet de branche).
 
-import { etat } from '../etat.js';
 import { CATEGORIES, STATUTS, PARCOURS, ROLES } from '../constantes.js';
 import { esc, icone } from '../ui.js';
 
@@ -126,23 +125,31 @@ export function rendreGuide(vue) {
         <h2 class="titre-section">Utiliser le site</h2>
         <div class="grille-guide">
           <div class="panneau">
-            <h3 class="titre-guide">🎭 Joueurs</h3>
+            <h3 class="titre-guide">🔐 Accès au site</h3>
             ${liste([
-              'Crée ton compte avec « Je suis joueur » : tu as tout de suite accès à ton espace.',
-              'Ouvre une <strong>demande de suivi</strong> en remplissant la fiche patient de ton personnage.',
-              'Un médecin prend ton dossier en charge et organise avec toi le premier rendez-vous RP.',
-              'Suis ton dossier : comptes rendus, résultats, traitements. Échange avec l’équipe par <strong>messages</strong>.',
-              'Donne ou retire ton accord pour la transmission à l’IRS.',
+              'Le site est réservé à l’équipe de la branche et aux chercheurs de l’IRS : <strong>les joueurs n’y ont pas accès</strong>.',
+              'Chacun se connecte avec le <strong>nom de son personnage</strong> et un <strong>code</strong> choisi à l’inscription.',
+              'Le responsable valide chaque nouveau compte et lui donne son rôle.',
+              'Code oublié : le responsable en choisit un nouveau depuis la page Équipe.',
+            ])}
+          </div>
+          <div class="panneau">
+            <h3 class="titre-guide">🎭 Annuaire des joueurs</h3>
+            ${liste([
+              'La page <strong>Joueurs</strong> reprend les membres du serveur Discord : leur pseudo sur le serveur donne leur nom RP, leurs rôles donnent leur grade, leur section et leur clan.',
+              'Elle se met à jour toute seule, ou avec le bouton « Mettre à jour ».',
+              'Les joueurs absents du serveur, par exemple les <strong>Roran</strong>, s’ajoutent à la main.',
+              'Une information fausse sur Discord se corrige dans la fiche du joueur, sans toucher au serveur.',
             ])}
           </div>
           <div class="panneau">
             <h3 class="titre-guide">🩺 Équipe de la branche</h3>
             ${liste([
-              'Prends en charge les nouvelles demandes depuis le tableau de bord.',
+              'Ouvre un dossier en choisissant le joueur dans l’annuaire : son nom, son prénom, son grade, sa section et son clan sont remplis automatiquement.',
+              'Prends en charge les dossiers sans médecin depuis le tableau de bord.',
               'Après chaque rendez-vous RP, publie un <strong>compte rendu</strong> dans le dossier.',
-              'Fais avancer le parcours, mets à jour le statut et le prochain rendez-vous.',
-              'Consigne chaque traitement essayé et ses effets.',
-              'Le tableau de bord signale les urgences, les messages des joueurs et les dossiers inactifs.',
+              'Fais avancer le parcours, mets à jour le statut et le prochain rendez-vous, et consigne chaque traitement essayé.',
+              'Les <strong>notes</strong> du journal servent à l’organisation entre membres de l’équipe.',
             ])}
           </div>
           <div class="panneau">
@@ -172,14 +179,13 @@ export function rendreGuide(vue) {
           ['Cohérence avec la fiche personnage', 'La pathologie suivie doit figurer sur la fiche validée du personnage, ou être validée par le staff. Tout changement important (guérison complète, prothèse, perte ou récupération d’une capacité) doit être validé par le staff avant d’être appliqué.'],
           ['Aucun avantage de puissance', 'Le suivi sert à soigner, stabiliser ou soulager, jamais à offrir un bonus au personnage.'],
           ['Pas de métagaming', 'Le contenu des dossiers reste couvert par le secret médical en RP : un personnage ne peut pas utiliser une information qu’il n’a pas apprise en jeu.'],
-          ['Qui écrit dans un dossier', 'Seuls le patient, l’équipe de la branche et les chercheurs de l’IRS concernés y publient.'],
+          ['Qui écrit dans un dossier', 'Seuls l’équipe de la branche et les chercheurs de l’IRS concernés y publient.'],
           ['Inactivité', 'Un dossier sans activité pendant trois semaines passe « En pause » et peut être repris à tout moment. Si un médecin référent devient inactif, le responsable confie ses dossiers à un autre médecin.'],
         ].map(([titre, texte]) => `
           <div class="panneau regle"><h3 class="titre-guide">${esc(titre)}</h3><p class="texte-guide">${esc(texte)}</p></div>`).join('')}
         </div>
       </section>
 
-      ${etat.estJoueur ? `<div class="actions-page"><a class="btn btn-primaire" href="#/dossiers/nouveau">${icone('plus')} Ouvrir une demande de suivi</a></div>` : ''}
     </div>`;
 
   vue.querySelector('.sommaire').addEventListener('click', e => {
