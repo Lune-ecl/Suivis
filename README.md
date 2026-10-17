@@ -1,35 +1,44 @@
 # 生命 Seimei · Suivi des pathologies
 
 Documentation de la branche **Suivi des pathologies** de la Seimei, en lien avec l'IRS.
-Le suivi des patients se fait entièrement sur le **forum Discord** de la branche ; ce site explique comment tout cela fonctionne.
+Le suivi des patients se fait entièrement sur le **forum Discord** de la branche ; ce site explique comment tout cela fonctionne. Il est en accès libre : pas de compte, pas d'inscription.
 
 👉 **En ligne : https://lune-ecl.github.io/Suivis/**
 
-## Les pages
+## Organisation
 
-| Page | Contenu |
-|---|---|
-| [Accueil](index.html) | La branche en bref, les six catégories, les deux parcours, un suivi en un coup d'œil, par où commencer |
-| [Fonctionnement](fonctionnement.html) | Rôles, dossier médical et secret médical, forum, ouverture d'un dossier, étiquettes, rendez-vous, examens, traitements, IRS, urgences, pause, clôture, rythme, règles |
-| [Pathologies](pathologies.html) | Les parcours « maladie » (7 étapes) et « réadaptation » (4 étapes), puis une fiche complète par catégorie : génétique, inconnue, post-opératoire, rééducation, séquelle permanente, chronique |
-| [Rééducation](reeducation.html) | Principes, structure d'une séance, échelles de mesure et onze séances détaillées (marche, épaule, amputation, main et signes, dos, souffle, équilibre, mémoire, chakra, brûlures, retour en mission) |
-| [Déroulement](deroulement.html) | Le cycle de vie d'un dossier et cinq suivis racontés semaine par semaine, avec les étiquettes et des extraits de comptes rendus |
-| [Modèles](modeles.html) | Tous les messages du forum à copier : fiche patient, prise en charge, comptes rendus, bilans, IRS, urgence, pause, clôture, réouverture… |
-| [FAQ](faq.html) | Questions des joueurs, de l'équipe et de l'IRS, et glossaire |
+Le site est rangé en sept catégories, chacune avec sa page d'ensemble et ses sous-pages :
 
-Sur chaque page : un sommaire qui suit la lecture, une **recherche dans toute la documentation** (bouton « Rechercher » ou <kbd>Ctrl</kbd> + <kbd>K</kbd>) et des boutons **Copier** sur les modèles, avec le nombre de caractères (limite Discord : 2 000).
+| Catégorie | Dossier | Sous-pages |
+|---|---|---|
+| 🏥 La branche | `branche/` | Présentation, rôles et organisation, dossier médical, règles et garde-fous |
+| 💬 Le suivi sur Discord | `discord/` | Forum, ouvrir un dossier, étiquettes, rendez-vous et comptes rendus, IRS, urgences et pauses, clôture, rythme |
+| 🧬 Soins et pathologies | `pathologies/` | Parcours de soin, examens et traitements, une fiche par catégorie (génétique, inconnue, post-opératoire, rééducation, séquelle permanente, chronique), plusieurs pathologies, créer sa pathologie |
+| 💪 Rééducation | `reeducation/` | Principes, mesurer les progrès, faire vivre une séance, puis onze séances (marche, dos, épaule, main et signes, amputation, brûlures, souffle, équilibre, mémoire, chakra, retour en mission) |
+| 🗓️ Exemples de suivis | `exemples/` | Cinq suivis racontés semaine par semaine, et les situations particulières |
+| 📋 Modèles Discord | `modeles/` | Ouvrir un dossier, pendant le suivi, avec l'IRS, les imprévus, la fin du suivi |
+| 💡 FAQ et glossaire | `faq/` | Questions des joueurs, de l'équipe, de l'IRS, et glossaire |
+
+Sur chaque page :
+- un menu déroulant par catégorie dans l'en-tête (ou un menu complet sur téléphone) ;
+- une barre latérale avec les pages de la catégorie et un fil d'Ariane ;
+- un sommaire qui suit la lecture ;
+- une **recherche dans tout le site** (bouton « Rechercher » ou <kbd>Ctrl</kbd> + <kbd>K</kbd>) ;
+- des boutons **Copier** sur les modèles, avec le nombre de caractères (limite Discord : 2 000).
 
 ## Modifier la documentation
 
 Le site est fait de simples fichiers HTML, sans outil à installer :
 
-- le texte se trouve dans les fichiers `*.html` à la racine ;
-- l'apparence dans `assets/css/doc.css` ;
-- l'en-tête, le sommaire, la recherche et les boutons « Copier » sont ajoutés par `assets/js/doc.js`. Pour ajouter une page, crée le fichier HTML sur le modèle des autres et ajoute-la à la liste `PAGES` en haut de ce script.
+- le texte de chaque page se trouve dans son fichier `.html`, entre `<main>` et `</main>` ;
+- l'apparence est dans `assets/css/doc.css` ;
+- le plan du site est en haut de `assets/js/doc.js` (liste `PLAN`). Le script s'en sert pour construire l'en-tête, les menus, la barre latérale, les cartes des pages d'ensemble, les liens « précédent / suivant » et la recherche.
+
+**Ajouter une page** : copie une page existante de la même catégorie, change son titre et son contenu, puis ajoute-la à la catégorie dans `PLAN` (fichier, titre, émoji, description).
 
 Chaque titre de section qui porte un `id` apparaît dans le sommaire et dans la recherche. Après une modification de `doc.css` ou `doc.js`, augmente le numéro `?v=` des liens dans les pages pour que les navigateurs chargent la nouvelle version.
 
-GitHub Pages publie automatiquement la branche `main` : les changements sont en ligne une à deux minutes après leur fusion.
+GitHub Pages publie automatiquement la branche `main` : les changements sont en ligne une à deux minutes après leur fusion. Une adresse qui n'existe pas affiche la page `404.html`, qui renvoie vers les catégories.
 
 ## Autres fichiers
 

@@ -4,16 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Seimei · Suivi des pathologies — Documentation de la branche</title>
-  <meta name="description" content="Documentation de la branche Suivi des pathologies de la Seimei, en lien avec l'IRS : fonctionnement, suivi par pathologie, séances de rééducation, exemples de suivis et modèles Discord.">
+  <meta name="description" content="Documentation de la branche Suivi des pathologies de la Seimei, en lien avec l'IRS : fonctionnement, suivi sur Discord, pathologies, rééducation, exemples de suivis et modèles.">
   <meta name="theme-color" content="#060a13">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7b7'/%3E%3Cstop offset='1' stop-color='%2314b8a6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Ctext x='32' y='45' font-size='36' font-weight='700' text-anchor='middle' fill='%2303221a' font-family='serif'%3E%E7%94%9F%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Shippori+Mincho:wght@700&display=swap">
-  <link rel="stylesheet" href="assets/css/doc.css?v=1">
-  <script src="assets/js/doc.js?v=1" defer></script>
+  <link rel="stylesheet" href="assets/css/doc.css?v=2">
+  <script src="assets/js/doc.js?v=2" defer></script>
 </head>
-<body data-page="accueil">
+<body>
 <div class="fond" aria-hidden="true"></div>
 <div class="mise-en-page">
 <main id="contenu">
@@ -21,14 +21,13 @@
   <header class="hero-doc accueil" data-kanji="生命">
     <p class="surtitre">Seimei · en lien avec l'IRS</p>
     <h1>Suivi des pathologies</h1>
-    <p class="chapo">La branche de la Seimei qui accompagne <strong>dans la durée</strong> les patients atteints d'une maladie génétique, d'une pathologie chronique ou inconnue, de séquelles, ou en convalescence après une opération. Cette documentation explique tout : comment fonctionne la branche, ce qu'il faut suivre pour chaque pathologie, comment se passent les séances de rééducation et comment se déroule un suivi, du premier rendez-vous à la clôture.</p>
+    <p class="chapo">La branche de la Seimei qui accompagne <strong>dans la durée</strong> les patients atteints d'une maladie génétique, d'une pathologie chronique ou inconnue, de séquelles, ou en convalescence après une opération. Cette documentation explique tout : le fonctionnement de la branche, le suivi sur Discord, les soins pour chaque pathologie, les séances de rééducation, des exemples complets et les modèles à copier.</p>
     <div class="actions">
-      <a class="btn btn-primaire" href="fonctionnement.html">Comprendre la branche</a>
-      <a class="btn" href="fonctionnement.html#ouvrir-un-dossier">Ouvrir un dossier</a>
-      <a class="btn" href="modeles.html">Modèles à copier</a>
+      <a class="btn btn-primaire" href="branche/">Découvrir la branche</a>
+      <a class="btn" href="discord/ouvrir-un-dossier.html">Ouvrir un dossier</a>
+      <a class="btn" href="modeles/">Modèles à copier</a>
     </div>
   </header>
-
   <div class="encadre info">
     <span class="emoji" aria-hidden="true">💬</span>
     <div>
@@ -36,105 +35,42 @@
       <p>Le <strong>forum de la branche</strong> sert de dossier médical : un post par patient, avec sa fiche, les comptes rendus de chaque rendez-vous et les rapports de l'IRS. Les rendez-vous eux-mêmes se jouent dans les salons RP habituels. Ce site est la référence : il explique comment tout cela fonctionne.</p>
     </div>
   </div>
-
-  <h2 id="en-bref">La branche en bref</h2>
-  <p>Plutôt que d'intervenir seulement quand une urgence survient, la branche suit chaque patient sur plusieurs semaines, voire plusieurs mois. La Seimei assure le suivi médical ; l'IRS apporte son expertise scientifique pour comprendre les pathologies et chercher des traitements.</p>
-  <div class="grille quatre">
-    <div class="carte">
-      <span class="emoji" aria-hidden="true">📁</span>
-      <strong class="titre">Un dossier par patient</strong>
-      <p>Un post du forum = un patient. Toutes ses pathologies, ses examens, ses traitements et ses comptes rendus y sont réunis.</p>
-    </div>
-    <div class="carte c-chronique">
-      <span class="emoji" aria-hidden="true">🩺</span>
-      <strong class="titre">Un médecin référent</strong>
-      <p>Il suit le patient du premier rendez-vous jusqu'à la fin, organise ses rendez-vous et tient son dossier à jour.</p>
-    </div>
-    <div class="carte c-genetique">
-      <span class="emoji" aria-hidden="true">🔬</span>
-      <strong class="titre">L'IRS en renfort</strong>
-      <p>Avec l'accord du patient, les prélèvements sont analysés par l'IRS, qui publie son rapport directement dans le dossier.</p>
-    </div>
-    <div class="carte c-sequelle">
-      <span class="emoji" aria-hidden="true">⏳</span>
-      <strong class="titre">Un suivi dans la durée</strong>
-      <p>Essais de traitement, rééducation, bilans réguliers puis contrôles espacés : les blessures et maladies ont des conséquences qui durent.</p>
-    </div>
-  </div>
-
-  <h2 id="categories">Les six catégories de suivi</h2>
-  <p>Chaque dossier porte au moins une étiquette de catégorie. Elle indique le type de suivi et le parcours de soin à appliquer. Clique sur une catégorie pour voir sa fiche complète : exemples, questions à poser, examens, surveillance, signes d'alerte et idées RP.</p>
+  <h2 id="categories">Les catégories</h2>
+  <p>La documentation est rangée en sept catégories. Ouvre une catégorie pour voir toutes ses pages, ou va directement à la page qui t'intéresse.</p>
+  <div data-categories></div>
+  <h2 id="par-ou-commencer">Par où commencer ?</h2>
   <div class="grille">
-    <a class="carte c-genetique" href="pathologies.html#genetique">
-      <span class="emoji" aria-hidden="true">🧬</span>
-      <strong class="titre">Maladie génétique</strong>
-      <p>Maladie héréditaire, connue ou encore inconnue. C'est la mission principale de la branche.</p>
-      <span class="suite">Parcours en 7 étapes →</span>
-    </a>
-    <a class="carte c-inconnue" href="pathologies.html#inconnue">
-      <span class="emoji" aria-hidden="true">❓</span>
-      <strong class="titre">Pathologie inconnue</strong>
-      <p>Des symptômes que personne n'explique encore. Le dossier devient une véritable enquête médicale.</p>
-      <span class="suite">Parcours en 7 étapes →</span>
-    </a>
-    <a class="carte c-postop" href="pathologies.html#post-operatoire">
-      <span class="emoji" aria-hidden="true">🩹</span>
-      <strong class="titre">Post-opératoire</strong>
-      <p>La convalescence qui suit une opération lourde : cicatrisation, douleur, reprise progressive.</p>
-      <span class="suite">Parcours en 4 étapes →</span>
-    </a>
-    <a class="carte c-reeducation" href="pathologies.html#reeducation">
-      <span class="emoji" aria-hidden="true">💪</span>
-      <strong class="titre">Rééducation</strong>
-      <p>Retrouver une capacité perdue après une blessure grave ou une perte de mobilité.</p>
-      <span class="suite">Parcours en 4 étapes →</span>
-    </a>
-    <a class="carte c-sequelle" href="pathologies.html#sequelle-permanente">
-      <span class="emoji" aria-hidden="true">🦿</span>
-      <strong class="titre">Séquelle permanente</strong>
-      <p>Amputation, blessure aux conséquences définitives : apprendre à vivre et à combattre avec.</p>
-      <span class="suite">Parcours en 4 étapes →</span>
-    </a>
-    <a class="carte c-chronique" href="pathologies.html#chronique">
-      <span class="emoji" aria-hidden="true">🔁</span>
-      <strong class="titre">Pathologie chronique</strong>
-      <p>Une maladie qui ne guérit pas mais se surveille : crises, traitement de fond, contrôles réguliers.</p>
-      <span class="suite">Parcours en 7 étapes →</span>
-    </a>
+    <div class="carte c-sequelle">
+      <span class="emoji" aria-hidden="true">🧑</span>
+      <strong class="titre">Mon personnage a besoin d'un suivi</strong>
+      <ul>
+        <li>Lire les <a href="branche/regles.html">règles et garde-fous</a></li>
+        <li>Trouver sa <a href="pathologies/">catégorie de suivi</a></li>
+        <li>Copier la <a href="modeles/ouverture.html#fiche-patient">fiche patient</a></li>
+        <li>Suivre les étapes pour <a href="discord/ouvrir-un-dossier.html">ouvrir son dossier</a></li>
+      </ul>
+    </div>
+    <div class="carte c-reeducation">
+      <span class="emoji" aria-hidden="true">🩺</span>
+      <strong class="titre">Je fais partie de la branche</strong>
+      <ul>
+        <li>Les <a href="branche/roles.html">rôles</a> et les <a href="discord/etiquettes.html">étiquettes</a></li>
+        <li>Les <a href="pathologies/">fiches par pathologie</a></li>
+        <li>Les <a href="reeducation/#les-seances">exemples de séances</a></li>
+        <li>Les <a href="modeles/suivi.html#compte-rendu">comptes rendus</a> et autres modèles</li>
+      </ul>
+    </div>
+    <div class="carte c-irs">
+      <span class="emoji" aria-hidden="true">🔬</span>
+      <strong class="titre">Je travaille à l'IRS</strong>
+      <ul>
+        <li>Le <a href="discord/irs.html">lien entre l'IRS et la branche</a></li>
+        <li>Filtrer le forum sur <span class="etiquette s-irs">🔬 Analyse IRS en cours</span></li>
+        <li>Le <a href="modeles/irs.html#rapport-irs">modèle de rapport d'analyse</a></li>
+        <li>Les <a href="faq/irs.html">questions fréquentes de l'IRS</a></li>
+      </ul>
+    </div>
   </div>
-
-  <h2 id="parcours">Deux parcours de soin</h2>
-  <p>Selon la situation, le médecin référent suit l'un des deux parcours. Ils sont détaillés étape par étape dans la page <a href="pathologies.html">Suivi par pathologie</a>.</p>
-  <div class="grille deux">
-    <a class="carte c-genetique" href="pathologies.html#parcours-maladie">
-      <span class="emoji" aria-hidden="true">🧬</span>
-      <strong class="titre">Parcours « maladie »</strong>
-      <p>Pour les maladies génétiques, inconnues ou chroniques.</p>
-      <ol>
-        <li>Premier rendez-vous</li>
-        <li>Examens et prélèvements</li>
-        <li>Collaboration avec l'IRS</li>
-        <li>Présentation des résultats</li>
-        <li>Essai d'un traitement</li>
-        <li>Analyses de contrôle</li>
-        <li>Suivi à long terme</li>
-      </ol>
-      <span class="suite">Voir le détail →</span>
-    </a>
-    <a class="carte c-reeducation" href="pathologies.html#parcours-readaptation">
-      <span class="emoji" aria-hidden="true">💪</span>
-      <strong class="titre">Parcours « réadaptation »</strong>
-      <p>Pour le post-opératoire, la rééducation et les séquelles.</p>
-      <ol>
-        <li>Bilan initial et objectifs</li>
-        <li>Programme de suivi personnalisé</li>
-        <li>Bilans d'étape</li>
-        <li>Fin de prise en charge ou suivi prolongé</li>
-      </ol>
-      <span class="suite">Voir le détail →</span>
-    </a>
-  </div>
-
   <h2 id="un-suivi-en-bref">Un suivi en un coup d'œil</h2>
   <p>Quelle que soit la pathologie, un dossier passe par les mêmes grands moments. L'étiquette de statut du post change à chaque étape, pour que tout le monde sache où en est le patient.</p>
   <ol class="frise">
@@ -168,82 +104,7 @@
       <div class="meta-etape"><span class="etiquette s-cloture">✅ Dossier clôturé</span></div>
     </li>
   </ol>
-  <p>Deux statuts peuvent apparaître à tout moment : <span class="etiquette s-urgent">🔴 Urgent</span> quand l'état se dégrade, et <span class="etiquette s-pause">⏸️ En pause</span> après trois semaines sans activité. Des exemples complets sont racontés dans <a href="deroulement.html">Déroulement d'un suivi</a>.</p>
-
-  <h2 id="par-ou-commencer">Par où commencer ?</h2>
-  <div class="grille">
-    <div class="carte c-sequelle">
-      <span class="emoji" aria-hidden="true">🧑</span>
-      <strong class="titre">Mon personnage a besoin d'un suivi</strong>
-      <ul>
-        <li>Lire les <a href="fonctionnement.html#regles">règles et garde-fous</a></li>
-        <li>Trouver sa <a href="pathologies.html">catégorie de suivi</a></li>
-        <li>Copier la <a href="modeles.html#fiche-patient">fiche patient</a></li>
-        <li>Suivre les étapes pour <a href="fonctionnement.html#ouvrir-un-dossier">ouvrir son dossier</a></li>
-      </ul>
-    </div>
-    <div class="carte c-reeducation">
-      <span class="emoji" aria-hidden="true">🩺</span>
-      <strong class="titre">Je fais partie de la branche</strong>
-      <ul>
-        <li>Les <a href="fonctionnement.html#organisation">rôles</a> et les <a href="fonctionnement.html#etiquettes">étiquettes</a></li>
-        <li>Les <a href="pathologies.html">fiches par pathologie</a></li>
-        <li>Les <a href="reeducation.html#exemples-seances">exemples de séances</a></li>
-        <li>Les <a href="modeles.html#compte-rendu">comptes rendus</a> et autres modèles</li>
-      </ul>
-    </div>
-    <div class="carte c-irs">
-      <span class="emoji" aria-hidden="true">🔬</span>
-      <strong class="titre">Je travaille à l'IRS</strong>
-      <ul>
-        <li>Le <a href="fonctionnement.html#irs">lien entre l'IRS et la branche</a></li>
-        <li>Filtrer le forum sur <span class="etiquette s-irs">🔬 Analyse IRS en cours</span></li>
-        <li>Le <a href="modeles.html#rapport-irs">modèle de rapport d'analyse</a></li>
-        <li>Les <a href="faq.html#faq-irs">questions fréquentes de l'IRS</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <h2 id="contenu-du-site">Ce que contient la documentation</h2>
-  <div class="grille">
-    <a class="carte" href="fonctionnement.html">
-      <span class="emoji" aria-hidden="true">🏥</span>
-      <strong class="titre">Fonctionnement</strong>
-      <p>Rôles, dossier médical, forum, ouverture d'un dossier, étiquettes, IRS, urgences, clôture, rythme et règles.</p>
-      <span class="suite">Lire →</span>
-    </a>
-    <a class="carte c-genetique" href="pathologies.html">
-      <span class="emoji" aria-hidden="true">🧬</span>
-      <strong class="titre">Suivi par pathologie</strong>
-      <p>Les deux parcours de soin détaillés et une fiche complète pour chacune des six catégories.</p>
-      <span class="suite">Lire →</span>
-    </a>
-    <a class="carte c-reeducation" href="reeducation.html">
-      <span class="emoji" aria-hidden="true">💪</span>
-      <strong class="titre">Séances de rééducation</strong>
-      <p>Structure d'une séance, échelles de mesure et onze séances détaillées, de la marche au retour en mission.</p>
-      <span class="suite">Lire →</span>
-    </a>
-    <a class="carte c-chronique" href="deroulement.html">
-      <span class="emoji" aria-hidden="true">🗓️</span>
-      <strong class="titre">Déroulement d'un suivi</strong>
-      <p>Cinq suivis racontés du début à la fin, semaine par semaine, avec les étiquettes et les comptes rendus.</p>
-      <span class="suite">Lire →</span>
-    </a>
-    <a class="carte c-sequelle" href="modeles.html">
-      <span class="emoji" aria-hidden="true">📋</span>
-      <strong class="titre">Modèles Discord</strong>
-      <p>Fiche patient, comptes rendus, bilans, rapport IRS, urgence, pause, clôture… prêts à copier.</p>
-      <span class="suite">Lire →</span>
-    </a>
-    <a class="carte c-inconnue" href="faq.html">
-      <span class="emoji" aria-hidden="true">💡</span>
-      <strong class="titre">FAQ et glossaire</strong>
-      <p>Les réponses aux questions des joueurs, de l'équipe et de l'IRS, et le vocabulaire de la branche.</p>
-      <span class="suite">Lire →</span>
-    </a>
-  </div>
-
+  <p>Deux statuts peuvent apparaître à tout moment : <span class="etiquette s-urgent">🔴 Urgent</span> quand l'état se dégrade, et <span class="etiquette s-pause">⏸️ En pause</span> après trois semaines sans activité. Des exemples complets sont racontés dans <a href="exemples/">Déroulement d'un suivi</a>.</p>
   <h2 id="regles-d-or">Les règles d'or</h2>
   <div class="grille deux">
     <div class="encadre conseil">
@@ -263,7 +124,7 @@
       <div><strong class="titre">Pas de métagaming</strong><p>Le forum est visible HRP, mais son contenu reste couvert par le secret médical en RP.</p></div>
     </div>
   </div>
-  <p>Toutes les règles sont détaillées dans <a href="fonctionnement.html#regles">Règles et garde-fous</a>.</p>
+  <p>Toutes les règles sont détaillées dans <a href="branche/regles.html">Règles et garde-fous</a>.</p>
 
 </main>
 </div>

@@ -1,16 +1,105 @@
 /* =====================================================================
    Seimei · Suivi des pathologies — documentation de la branche
-   En-tête, sommaire, recherche, boutons « Copier » et petits effets.
+   Plan du site, en-tête et menus, barre latérale, sommaire, recherche,
+   boutons « Copier » et petits effets.
    ===================================================================== */
 
-const PAGES = [
-  { id: 'accueil', fichier: 'index.html', titre: 'Accueil', nav: 'Accueil' },
-  { id: 'fonctionnement', fichier: 'fonctionnement.html', titre: 'Fonctionnement de la branche', nav: 'Fonctionnement' },
-  { id: 'pathologies', fichier: 'pathologies.html', titre: 'Suivi par pathologie', nav: 'Pathologies' },
-  { id: 'reeducation', fichier: 'reeducation.html', titre: 'Séances de rééducation', nav: 'Rééducation' },
-  { id: 'deroulement', fichier: 'deroulement.html', titre: 'Déroulement d’un suivi', nav: 'Déroulement' },
-  { id: 'modeles', fichier: 'modeles.html', titre: 'Modèles Discord', nav: 'Modèles' },
-  { id: 'faq', fichier: 'faq.html', titre: 'FAQ et glossaire', nav: 'FAQ' },
+/* Plan du site : chaque catégorie a sa page d'accueil (dossier/index.html) et ses sous-pages.
+   Pour ajouter une page : créer le fichier HTML dans le dossier de la catégorie, puis l'ajouter ici. */
+const PLAN = [
+  {
+    id: 'branche', titre: 'La branche', nav: 'La branche', emoji: '🏥', couleur: 'var(--or)',
+    description: 'Ce qu’est la branche, qui y fait quoi, le dossier médical et les règles qui protègent les joueurs.',
+    pages: [
+      { fichier: 'presentation.html', titre: 'Présentation', emoji: '📖', description: 'La mission de la branche, ses six catégories de suivi et ce qu’elle apporte au serveur.' },
+      { fichier: 'roles.html', titre: 'Rôles et organisation', emoji: '👥', description: 'Responsable, médecins référents, soignants, référents IRS, et qui fait quoi.' },
+      { fichier: 'dossier-medical.html', titre: 'Le dossier médical', emoji: '📁', description: 'Ce que contient le dossier d’un patient, et le secret médical.' },
+      { fichier: 'regles.html', titre: 'Règles et garde-fous', emoji: '⚖️', description: 'Les règles qui protègent les joueurs et les bonnes pratiques de l’équipe.' },
+    ],
+  },
+  {
+    id: 'discord', titre: 'Le suivi sur Discord', nav: 'Discord', emoji: '💬', couleur: 'var(--ciel)',
+    description: 'Le forum, l’ouverture d’un dossier, les étiquettes, les rendez-vous, l’IRS, les urgences et la clôture.',
+    pages: [
+      { fichier: 'forum.html', titre: 'Le forum de la branche', emoji: '🗂️', description: 'Un post par patient : ce qu’on y publie et ce qu’on évite.' },
+      { fichier: 'ouvrir-un-dossier.html', titre: 'Ouvrir un dossier', emoji: '📝', description: 'Les quatre étapes, le dossier ouvert par un médecin, plusieurs pathologies.' },
+      { fichier: 'etiquettes.html', titre: 'Les étiquettes', emoji: '🏷️', description: 'Catégories et statuts : qui les pose, quand elles changent, comment filtrer le forum.' },
+      { fichier: 'rendez-vous.html', titre: 'Rendez-vous et comptes rendus', emoji: '📋', description: 'Les types de rendez-vous et le compte rendu publié après chacun.' },
+      { fichier: 'irs.html', titre: 'Le lien avec l’IRS', emoji: '🔬', description: 'Accord du patient, demande d’analyse, rapport et présentation des résultats.' },
+      { fichier: 'urgences-et-pauses.html', titre: 'Urgences et pauses', emoji: '🚨', description: 'Aggravation, urgence vitale, inactivité et mise en pause.' },
+      { fichier: 'cloture.html', titre: 'Clôture et réouverture', emoji: '✅', description: 'Quand et comment clôturer un dossier, et comment le rouvrir.' },
+      { fichier: 'rythme.html', titre: 'Le rythme des suivis', emoji: '⏳', description: 'Les durées RP converties en temps IRL, et un calendrier type.' },
+    ],
+  },
+  {
+    id: 'pathologies', titre: 'Soins et pathologies', nav: 'Pathologies', emoji: '🧬', couleur: 'var(--violet)',
+    description: 'Les parcours de soin, les examens et les traitements, et une fiche complète pour chaque catégorie de pathologie.',
+    pages: [
+      { groupe: 'Les soins', fichier: 'parcours.html', titre: 'Les parcours de soin', emoji: '🧭', description: 'Le parcours « maladie » en 7 étapes et le parcours « réadaptation » en 4 étapes.' },
+      { groupe: 'Les soins', fichier: 'examens-et-traitements.html', titre: 'Examens et traitements', emoji: '💊', description: 'Les examens possibles, les principes d’un traitement et comment en inventer un crédible.' },
+      { groupe: 'Les catégories', fichier: 'genetique.html', titre: 'Maladie génétique', emoji: '🧬', couleur: 'var(--violet)', description: 'Maladie héréditaire, connue ou non : la mission principale de la branche.' },
+      { groupe: 'Les catégories', fichier: 'inconnue.html', titre: 'Pathologie inconnue', emoji: '❓', couleur: 'var(--ambre)', description: 'Des symptômes inexpliqués : une véritable enquête médicale.' },
+      { groupe: 'Les catégories', fichier: 'post-operatoire.html', titre: 'Post-opératoire', emoji: '🩹', couleur: 'var(--rose)', description: 'La convalescence après une opération lourde.' },
+      { groupe: 'Les catégories', fichier: 'reeducation.html', titre: 'Rééducation', emoji: '💪', couleur: 'var(--jade)', description: 'Retrouver une capacité perdue après une blessure grave.' },
+      { groupe: 'Les catégories', fichier: 'sequelle-permanente.html', titre: 'Séquelle permanente', emoji: '🦿', couleur: 'var(--or)', description: 'Amputation, blessure définitive : vivre et combattre avec.' },
+      { groupe: 'Les catégories', fichier: 'chronique.html', titre: 'Pathologie chronique', emoji: '🔁', couleur: 'var(--ciel)', description: 'Une maladie qui ne guérit pas mais se contrôle.' },
+      { groupe: 'Cas particuliers', fichier: 'plusieurs-pathologies.html', titre: 'Plusieurs pathologies', emoji: '🧩', description: 'Cumuler des pathologies dans un même dossier, et changer de catégorie.' },
+      { groupe: 'Cas particuliers', fichier: 'creer-sa-pathologie.html', titre: 'Créer la pathologie de son personnage', emoji: '✍️', description: 'Les conseils pour les joueurs qui imaginent une pathologie.' },
+    ],
+  },
+  {
+    id: 'reeducation', titre: 'Rééducation', nav: 'Rééducation', emoji: '💪', couleur: 'var(--jade)',
+    description: 'Les bases d’une séance, la mesure des progrès et onze séances détaillées, prêtes à jouer.',
+    pages: [
+      { groupe: 'Les bases', fichier: 'principes.html', titre: 'Principes et déroulé d’une séance', emoji: '📐', description: 'Les principes de la rééducation, la trame d’une séance et le matériel.' },
+      { groupe: 'Les bases', fichier: 'mesurer.html', titre: 'Mesurer les progrès', emoji: '📏', description: 'Échelle de la douleur, force de 0 à 5, autres mesures et objectifs.' },
+      { groupe: 'Les bases', fichier: 'faire-vivre.html', titre: 'Faire vivre une séance', emoji: '🎭', description: 'Idées RP, exemple de compte rendu de séance et erreurs à éviter.' },
+      { groupe: 'Les séances', fichier: 'marche.html', titre: 'Remarcher après une fracture', emoji: '🦵', description: 'Barres parallèles, béquilles, escaliers, puis course et sauts.' },
+      { groupe: 'Les séances', fichier: 'dos.html', titre: 'Dos et posture', emoji: '🧍', description: 'Gainage, gestes du quotidien, port du sac de mission.' },
+      { groupe: 'Les séances', fichier: 'epaule.html', titre: 'Épaule', emoji: '💪', description: 'Retrouver l’amplitude, la force et la précision des lancers.' },
+      { groupe: 'Les séances', fichier: 'main.html', titre: 'Main et signes', emoji: '✋', description: 'Dextérité, pince fine et enchaînement des signes.' },
+      { groupe: 'Les séances', fichier: 'amputation.html', titre: 'Amputation et prothèse', emoji: '🦿', description: 'Moignon, douleurs fantômes, thérapie du miroir, prothèse.' },
+      { groupe: 'Les séances', fichier: 'brulures.html', titre: 'Brûlures et cicatrices', emoji: '🔥', description: 'Assouplir la peau et retrouver l’amplitude des mouvements.' },
+      { groupe: 'Les séances', fichier: 'souffle.html', titre: 'Retrouver son souffle', emoji: '🫁', description: 'Respiration, désencombrement, endurance.' },
+      { groupe: 'Les séances', fichier: 'equilibre.html', titre: 'Équilibre et vertiges', emoji: '🌀', description: 'Fixer le regard, équilibre immobile puis en mouvement.' },
+      { groupe: 'Les séances', fichier: 'memoire.html', titre: 'Mémoire et attention', emoji: '🧠', description: 'Après un traumatisme crânien : attention, mémoire, double tâche.' },
+      { groupe: 'Les séances', fichier: 'chakra.html', titre: 'Réadaptation du chakra', emoji: '🌊', description: 'Méditation, contrôle fin, endurance, sans jamais dépasser le niveau d’avant.' },
+      { groupe: 'Les séances', fichier: 'retour-en-mission.html', titre: 'Retour en mission', emoji: '⚔️', description: 'Réathlétisation, combat encadré et test de reprise.' },
+    ],
+  },
+  {
+    id: 'exemples', titre: 'Exemples de suivis', nav: 'Exemples', emoji: '🗓️', couleur: 'var(--ambre)',
+    description: 'Cinq suivis racontés du début à la fin, semaine par semaine, et les situations particulières.',
+    pages: [
+      { fichier: 'genetique.html', titre: 'Mei Tanaka · maladie génétique', emoji: '🧬', couleur: 'var(--violet)', description: 'Examens, analyse de l’IRS, deux essais de traitement, puis suivi stable.' },
+      { fichier: 'post-operatoire.html', titre: 'Kaito Mizuno · post-opératoire', emoji: '🩹', couleur: 'var(--rose)', description: 'Un dossier ouvert par le chirurgien, une complication, puis la clôture.' },
+      { fichier: 'amputation.html', titre: 'Ren Akiyama · amputation', emoji: '🦿', couleur: 'var(--or)', description: 'Quinze semaines de rééducation, une prothèse, puis le suivi à long terme.' },
+      { fichier: 'chronique.html', titre: 'Sora Ishikawa · asthme', emoji: '🔁', couleur: 'var(--ciel)', description: 'Traitement de fond, plan d’action, équipe formée, pause et reprise.' },
+      { fichier: 'inconnue.html', titre: 'Yuki Fujimoto · pathologie inconnue', emoji: '❓', couleur: 'var(--ambre)', description: 'Une enquête, une fausse piste et une cause enfin trouvée.' },
+      { fichier: 'situations-particulieres.html', titre: 'Situations particulières', emoji: '🧭', description: 'Arrêt du suivi, refus, absences, rechute, aggravation souhaitée…' },
+    ],
+  },
+  {
+    id: 'modeles', titre: 'Modèles Discord', nav: 'Modèles', emoji: '📋', couleur: 'var(--sarcelle)',
+    description: 'Tous les messages du forum, prêts à copier : de la fiche patient à la réouverture d’un dossier.',
+    pages: [
+      { fichier: 'ouverture.html', titre: 'Ouvrir un dossier', emoji: '📁', description: 'Titre du post, fiche patient, consignes du forum et message épinglé.' },
+      { fichier: 'suivi.html', titre: 'Pendant le suivi', emoji: '🩺', description: 'Prise en charge, comptes rendus, bilan d’étape, essai de traitement, plan d’action.' },
+      { fichier: 'irs.html', titre: 'Avec l’IRS', emoji: '🔬', description: 'Demande d’analyse et rapport d’analyse.' },
+      { fichier: 'imprevus.html', titre: 'Les imprévus', emoji: '🚨', description: 'Urgence, mise en pause, reprise, changement de médecin référent.' },
+      { fichier: 'fin-du-suivi.html', titre: 'La fin du suivi', emoji: '🏁', description: 'Fin de prise en charge, clôture et réouverture.' },
+    ],
+  },
+  {
+    id: 'faq', titre: 'FAQ et glossaire', nav: 'FAQ', emoji: '💡', couleur: 'var(--rose)',
+    description: 'Les réponses aux questions des joueurs, de l’équipe et de l’IRS, et le vocabulaire de la branche.',
+    pages: [
+      { fichier: 'joueurs.html', titre: 'Questions des joueurs', emoji: '🙋', description: 'Fiche, catégorie, délais, guérison, prothèse, confidentialité…' },
+      { fichier: 'equipe.html', titre: 'Questions de l’équipe', emoji: '🩺', description: 'Prise en charge, comptes rendus, étiquettes, absences…' },
+      { fichier: 'irs.html', titre: 'Questions de l’IRS', emoji: '🔬', description: 'Trouver les dossiers, rencontrer le patient, résultats non concluants.' },
+      { fichier: 'glossaire.html', titre: 'Glossaire', emoji: '📚', description: 'Le vocabulaire du suivi des pathologies.' },
+    ],
+  },
 ];
 
 const ICONES = {
@@ -22,10 +111,44 @@ const ICONES = {
   copier: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/>',
   ok: '<path d="m5 12 4.5 4.5L19 7"/>',
   fleche: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  chevron: '<path d="m6 9 6 6 6-6"/>',
 };
 
 const LIMITE_DISCORD = 2000;
-const pageActuelle = PAGES.find((p) => p.id === document.body.dataset.page) || PAGES[0];
+
+// Racine du site, déduite de l'adresse de ce script (assets/js/doc.js).
+const SCRIPT = document.currentScript || document.querySelector('script[src*="doc.js"]');
+const RACINE = new URL('../../', SCRIPT.src);
+
+// Toutes les pages dans l'ordre de lecture : accueil, puis chaque catégorie et ses sous-pages.
+const ACCUEIL = { chemin: 'index.html', titre: 'Accueil', emoji: '生', categorie: null };
+const TOUTES = [ACCUEIL];
+for (const cat of PLAN) {
+  cat.chemin = `${cat.id}/index.html`;
+  cat.categorie = cat;
+  cat.estCategorie = true;
+  TOUTES.push(cat);
+  for (const page of cat.pages) {
+    page.chemin = `${cat.id}/${page.fichier}`;
+    page.categorie = cat;
+    TOUTES.push(page);
+  }
+}
+
+function lien(chemin) {
+  return new URL(chemin.replace(/index\.html$/, ''), RACINE).href;
+}
+
+function cheminActuel() {
+  const racine = decodeURI(RACINE.pathname);
+  let chemin = decodeURI(location.pathname);
+  chemin = chemin.startsWith(racine) ? chemin.slice(racine.length) : chemin;
+  if (chemin === '' || chemin.endsWith('/')) chemin += 'index.html';
+  return chemin;
+}
+
+const pageActuelle = TOUTES.find((p) => p.chemin === cheminActuel()) || null;
+const categorieActuelle = pageActuelle?.categorie || null;
 
 function icone(nom) {
   return `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONES[nom]}</svg>`;
@@ -38,6 +161,10 @@ function element(balise, attributs = {}, html = '') {
   return el;
 }
 
+function echapper(texte) {
+  return String(texte).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
 function texteTitre(titre) {
   if (titre.dataset.sommaire) return titre.dataset.sommaire;
   const copie = titre.cloneNode(true);
@@ -45,23 +172,63 @@ function texteTitre(titre) {
   return copie.textContent.replace(/\s+/g, ' ').trim();
 }
 
-/* ---------- En-tête et pied de page ---------- */
+function courant(page) {
+  return page === pageActuelle ? ' aria-current="page"' : '';
+}
+
+/* Liste des sous-pages d'une catégorie, avec les intertitres de groupe. */
+function listeSousPages(cat, classe = '') {
+  let html = '';
+  let groupe = null;
+  for (const page of cat.pages) {
+    if (page.groupe && page.groupe !== groupe) {
+      groupe = page.groupe;
+      html += `<span class="groupe">${echapper(groupe)}</span>`;
+    }
+    html += `<a href="${lien(page.chemin)}"${courant(page)}${classe}><span class="emoji" aria-hidden="true">${page.emoji}</span>${echapper(page.titre)}</a>`;
+  }
+  return html;
+}
+
+/* ---------- En-tête, menus et pied de page ---------- */
 
 function construireEntete() {
   const mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
-  const liens = PAGES.map((p) =>
-    `<a href="${p.fichier}"${p.id === pageActuelle.id ? ' aria-current="page"' : ''}>${p.nav}</a>`).join('');
+  const categories = PLAN.map((cat) => `
+    <div class="nav-item${cat === categorieActuelle ? ' actif' : ''}">
+      <a class="nav-lien" href="${lien(cat.chemin)}"${cat === categorieActuelle ? ' aria-current="true"' : ''}>${cat.nav}${icone('chevron')}</a>
+      <div class="nav-menu" style="--c: ${cat.couleur}">
+        <a class="nav-menu-tete" href="${lien(cat.chemin)}"${courant(cat)}>
+          <span class="emoji" aria-hidden="true">${cat.emoji}</span>
+          <span><strong>${echapper(cat.titre)}</strong><small>${echapper(cat.description)}</small></span>
+        </a>
+        <div class="nav-menu-liste">${listeSousPages(cat)}</div>
+      </div>
+    </div>`).join('');
+
+  const tiroir = PLAN.map((cat) => `
+    <details${cat === categorieActuelle ? ' open' : ''} style="--c: ${cat.couleur}">
+      <summary><span class="emoji" aria-hidden="true">${cat.emoji}</span>${echapper(cat.titre)}</summary>
+      <div class="tiroir-liste">
+        <a href="${lien(cat.chemin)}"${courant(cat)}><span class="emoji" aria-hidden="true">🧭</span>Vue d’ensemble</a>
+        ${listeSousPages(cat)}
+      </div>
+    </details>`).join('');
 
   const entete = element('header', { class: 'entete' }, `
-    <a class="marque" href="index.html" aria-label="Seimei, suivi des pathologies : accueil">
+    <a class="marque" href="${lien('index.html')}" aria-label="Seimei, suivi des pathologies : accueil">
       <span class="sceau" aria-hidden="true"><span>生</span><span>命</span></span>
       <span><strong>Seimei</strong><small>Suivi des pathologies</small></span>
     </a>
-    <nav class="nav-principale" id="nav-principale" aria-label="Pages de la documentation">${liens}</nav>
+    <nav class="nav-principale" aria-label="Catégories de la documentation">${categories}</nav>
     <button class="bouton-recherche" type="button" aria-label="Rechercher dans la documentation">
       ${icone('recherche')}<span>Rechercher</span><kbd>${mac ? '⌘' : 'Ctrl'} K</kbd>
     </button>
-    <button class="bouton-menu" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav-principale">${icone('menu')}</button>
+    <button class="bouton-menu" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="tiroir">${icone('menu')}</button>
+    <nav class="tiroir" id="tiroir" aria-label="Toutes les pages">
+      <a class="tiroir-accueil" href="${lien('index.html')}"${courant(ACCUEIL)}><span class="emoji" aria-hidden="true">🏠</span>Accueil</a>
+      ${tiroir}
+    </nav>
   `);
 
   const passer = element('a', { class: 'passer', href: '#contenu' }, 'Aller au contenu');
@@ -69,23 +236,101 @@ function construireEntete() {
   if (fond) fond.after(passer, entete);
   else document.body.prepend(passer, entete);
 
-  const nav = entete.querySelector('.nav-principale');
+  const panneau = entete.querySelector('.tiroir');
   const boutonMenu = entete.querySelector('.bouton-menu');
   const basculerMenu = (ouvert) => {
-    nav.classList.toggle('ouvert', ouvert);
+    panneau.classList.toggle('ouvert', ouvert);
+    document.body.classList.toggle('tiroir-ouvert', ouvert);
     boutonMenu.setAttribute('aria-expanded', String(ouvert));
     boutonMenu.setAttribute('aria-label', ouvert ? 'Fermer le menu' : 'Ouvrir le menu');
     boutonMenu.innerHTML = icone(ouvert ? 'fermer' : 'menu');
   };
-  boutonMenu.addEventListener('click', () => basculerMenu(!nav.classList.contains('ouvert')));
-  nav.addEventListener('click', (e) => { if (e.target.closest('a')) basculerMenu(false); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && nav.classList.contains('ouvert')) basculerMenu(false); });
+  boutonMenu.addEventListener('click', () => basculerMenu(!panneau.classList.contains('ouvert')));
+  panneau.addEventListener('click', (e) => { if (e.target.closest('a')) basculerMenu(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && panneau.classList.contains('ouvert')) basculerMenu(false); });
   document.addEventListener('click', (e) => {
     // composedPath() garde le chemin d'origine, même si l'icône cliquée vient d'être remplacée.
-    if (nav.classList.contains('ouvert') && !e.composedPath().includes(entete)) basculerMenu(false);
+    if (panneau.classList.contains('ouvert') && !e.composedPath().includes(entete)) basculerMenu(false);
+  });
+
+  // Menus déroulants : fermés après un clic, et au clavier avec Échap.
+  entete.querySelectorAll('.nav-item').forEach((item) => {
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { item.classList.add('ferme'); item.querySelector('.nav-lien').focus(); }
+    });
+    item.addEventListener('mouseleave', () => item.classList.remove('ferme'));
+    item.addEventListener('focusout', (e) => { if (!item.contains(e.relatedTarget)) item.classList.remove('ferme'); });
   });
 
   entete.querySelector('.bouton-recherche').addEventListener('click', ouvrirRecherche);
+}
+
+/* Barre latérale : les sous-pages de la catégorie en cours, puis les autres catégories. */
+function construireLaterale() {
+  const mise = document.querySelector('.mise-en-page');
+  if (!mise || !categorieActuelle) return;
+  const cat = categorieActuelle;
+  const autres = PLAN.filter((c) => c !== cat).map((c) =>
+    `<a href="${lien(c.chemin)}"><span class="emoji" aria-hidden="true">${c.emoji}</span>${echapper(c.titre)}</a>`).join('');
+  const aside = element('aside', { class: 'nav-laterale', 'aria-label': `Pages de la catégorie ${cat.titre}`, style: `--c: ${cat.couleur}` }, `
+    <a class="laterale-categorie" href="${lien(cat.chemin)}"${courant(cat)}>
+      <span class="emoji" aria-hidden="true">${cat.emoji}</span><span>${echapper(cat.titre)}</span>
+    </a>
+    <div class="laterale-liste">${listeSousPages(cat)}</div>
+    <div class="laterale-autres"><span class="groupe">Autres catégories</span>${autres}</div>
+  `);
+  mise.prepend(aside);
+  mise.classList.add('avec-laterale');
+}
+
+/* Fil d'Ariane au-dessus de l'en-tête de page. */
+function construireFilAriane() {
+  const main = document.querySelector('main');
+  if (!main || !pageActuelle || pageActuelle === ACCUEIL) return;
+  const etapes = [`<a href="${lien('index.html')}">Accueil</a>`];
+  const cat = pageActuelle.categorie;
+  if (pageActuelle.estCategorie) etapes.push(`<span aria-current="page">${echapper(cat.titre)}</span>`);
+  else etapes.push(`<a href="${lien(cat.chemin)}">${echapper(cat.titre)}</a>`, `<span aria-current="page">${echapper(pageActuelle.titre)}</span>`);
+  main.prepend(element('nav', { class: 'fil-ariane', 'aria-label': 'Fil d’Ariane' }, etapes.join('<span class="sep" aria-hidden="true">›</span>')));
+}
+
+/* Cartes générées depuis le plan : sous-pages d'une catégorie, ou toutes les catégories (accueil). */
+function construireCartes() {
+  document.querySelectorAll('[data-sous-pages]').forEach((zone) => {
+    const cat = PLAN.find((c) => c.id === zone.dataset.sousPages) || categorieActuelle;
+    if (!cat) return;
+    const groupes = [];
+    for (const page of cat.pages) {
+      const nom = page.groupe || '';
+      if (!groupes.length || groupes[groupes.length - 1].nom !== nom) groupes.push({ nom, pages: [] });
+      groupes[groupes.length - 1].pages.push(page);
+    }
+    const html = groupes.map((g) => `
+      ${g.nom ? `<h2 id="${g.nom.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}">${echapper(g.nom)}</h2>` : ''}
+      <div class="grille">
+        ${g.pages.map((p) => `
+          <a class="carte" href="${lien(p.chemin)}" style="--c: ${p.couleur || cat.couleur}">
+            <span class="emoji" aria-hidden="true">${p.emoji}</span>
+            <strong class="titre">${echapper(p.titre)}</strong>
+            <p>${echapper(p.description)}</p>
+            <span class="suite">Lire →</span>
+          </a>`).join('')}
+      </div>`).join('');
+    zone.outerHTML = html;
+  });
+
+  document.querySelectorAll('[data-categories]').forEach((zone) => {
+    zone.outerHTML = `<div class="grille categories">${PLAN.map((cat) => `
+      <div class="carte carte-categorie" style="--c: ${cat.couleur}">
+        <a class="carte-categorie-tete" href="${lien(cat.chemin)}">
+          <span class="emoji" aria-hidden="true">${cat.emoji}</span>
+          <strong class="titre">${echapper(cat.titre)}</strong>
+        </a>
+        <p>${echapper(cat.description)}</p>
+        <div class="carte-categorie-liens">${cat.pages.map((p) => `<a href="${lien(p.chemin)}">${echapper(p.titre)}</a>`).join('')}</div>
+        <a class="suite" href="${lien(cat.chemin)}">Voir la catégorie →</a>
+      </div>`).join('')}</div>`;
+  });
 }
 
 function construirePied() {
@@ -99,13 +344,14 @@ function construirePied() {
 
 function construireSuitePages() {
   const main = document.querySelector('main');
-  const index = PAGES.indexOf(pageActuelle);
-  const avant = PAGES[index - 1];
-  const apres = PAGES[index + 1];
-  if (!main || (!avant && !apres)) return;
+  const index = TOUTES.indexOf(pageActuelle);
+  if (!main || index === -1) return;
+  const avant = TOUTES[index - 1];
+  const apres = TOUTES[index + 1];
+  const nom = (p) => (p.estCategorie ? p.titre : p.categorie && p !== ACCUEIL ? p.titre : 'Accueil');
   const nav = element('nav', { class: 'suite-pages', 'aria-label': 'Page précédente et suivante' });
-  if (avant) nav.append(element('a', { href: avant.fichier }, `<small>← Précédent</small><strong>${avant.titre}</strong>`));
-  if (apres) nav.append(element('a', { href: apres.fichier, class: 'apres' }, `<small>Suivant →</small><strong>${apres.titre}</strong>`));
+  if (avant) nav.append(element('a', { href: lien(avant.chemin) }, `<small>← Précédent</small><strong>${echapper(nom(avant))}</strong>`));
+  if (apres) nav.append(element('a', { href: lien(apres.chemin), class: 'apres' }, `<small>Suivant${apres.estCategorie ? ' · nouvelle catégorie' : ''} →</small><strong>${echapper(nom(apres))}</strong>`));
   main.append(nav);
 }
 
@@ -125,8 +371,11 @@ function ajouterAncres() {
 function construireSommaire() {
   const mise = document.querySelector('.mise-en-page');
   const titres = titresDuContenu();
-  if (!mise) return;
-  if (titres.length < 2) { mise.classList.add('sans-sommaire'); return; }
+  if (!mise || titres.length < 2) return;
+  mise.classList.add('avec-sommaire');
+  // Le niveau le plus haut de la page sert de premier niveau du sommaire.
+  const niveauHaut = Math.min(...titres.map((t) => Number(t.tagName[1])));
+  const estSous = (t) => Number(t.tagName[1]) > niveauHaut;
 
   // Sommaire latéral (grands écrans)
   const aside = element('aside', { class: 'sommaire-page', 'aria-label': 'Sommaire de la page' });
@@ -137,7 +386,7 @@ function construireSommaire() {
     const li = element('li');
     const a = element('a', { href: `#${titre.id}` });
     a.textContent = texteTitre(titre);
-    if (titre.tagName === 'H3') a.classList.add('sous');
+    if (estSous(titre)) a.classList.add('sous');
     li.append(a);
     liste.append(li);
     liensParId.set(titre.id, a);
@@ -156,13 +405,13 @@ function construireSommaire() {
     const a = element('a', { href: `#${titre.id}` });
     a.textContent = texteTitre(titre);
     li.append(a);
-    if (titre.tagName === 'H3' && dernierH2) {
+    if (estSous(titre) && dernierH2) {
       let sous = dernierH2.querySelector(':scope > ol');
       if (!sous) { sous = element('ol'); dernierH2.append(sous); }
       sous.append(li);
     } else {
       racine.append(li);
-      if (titre.tagName === 'H2') dernierH2 = li;
+      dernierH2 = li;
     }
   }
   details.append(racine);
@@ -266,16 +515,16 @@ function decouperSections(doc, page) {
 function chargerIndex() {
   if (chargement) return chargement;
   const lecteur = new DOMParser();
-  chargement = Promise.all(PAGES.map(async (page) => {
+  chargement = Promise.all(TOUTES.map(async (page) => {
     try {
-      const reponse = await fetch(page.fichier);
+      const reponse = await fetch(lien(page.chemin));
       if (!reponse.ok) throw new Error(reponse.statusText);
       return decouperSections(lecteur.parseFromString(await reponse.text(), 'text/html'), page);
     } catch {
-      if (page.id !== pageActuelle.id) return [];
+      if (page !== pageActuelle) return [];
       // Page ouverte sans serveur : on indexe au moins la page affichée, sans les ajouts du script.
       const doc = lecteur.parseFromString(document.documentElement.outerHTML, 'text/html');
-      doc.querySelectorAll('.ancre, .sommaire-mobile, .suite-pages, .modele-tete small, .copier').forEach((n) => n.remove());
+      doc.querySelectorAll('.ancre, .sommaire-mobile, .suite-pages, .fil-ariane, .modele-tete small, .copier').forEach((n) => n.remove());
       return decouperSections(doc, page);
     }
   })).then((parPage) => { index = parPage.flat(); return index; });
@@ -394,9 +643,10 @@ function construireRecherche() {
       return;
     }
     for (const s of resultats) {
-      const a = element('a', { href: s.id ? `${s.page.fichier}#${s.id}` : s.page.fichier, role: 'option' });
+      const a = element('a', { href: lien(s.page.chemin) + (s.id ? `#${s.id}` : ''), role: 'option' });
       const page = element('small');
-      page.textContent = s.page.titre;
+      const cat = s.page.categorie;
+      page.textContent = !cat ? 'Accueil' : s.page.estCategorie ? cat.titre : `${cat.titre} › ${s.page.titre}`;
       const titre = element('strong');
       titre.append(surligner(s.titre, s.titreN, termes));
       a.append(page, titre, extrait(s, termes));
@@ -511,6 +761,9 @@ function lumiereCartes() {
 /* ---------- Démarrage ---------- */
 
 construireEntete();
+construireCartes();
+construireFilAriane();
+construireLaterale();
 construireSommaire();
 ajouterAncres();
 construireSuitePages();

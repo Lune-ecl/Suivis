@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plusieurs pathologies · Seimei — Suivi des pathologies</title>
+  <meta name="description" content="Un personnage n'a qu'un seul dossier, même avec plusieurs pathologies, et la catégorie d'un dossier peut évoluer au fil du suivi.">
+  <meta name="theme-color" content="#060a13">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7b7'/%3E%3Cstop offset='1' stop-color='%2314b8a6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Ctext x='32' y='45' font-size='36' font-weight='700' text-anchor='middle' fill='%2303221a' font-family='serif'%3E%E7%94%9F%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Shippori+Mincho:wght@700&display=swap">
+  <link rel="stylesheet" href="../assets/css/doc.css?v=2">
+  <script src="../assets/js/doc.js?v=2" defer></script>
+</head>
+<body>
+<div class="fond" aria-hidden="true"></div>
+<div class="mise-en-page">
+<main id="contenu" style="--c: var(--violet)">
+
+  <header class="hero-doc" data-kanji="病">
+    <p class="surtitre">Soins et pathologies</p>
+    <h1>Plusieurs pathologies</h1>
+    <p class="chapo">Un personnage n'a qu'un seul dossier, même avec plusieurs pathologies, et la catégorie d'un dossier peut évoluer au fil du suivi.</p>
+  </header>
+
+  <h2 id="un-seul-dossier">Un seul dossier</h2>
+  <p>Un personnage n'a qu'<strong>un seul dossier</strong>. S'il a plusieurs pathologies, elles sont regroupées dans le même post : on ajoute les étiquettes de catégorie correspondantes, et chaque compte rendu précise de quelle pathologie il parle. Le médecin référent reste le même ; il peut s'appuyer sur un collègue pour une partie du suivi (par exemple un soignant pour la rééducation).</p>
+  <div class="encadre conseil">
+    <span class="emoji" aria-hidden="true">🧩</span>
+    <div>
+      <strong class="titre">Attention aux interactions</strong>
+      <p>Un traitement pour une pathologie peut gêner l'autre : un médicament qui fatigue ralentit une rééducation, un effort de rééducation peut déclencher une crise chronique. C'est une excellente source de RP… et une raison de bien tout noter dans le dossier.</p>
+    </div>
+  </div>
+  <h2 id="changer-de-categorie">Quand la catégorie change</h2>
+  <div class="tableau"><div class="defilement">
+    <table>
+      <thead><tr><th>Situation</th><th>Changement d'étiquette</th></tr></thead>
+      <tbody>
+        <tr><td>L'IRS découvre que la pathologie inconnue est héréditaire</td><td><span class="etiquette c-inconnue">❓</span> → <span class="etiquette c-genetique">🧬 Maladie génétique</span></td></tr>
+        <tr><td>Une pathologie inconnue s'avère durable mais contrôlable</td><td><span class="etiquette c-inconnue">❓</span> → <span class="etiquette c-chronique">🔁 Pathologie chronique</span></td></tr>
+        <tr><td>Après une opération, des capacités restent à récupérer</td><td><span class="etiquette c-postop">🩹</span> + <span class="etiquette c-reeducation">💪 Rééducation</span></td></tr>
+        <tr><td>La rééducation montre qu'une capacité ne reviendra pas</td><td><span class="etiquette c-reeducation">💪</span> → <span class="etiquette c-sequelle">🦿 Séquelle permanente</span></td></tr>
+        <tr><td>Une séquelle entraîne des douleurs durables</td><td><span class="etiquette c-sequelle">🦿</span> + <span class="etiquette c-chronique">🔁 Pathologie chronique</span></td></tr>
+      </tbody>
+    </table>
+  </div></div>
+  <p>Chaque changement de catégorie est expliqué dans un compte rendu. S'il modifie ce qui figure sur la fiche du personnage, il est validé par le staff.</p>
+
+</main>
+</div>
+</body>
+</html>
