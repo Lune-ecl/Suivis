@@ -28,7 +28,7 @@ const PLAN = [
       { fichier: 'irs.html', titre: 'Le lien avec l’IRS', emoji: '🔬', description: 'Accord du patient, demande d’analyse, rapport et présentation des résultats.' },
       { fichier: 'urgences-et-pauses.html', titre: 'Urgences et pauses', emoji: '🚨', description: 'Aggravation, urgence vitale, inactivité et mise en pause.' },
       { fichier: 'cloture.html', titre: 'Clôture et réouverture', emoji: '✅', description: 'Quand et comment clôturer un dossier, et comment le rouvrir.' },
-      { fichier: 'rythme.html', titre: 'Le rythme des suivis', emoji: '⏳', description: 'Les repères de durée de chaque étape, et un calendrier type.' },
+      { fichier: 'rythme.html', titre: 'Le rythme des suivis', emoji: '⏳', description: '1 jour = 1 mois pour le patient : durées, séances prescrites et calendrier type.' },
     ],
   },
   {
@@ -50,7 +50,7 @@ const PLAN = [
     id: 'reeducation', titre: 'Rééducation', nav: 'Rééducation', emoji: '💪', couleur: 'var(--jade)',
     description: 'Les bases d’une séance, la mesure des progrès et onze séances détaillées, prêtes à jouer.',
     pages: [
-      { groupe: 'Les bases', fichier: 'principes.html', titre: 'Principes et déroulé d’une séance', emoji: '📐', description: 'Les principes de la rééducation, la trame d’une séance et le matériel.' },
+      { groupe: 'Les bases', fichier: 'principes.html', titre: 'Principes et déroulé d’une séance', emoji: '📐', description: 'Les principes, le nombre de séances prescrites, la trame d’une séance et le matériel.' },
       { groupe: 'Les bases', fichier: 'mesurer.html', titre: 'Mesurer les progrès', emoji: '📏', description: 'Échelle de la douleur, force de 0 à 5, autres mesures et objectifs.' },
       { groupe: 'Les bases', fichier: 'faire-vivre.html', titre: 'Accompagner le patient', emoji: '🤝', description: 'Pendant la séance, exemple de compte rendu de séance et erreurs à éviter.' },
       { groupe: 'Les séances', fichier: 'marche.html', titre: 'Remarcher après une fracture', emoji: '🦵', description: 'Barres parallèles, béquilles, escaliers, puis course et sauts.' },
@@ -68,11 +68,11 @@ const PLAN = [
   },
   {
     id: 'exemples', titre: 'Exemples de suivis', nav: 'Exemples', emoji: '🗓️', couleur: 'var(--ambre)',
-    description: 'Cinq suivis racontés du début à la fin, semaine par semaine, et les situations particulières.',
+    description: 'Cinq suivis racontés du début à la fin, jour par jour, et les situations particulières.',
     pages: [
       { fichier: 'genetique.html', titre: 'Mei Tanaka · maladie génétique', emoji: '🧬', couleur: 'var(--violet)', description: 'Examens, analyse de l’IRS, deux essais de traitement, puis suivi stable.' },
       { fichier: 'post-operatoire.html', titre: 'Kaito Mizuno · post-opératoire', emoji: '🩹', couleur: 'var(--rose)', description: 'Un dossier ouvert par le chirurgien, une complication, puis la clôture.' },
-      { fichier: 'amputation.html', titre: 'Ren Akiyama · amputation', emoji: '🦿', couleur: 'var(--or)', description: 'Quinze semaines de rééducation, une prothèse, puis le suivi à long terme.' },
+      { fichier: 'amputation.html', titre: 'Ren Akiyama · amputation', emoji: '🦿', couleur: 'var(--or)', description: 'Trois semaines de rééducation, une prothèse, puis le suivi à long terme.' },
       { fichier: 'chronique.html', titre: 'Sora Ishikawa · asthme', emoji: '🔁', couleur: 'var(--ciel)', description: 'Traitement de fond, plan d’action, équipe formée, pause et reprise.' },
       { fichier: 'inconnue.html', titre: 'Yuki Fujimoto · pathologie inconnue', emoji: '❓', couleur: 'var(--ambre)', description: 'Une enquête, une fausse piste et une cause enfin trouvée.' },
       { fichier: 'situations-particulieres.html', titre: 'Situations particulières', emoji: '🧭', description: 'Arrêt du suivi, refus, absences, rechute, aggravation souhaitée…' },

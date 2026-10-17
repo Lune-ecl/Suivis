@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Le rythme des suivis · Seimei — Suivi des pathologies</title>
-  <meta name="description" content="Les repères de durée pour chaque moment du suivi, et un calendrier type.">
+  <meta name="description" content="Un jour de suivi correspond à un mois pour le patient. Voici les durées de chaque étape, les séances prescrites et un calendrier type.">
   <meta name="theme-color" content="#060a13">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7b7'/%3E%3Cstop offset='1' stop-color='%2314b8a6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Ctext x='32' y='45' font-size='36' font-weight='700' text-anchor='middle' fill='%2303221a' font-family='serif'%3E%E7%94%9F%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Shippori+Mincho:wght@700&display=swap">
-  <link rel="stylesheet" href="../assets/css/doc.css?v=3">
-  <script src="../assets/js/doc.js?v=3" defer></script>
+  <link rel="stylesheet" href="../assets/css/doc.css?v=4">
+  <script src="../assets/js/doc.js?v=4" defer></script>
 </head>
 <body>
 <div class="fond" aria-hidden="true"></div>
@@ -21,37 +21,52 @@
   <header class="hero-doc" data-kanji="繋">
     <p class="surtitre">Le suivi sur Discord</p>
     <h1>Le rythme des suivis</h1>
-    <p class="chapo">Les repères de durée pour chaque moment du suivi, et un calendrier type.</p>
+    <p class="chapo">Un jour de suivi correspond à un mois pour le patient. Voici les durées de chaque étape, les séances prescrites et un calendrier type.</p>
   </header>
 
+  <div class="encadre info">
+    <span class="emoji" aria-hidden="true">⏳</span>
+    <div>
+      <strong class="titre">1 jour = 1 mois</strong>
+      <p>Une journée de suivi sur le forum correspond à un mois dans la vie du patient. Deux semaines de rééducation représentent donc plus d'un an de soins pour lui, et un contrôle par semaine revient à le revoir environ deux fois par an.</p>
+    </div>
+  </div>
+
   <h2 id="durees">Les durées indicatives</h2>
-  <p>À titre indicatif ; le rythme s'adapte toujours au patient et à son état :</p>
+  <p>Le rythme s'adapte toujours au patient et à son état :</p>
   <div class="tableau"><div class="defilement">
     <table>
-      <thead><tr><th>Moment du suivi</th><th>Rythme indicatif</th></tr></thead>
+      <thead><tr><th>Moment du suivi</th><th>Durée</th><th>Pour le patient</th></tr></thead>
       <tbody>
-        <tr><td><strong>Prise en charge d'un nouveau dossier</strong></td><td>Dans les meilleurs délais, idéalement en quelques jours.</td></tr>
-        <tr><td><strong>Essai d'un traitement</strong></td><td>Au moins une à deux semaines avant l'analyse de contrôle.</td></tr>
-        <tr><td><strong>Rééducation</strong></td><td>Environ une séance par semaine.</td></tr>
-        <tr><td><strong>Bilan d'étape</strong></td><td>Toutes les trois à quatre séances environ.</td></tr>
-        <tr><td><strong>Suivi stable</strong></td><td>Un contrôle environ une fois par mois, plus souvent si besoin.</td></tr>
-        <tr><td><strong>Mise en pause</strong></td><td>Après trois semaines sans activité.</td></tr>
+        <tr><td><strong>Prise en charge d'un nouveau dossier</strong></td><td>Sous un à deux jours.</td><td>1 à 2 mois</td></tr>
+        <tr><td><strong>Analyse de l'IRS</strong></td><td>Un à deux jours.</td><td>1 à 2 mois</td></tr>
+        <tr><td><strong>Essai d'un traitement</strong></td><td>Au moins deux à trois jours avant l'analyse de contrôle.</td><td>2 à 3 mois</td></tr>
+        <tr><td><strong>Convalescence post-opératoire</strong></td><td>Trois à cinq jours, avec un rendez-vous tous les un à deux jours.</td><td>3 à 5 mois</td></tr>
+        <tr><td><strong>Rééducation</strong></td><td>Deux séances par semaine, en nombre prescrit selon la pathologie : environ deux semaines au total.</td><td>Environ 1 an</td></tr>
+        <tr><td><strong>Bilan d'étape</strong></td><td>À la fin de la première semaine de rééducation.</td><td>Au bout de 7 mois</td></tr>
+        <tr><td><strong>Suivi stable</strong></td><td>Un contrôle environ une fois par semaine, plus souvent si besoin.</td><td>Environ 2 fois par an</td></tr>
+        <tr><td><strong>Mise en pause</strong></td><td>Après trois semaines sans activité.</td><td>—</td></tr>
       </tbody>
     </table>
   </div></div>
+
+  <h2 id="seances-prescrites">Les séances prescrites</h2>
+  <p>Au bilan initial, le médecin référent prescrit un nombre de séances selon la blessure : en général <strong>quatre séances sur deux semaines</strong>, moins pour une atteinte légère, plus pour une amputation. Le détail par type de séance est dans <a href="../reeducation/principes.html#combien-de-seances">Combien de séances ?</a></p>
+
   <h2 id="calendrier-type">Calendrier type</h2>
   <div class="tableau"><div class="defilement">
     <table>
-      <thead><tr><th>Semaine</th><th>Parcours « maladie »</th><th>Parcours « réadaptation »</th></tr></thead>
+      <thead><tr><th>Jour</th><th>Parcours « maladie »</th><th>Parcours « réadaptation »</th></tr></thead>
       <tbody>
-        <tr><td><strong>1</strong></td><td>Post, prise en charge, premier rendez-vous</td><td>Post, prise en charge, bilan initial et objectifs</td></tr>
-        <tr><td><strong>2</strong></td><td>Examens et prélèvements</td><td>Séance n°1</td></tr>
-        <tr><td><strong>3 et 4</strong></td><td>Analyse de l'IRS, rapport</td><td>Séances n°2 et 3</td></tr>
-        <tr><td><strong>5</strong></td><td>Rendez-vous de résultats, début de l'essai</td><td>Bilan d'étape n°1</td></tr>
-        <tr><td><strong>6 et 7</strong></td><td>Essai du traitement</td><td>Séances n°4 à 6</td></tr>
-        <tr><td><strong>8</strong></td><td>Analyses de contrôle</td><td>Bilan d'étape n°2</td></tr>
-        <tr><td><strong>9 et plus</strong></td><td>Nouvel essai, ou suivi stable</td><td>Séances, réathlétisation, test de reprise</td></tr>
-        <tr><td><strong>Ensuite</strong></td><td>Un contrôle par mois environ</td><td>Clôture, ou suivi stable si séquelles</td></tr>
+        <tr><td><strong>Jour 1</strong></td><td>Premier rendez-vous</td><td>Bilan initial, objectifs et séances prescrites</td></tr>
+        <tr><td><strong>Jour 2</strong></td><td>Examens et prélèvements</td><td>—</td></tr>
+        <tr><td><strong>Jours 3 et 4</strong></td><td>Analyse de l'IRS, rapport</td><td>Séance n°1 (jour 3)</td></tr>
+        <tr><td><strong>Jour 5</strong></td><td>Résultats, début de l'essai</td><td>—</td></tr>
+        <tr><td><strong>Jours 6 et 7</strong></td><td>Essai du traitement</td><td>Séance n°2 (jour 6), bilan d'étape (jour 7)</td></tr>
+        <tr><td><strong>Jour 8</strong></td><td>Analyses de contrôle</td><td>—</td></tr>
+        <tr><td><strong>Jours 10 à 13</strong></td><td>Nouvel essai, ou suivi stable</td><td>Séances n°3 et 4</td></tr>
+        <tr><td><strong>Jour 14</strong></td><td>—</td><td>Fin de prise en charge, ou suivi stable si des séquelles restent</td></tr>
+        <tr><td><strong>Ensuite</strong></td><td>Un contrôle environ une fois par semaine</td><td>Clôture, ou un contrôle environ une fois par semaine</td></tr>
       </tbody>
     </table>
   </div></div>
