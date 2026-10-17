@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Shippori+Mincho:wght@700&display=swap">
-  <link rel="stylesheet" href="assets/css/doc.css?v=2">
-  <script src="assets/js/doc.js?v=2" defer></script>
+  <link rel="stylesheet" href="assets/css/doc.css?v=3">
+  <script src="assets/js/doc.js?v=3" defer></script>
 </head>
 <body>
 <div class="fond" aria-hidden="true"></div>
@@ -32,7 +32,7 @@
     <span class="emoji" aria-hidden="true">💬</span>
     <div>
       <strong class="titre">Tout le suivi se fait sur Discord</strong>
-      <p>Le <strong>forum de la branche</strong> sert de dossier médical : un post par patient, avec sa fiche, les comptes rendus de chaque rendez-vous et les rapports de l'IRS. Les rendez-vous eux-mêmes se jouent dans les salons RP habituels. Ce site est la référence : il explique comment tout cela fonctionne.</p>
+      <p>Le <strong>forum de la branche</strong> sert de dossier médical : un post par patient, avec sa fiche, les comptes rendus de chaque rendez-vous et les rapports de l'IRS. Ce site est réservé aux médecins de la branche : il explique comment tout cela fonctionne. Les patients n'ont accès ni au forum ni à leur dossier.</p>
     </div>
   </div>
   <h2 id="categories">Les catégories</h2>
@@ -41,33 +41,33 @@
   <h2 id="par-ou-commencer">Par où commencer ?</h2>
   <div class="grille">
     <div class="carte c-sequelle">
-      <span class="emoji" aria-hidden="true">🧑</span>
-      <strong class="titre">Mon personnage a besoin d'un suivi</strong>
+      <span class="emoji" aria-hidden="true">🩺</span>
+      <strong class="titre">Je rejoins la branche</strong>
       <ul>
-        <li>Lire les <a href="branche/regles.html">règles et garde-fous</a></li>
-        <li>Trouver sa <a href="pathologies/">catégorie de suivi</a></li>
-        <li>Copier la <a href="modeles/ouverture.html#fiche-patient">fiche patient</a></li>
-        <li>Suivre les étapes pour <a href="discord/ouvrir-un-dossier.html">ouvrir son dossier</a></li>
+        <li>Les <a href="branche/roles.html">rôles</a> et l'organisation</li>
+        <li>Les <a href="branche/regles.html">règles et garde-fous</a></li>
+        <li>Le <a href="branche/dossier-medical.html">dossier médical</a> et le secret</li>
+        <li>Le <a href="discord/forum.html">forum de la branche</a></li>
       </ul>
     </div>
     <div class="carte c-reeducation">
-      <span class="emoji" aria-hidden="true">🩺</span>
-      <strong class="titre">Je fais partie de la branche</strong>
+      <span class="emoji" aria-hidden="true">📁</span>
+      <strong class="titre">J'ouvre un dossier</strong>
       <ul>
-        <li>Les <a href="branche/roles.html">rôles</a> et les <a href="discord/etiquettes.html">étiquettes</a></li>
-        <li>Les <a href="pathologies/">fiches par pathologie</a></li>
-        <li>Les <a href="reeducation/#les-seances">exemples de séances</a></li>
-        <li>Les <a href="modeles/suivi.html#compte-rendu">comptes rendus</a> et autres modèles</li>
+        <li>Les étapes pour <a href="discord/ouvrir-un-dossier.html">ouvrir un dossier</a></li>
+        <li>La <a href="modeles/ouverture.html#fiche-patient">fiche patient</a> à copier</li>
+        <li>Les <a href="discord/etiquettes.html">étiquettes</a> à poser</li>
+        <li>Le bon <a href="pathologies/parcours.html">parcours de soin</a></li>
       </ul>
     </div>
     <div class="carte c-irs">
-      <span class="emoji" aria-hidden="true">🔬</span>
-      <strong class="titre">Je travaille à l'IRS</strong>
+      <span class="emoji" aria-hidden="true">📋</span>
+      <strong class="titre">Je prépare un rendez-vous</strong>
       <ul>
-        <li>Le <a href="discord/irs.html">lien entre l'IRS et la branche</a></li>
-        <li>Filtrer le forum sur <span class="etiquette s-irs">🔬 Analyse IRS en cours</span></li>
-        <li>Le <a href="modeles/irs.html#rapport-irs">modèle de rapport d'analyse</a></li>
-        <li>Les <a href="faq/irs.html">questions fréquentes de l'IRS</a></li>
+        <li>La <a href="pathologies/">fiche de la pathologie</a></li>
+        <li>Les <a href="reeducation/#les-seances">séances de rééducation</a></li>
+        <li>Les <a href="modeles/suivi.html#compte-rendu">comptes rendus</a> et autres modèles</li>
+        <li>Le <a href="discord/irs.html">travail avec l'IRS</a></li>
       </ul>
     </div>
   </div>
@@ -75,13 +75,13 @@
   <p>Quelle que soit la pathologie, un dossier passe par les mêmes grands moments. L'étiquette de statut du post change à chaque étape, pour que tout le monde sache où en est le patient.</p>
   <ol class="frise">
     <li>
-      <strong class="titre">Le joueur ouvre son post</strong>
+      <strong class="titre">Un membre de la branche ouvre le dossier</strong>
       <p>Titre au format <code>Prénom Nom | Pathologie</code>, fiche patient dans le premier message, étiquette de catégorie et étiquette « En attente ».</p>
       <div class="meta-etape"><span class="etiquette s-attente">🟡 En attente</span></div>
     </li>
     <li>
       <strong class="titre">Un médecin le prend en charge</strong>
-      <p>Il se présente dans le post comme médecin référent et organise le premier rendez-vous RP.</p>
+      <p>Il se présente dans le post comme médecin référent et organise le premier rendez-vous avec le patient.</p>
     </li>
     <li>
       <strong class="titre">Bilan, examens et analyses</strong>
@@ -107,21 +107,21 @@
   <p>Deux statuts peuvent apparaître à tout moment : <span class="etiquette s-urgent">🔴 Urgent</span> quand l'état se dégrade, et <span class="etiquette s-pause">⏸️ En pause</span> après trois semaines sans activité. Des exemples complets sont racontés dans <a href="exemples/">Déroulement d'un suivi</a>.</p>
   <h2 id="regles-d-or">Les règles d'or</h2>
   <div class="grille deux">
-    <div class="encadre conseil">
-      <span class="emoji" aria-hidden="true">🎮</span>
-      <div><strong class="titre">Le joueur garde la main</strong><p>Aucune aggravation, complication ou séquelle majeure ne lui est imposée sans son accord HRP.</p></div>
+    <div class="encadre info">
+      <span class="emoji" aria-hidden="true">🔒</span>
+      <div><strong class="titre">Le secret médical</strong><p>Un dossier reste dans la branche. Rien n'est transmis à l'IRS sans l'accord du patient.</p></div>
     </div>
-    <div class="encadre rp">
-      <span class="emoji" aria-hidden="true">📜</span>
-      <div><strong class="titre">Cohérence avec la fiche</strong><p>La pathologie figure sur la fiche validée du personnage, ou est validée par le staff, comme tout changement important.</p></div>
+    <div class="encadre conseil">
+      <span class="emoji" aria-hidden="true">🙋</span>
+      <div><strong class="titre">Le patient décide</strong><p>Il accepte ou refuse chaque traitement, et peut arrêter son suivi à tout moment.</p></div>
     </div>
     <div class="encadre attention">
       <span class="emoji" aria-hidden="true">⚖️</span>
-      <div><strong class="titre">Aucun avantage de puissance</strong><p>Le suivi soigne, stabilise ou soulage. Il n'offre jamais de bonus au personnage.</p></div>
+      <div><strong class="titre">Soigner, pas renforcer</strong><p>Le suivi soigne, stabilise ou soulage. Il ne rend jamais un patient plus fort qu'avant.</p></div>
     </div>
-    <div class="encadre info">
-      <span class="emoji" aria-hidden="true">🤐</span>
-      <div><strong class="titre">Pas de métagaming</strong><p>Le forum est visible HRP, mais son contenu reste couvert par le secret médical en RP.</p></div>
+    <div class="encadre rp">
+      <span class="emoji" aria-hidden="true">📋</span>
+      <div><strong class="titre">Tout est écrit</strong><p>Un compte rendu après chaque rendez-vous : le dossier est la mémoire du suivi.</p></div>
     </div>
   </div>
   <p>Toutes les règles sont détaillées dans <a href="branche/regles.html">Règles et garde-fous</a>.</p>

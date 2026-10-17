@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Shippori+Mincho:wght@700&display=swap">
-  <link rel="stylesheet" href="../assets/css/doc.css?v=2">
-  <script src="../assets/js/doc.js?v=2" defer></script>
+  <link rel="stylesheet" href="../assets/css/doc.css?v=3">
+  <script src="../assets/js/doc.js?v=3" defer></script>
 </head>
 <body>
 <div class="fond" aria-hidden="true"></div>
@@ -26,23 +26,19 @@
 
   <details class="repli" id="patient-arrete">
     <summary><span class="emoji" aria-hidden="true">🙋</span> Le patient veut arrêter son suivi</summary>
-    <div class="repli-corps"><p>C'est son droit. Le médecin peut lui expliquer les risques en RP, mais ne le retient pas. Il publie le message de clôture avec le motif « demande du patient ». Le dossier pourra être rouvert s'il change d'avis.</p></div>
+    <div class="repli-corps"><p>C'est son droit. Le médecin lui explique les risques, mais ne le retient pas. Il publie le message de clôture avec le motif « demande du patient ». Le dossier pourra être rouvert s'il change d'avis.</p></div>
   </details>
   <details class="repli" id="patient-refuse">
     <summary><span class="emoji" aria-hidden="true">🚫</span> Le patient refuse un traitement</summary>
     <div class="repli-corps"><p>Le refus est noté dans le compte rendu. Le médecin propose une autre piste, ou un simple suivi des symptômes. Un refus n'est jamais pénalisé.</p></div>
   </details>
-  <details class="repli" id="joueur-absent">
-    <summary><span class="emoji" aria-hidden="true">🌙</span> Le joueur s'absente</summary>
-    <div class="repli-corps"><p>Le dossier passe « En pause » : tout de suite si l'absence est annoncée, sinon après trois semaines sans activité. À son retour, un message dans le post suffit pour reprendre là où on en était.</p></div>
+  <details class="repli" id="patient-absent">
+    <summary><span class="emoji" aria-hidden="true">🌙</span> Le patient s'absente longtemps</summary>
+    <div class="repli-corps"><p>Mission longue, départ du village… Le dossier passe « En pause » : tout de suite si l'absence est connue, sinon après trois semaines sans activité. À son retour, le médecin référent le revoit pour un contrôle et reprend le suivi là où il s'était arrêté.</p></div>
   </details>
   <details class="repli" id="medecin-absent">
-    <summary><span class="emoji" aria-hidden="true">🔁</span> Le médecin référent devient inactif</summary>
+    <summary><span class="emoji" aria-hidden="true">🔁</span> Le médecin référent n'est plus disponible</summary>
     <div class="repli-corps"><p>Le responsable de la branche confie le dossier à un autre médecin, qui publie le message de changement de médecin référent, relit les comptes rendus et propose un rendez-vous pour faire connaissance avec le patient.</p></div>
-  </details>
-  <details class="repli" id="aggravation-souhaitee">
-    <summary><span class="emoji" aria-hidden="true">📉</span> Le joueur souhaite une aggravation</summary>
-    <div class="repli-corps"><p>Il en parle HRP au médecin référent. Ensemble, ils décident de ce qui arrive et de quand. Si l'aggravation change ce qui figure sur la fiche du personnage, elle est validée par le staff.</p></div>
   </details>
   <details class="repli" id="nouvelle-pathologie">
     <summary><span class="emoji" aria-hidden="true">➕</span> Un deuxième problème apparaît</summary>
@@ -53,8 +49,8 @@
     <div class="repli-corps"><p>Le même post est rouvert avec le message de réouverture, et le statut redevient « Examens en cours ». Tout l'historique est déjà là : c'est l'intérêt d'un dossier unique.</p></div>
   </details>
   <details class="repli" id="deces">
-    <summary><span class="emoji" aria-hidden="true">🕯️</span> La mort du personnage</summary>
-    <div class="repli-corps"><p>Uniquement si le joueur le décide, et dans le respect des règles du serveur. Le dossier est clôturé avec un court message, et le post fermé.</p></div>
+    <summary><span class="emoji" aria-hidden="true">🕯️</span> Le décès d'un patient</summary>
+    <div class="repli-corps"><p>Le médecin référent publie un court message de clôture, le dossier reçoit l'étiquette « Dossier clôturé » et le post est fermé.</p></div>
   </details>
 
 </main>

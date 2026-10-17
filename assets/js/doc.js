@@ -9,12 +9,12 @@
 const PLAN = [
   {
     id: 'branche', titre: 'La branche', nav: 'La branche', emoji: '🏥', couleur: 'var(--or)',
-    description: 'Ce qu’est la branche, qui y fait quoi, le dossier médical et les règles qui protègent les joueurs.',
+    description: 'Ce qu’est la branche, qui y fait quoi, le dossier médical et les règles qui encadrent chaque suivi.',
     pages: [
-      { fichier: 'presentation.html', titre: 'Présentation', emoji: '📖', description: 'La mission de la branche, ses six catégories de suivi et ce qu’elle apporte au serveur.' },
+      { fichier: 'presentation.html', titre: 'Présentation', emoji: '📖', description: 'La mission de la branche, ses six catégories de suivi et ce qu’elle apporte.' },
       { fichier: 'roles.html', titre: 'Rôles et organisation', emoji: '👥', description: 'Responsable, médecins référents, soignants, référents IRS, et qui fait quoi.' },
       { fichier: 'dossier-medical.html', titre: 'Le dossier médical', emoji: '📁', description: 'Ce que contient le dossier d’un patient, et le secret médical.' },
-      { fichier: 'regles.html', titre: 'Règles et garde-fous', emoji: '⚖️', description: 'Les règles qui protègent les joueurs et les bonnes pratiques de l’équipe.' },
+      { fichier: 'regles.html', titre: 'Règles et garde-fous', emoji: '⚖️', description: 'Les règles qui encadrent chaque suivi et les bonnes pratiques de l’équipe.' },
     ],
   },
   {
@@ -22,13 +22,13 @@ const PLAN = [
     description: 'Le forum, l’ouverture d’un dossier, les étiquettes, les rendez-vous, l’IRS, les urgences et la clôture.',
     pages: [
       { fichier: 'forum.html', titre: 'Le forum de la branche', emoji: '🗂️', description: 'Un post par patient : ce qu’on y publie et ce qu’on évite.' },
-      { fichier: 'ouvrir-un-dossier.html', titre: 'Ouvrir un dossier', emoji: '📝', description: 'Les quatre étapes, le dossier ouvert par un médecin, plusieurs pathologies.' },
+      { fichier: 'ouvrir-un-dossier.html', titre: 'Ouvrir un dossier', emoji: '📝', description: 'Les quatre étapes, qui ouvre le dossier, un patient avec plusieurs pathologies.' },
       { fichier: 'etiquettes.html', titre: 'Les étiquettes', emoji: '🏷️', description: 'Catégories et statuts : qui les pose, quand elles changent, comment filtrer le forum.' },
       { fichier: 'rendez-vous.html', titre: 'Rendez-vous et comptes rendus', emoji: '📋', description: 'Les types de rendez-vous et le compte rendu publié après chacun.' },
       { fichier: 'irs.html', titre: 'Le lien avec l’IRS', emoji: '🔬', description: 'Accord du patient, demande d’analyse, rapport et présentation des résultats.' },
       { fichier: 'urgences-et-pauses.html', titre: 'Urgences et pauses', emoji: '🚨', description: 'Aggravation, urgence vitale, inactivité et mise en pause.' },
       { fichier: 'cloture.html', titre: 'Clôture et réouverture', emoji: '✅', description: 'Quand et comment clôturer un dossier, et comment le rouvrir.' },
-      { fichier: 'rythme.html', titre: 'Le rythme des suivis', emoji: '⏳', description: 'Les durées RP converties en temps IRL, et un calendrier type.' },
+      { fichier: 'rythme.html', titre: 'Le rythme des suivis', emoji: '⏳', description: 'Les repères de durée de chaque étape, et un calendrier type.' },
     ],
   },
   {
@@ -44,7 +44,6 @@ const PLAN = [
       { groupe: 'Les catégories', fichier: 'sequelle-permanente.html', titre: 'Séquelle permanente', emoji: '🦿', couleur: 'var(--or)', description: 'Amputation, blessure définitive : vivre et combattre avec.' },
       { groupe: 'Les catégories', fichier: 'chronique.html', titre: 'Pathologie chronique', emoji: '🔁', couleur: 'var(--ciel)', description: 'Une maladie qui ne guérit pas mais se contrôle.' },
       { groupe: 'Cas particuliers', fichier: 'plusieurs-pathologies.html', titre: 'Plusieurs pathologies', emoji: '🧩', description: 'Cumuler des pathologies dans un même dossier, et changer de catégorie.' },
-      { groupe: 'Cas particuliers', fichier: 'creer-sa-pathologie.html', titre: 'Créer la pathologie de son personnage', emoji: '✍️', description: 'Les conseils pour les joueurs qui imaginent une pathologie.' },
     ],
   },
   {
@@ -53,7 +52,7 @@ const PLAN = [
     pages: [
       { groupe: 'Les bases', fichier: 'principes.html', titre: 'Principes et déroulé d’une séance', emoji: '📐', description: 'Les principes de la rééducation, la trame d’une séance et le matériel.' },
       { groupe: 'Les bases', fichier: 'mesurer.html', titre: 'Mesurer les progrès', emoji: '📏', description: 'Échelle de la douleur, force de 0 à 5, autres mesures et objectifs.' },
-      { groupe: 'Les bases', fichier: 'faire-vivre.html', titre: 'Faire vivre une séance', emoji: '🎭', description: 'Idées RP, exemple de compte rendu de séance et erreurs à éviter.' },
+      { groupe: 'Les bases', fichier: 'faire-vivre.html', titre: 'Accompagner le patient', emoji: '🤝', description: 'Pendant la séance, exemple de compte rendu de séance et erreurs à éviter.' },
       { groupe: 'Les séances', fichier: 'marche.html', titre: 'Remarcher après une fracture', emoji: '🦵', description: 'Barres parallèles, béquilles, escaliers, puis course et sauts.' },
       { groupe: 'Les séances', fichier: 'dos.html', titre: 'Dos et posture', emoji: '🧍', description: 'Gainage, gestes du quotidien, port du sac de mission.' },
       { groupe: 'Les séances', fichier: 'epaule.html', titre: 'Épaule', emoji: '💪', description: 'Retrouver l’amplitude, la force et la précision des lancers.' },
@@ -92,11 +91,11 @@ const PLAN = [
   },
   {
     id: 'faq', titre: 'FAQ et glossaire', nav: 'FAQ', emoji: '💡', couleur: 'var(--rose)',
-    description: 'Les réponses aux questions des joueurs, de l’équipe et de l’IRS, et le vocabulaire de la branche.',
+    description: 'Les réponses aux questions fréquentes sur les dossiers, les patients et l’IRS, et le vocabulaire de la branche.',
     pages: [
-      { fichier: 'joueurs.html', titre: 'Questions des joueurs', emoji: '🙋', description: 'Fiche, catégorie, délais, guérison, prothèse, confidentialité…' },
-      { fichier: 'equipe.html', titre: 'Questions de l’équipe', emoji: '🩺', description: 'Prise en charge, comptes rendus, étiquettes, absences…' },
-      { fichier: 'irs.html', titre: 'Questions de l’IRS', emoji: '🔬', description: 'Trouver les dossiers, rencontrer le patient, résultats non concluants.' },
+      { fichier: 'dossiers.html', titre: 'Dossiers et prise en charge', emoji: '📁', description: 'Ouvrir et prendre en charge un dossier, comptes rendus, étiquettes, absences…' },
+      { fichier: 'patients.html', titre: 'Les patients', emoji: '🙋', description: 'Accès au dossier, refus, guérison, prothèse, secret médical…' },
+      { fichier: 'irs.html', titre: 'Travailler avec l’IRS', emoji: '🔬', description: 'Quand demander une analyse, délais, résultats non concluants…' },
       { fichier: 'glossaire.html', titre: 'Glossaire', emoji: '📚', description: 'Le vocabulaire du suivi des pathologies.' },
     ],
   },
