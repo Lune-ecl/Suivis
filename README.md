@@ -14,10 +14,10 @@ Le site est rangé en sept catégories, chacune avec sa page d'ensemble et ses s
 | Catégorie | Dossier | Sous-pages |
 |---|---|---|
 | 🏥 La branche | `branche/` | Présentation, rôles et organisation, dossier médical, règles et garde-fous |
-| 💬 Le suivi sur parchemin | `parchemins/` | Forum, ouvrir un dossier, étiquettes, rendez-vous et comptes rendus, IRS, urgences et pauses, clôture, rythme |
+| 📜 Le suivi sur parchemin | `parchemins/` | Forum, ouvrir un dossier, étiquettes, rendez-vous et comptes rendus, IRS, urgences et pauses, clôture, rythme |
 | 🧬 Soins et pathologies | `pathologies/` | Parcours de soin, examens et traitements, une fiche par catégorie (génétique, inconnue, post-opératoire, rééducation, séquelle permanente, chronique), plusieurs pathologies |
-| 💪 Rééducation | `reeducation/` | Principes, mesurer les progrès, accompagner le patient, puis onze séances (marche, dos, épaule, main et signes, amputation, brûlures, souffle, équilibre, mémoire, chakra, retour en mission) |
-| 🗓️ Exemples de suivis | `exemples/` | Cinq suivis racontés semaine par semaine, et les situations particulières |
+| 💪 Rééducation | `reeducation/` | Principes, mesurer les progrès, accompagner le patient, puis dix séances (marche, dos, épaule, main et signes, amputation, brûlures, souffle, équilibre, mémoire, retour en mission) |
+| 🗓️ Exemples de suivis | `exemples/` | Cinq suivis racontés jour par jour, et les situations particulières |
 | 📋 Modèles de parchemins | `modeles/` | Ouvrir un dossier, pendant le suivi, avec l'IRS, les imprévus, la fin du suivi |
 | 💡 FAQ et glossaire | `faq/` | Dossiers et prise en charge, les patients, travailler avec l'IRS, glossaire |
 
@@ -35,6 +35,8 @@ Le site est fait de simples fichiers HTML, sans outil à installer :
 - le texte de chaque page se trouve dans son fichier `.html`, entre `<main>` et `</main>` ;
 - l'apparence est dans `assets/css/doc.css` ;
 - le plan du site est en haut de `assets/js/doc.js` (liste `PLAN`). Le script s'en sert pour construire l'en-tête, les menus, la barre latérale, les cartes des pages d'ensemble, les liens « précédent / suivant » et la recherche.
+
+**Masquer une page** : ajoute `cache: true` à son entrée dans `PLAN` ; elle disparaît des menus, des cartes et de la recherche, mais son fichier est conservé (c'est le cas de la séance « Réadaptation du chakra »). Retire `cache: true` pour la réafficher.
 
 **Ajouter une page** : copie une page existante de la même catégorie, change son titre et son contenu, puis ajoute-la à la catégorie dans `PLAN` (fichier, titre, émoji, description).
 

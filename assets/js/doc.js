@@ -5,7 +5,8 @@
    ===================================================================== */
 
 /* Plan du site : chaque catégorie a sa page d'accueil (dossier/index.html) et ses sous-pages.
-   Pour ajouter une page : créer le fichier HTML dans le dossier de la catégorie, puis l'ajouter ici. */
+   Pour ajouter une page : créer le fichier HTML dans le dossier de la catégorie, puis l'ajouter ici.
+   Une page marquée « cache: true » est masquée partout (menus, cartes, recherche) mais son fichier est gardé. */
 const PLAN = [
   {
     id: 'branche', titre: 'La branche', nav: 'La branche', emoji: '🏥', couleur: 'var(--or)',
@@ -48,7 +49,7 @@ const PLAN = [
   },
   {
     id: 'reeducation', titre: 'Rééducation', nav: 'Rééducation', emoji: '💪', couleur: 'var(--jade)',
-    description: 'Les bases d’une séance, la mesure des progrès et onze séances détaillées, prêtes à jouer.',
+    description: 'Les bases d’une séance, la mesure des progrès et dix séances détaillées, prêtes à jouer.',
     pages: [
       { groupe: 'Les bases', fichier: 'principes.html', titre: 'Principes et déroulé d’une séance', emoji: '📐', description: 'Les principes, le nombre de séances prescrites, la trame d’une séance et le matériel.' },
       { groupe: 'Les bases', fichier: 'mesurer.html', titre: 'Mesurer les progrès', emoji: '📏', description: 'Échelle de la douleur, force de 0 à 5, autres mesures et objectifs.' },
@@ -62,7 +63,7 @@ const PLAN = [
       { groupe: 'Les séances', fichier: 'souffle.html', titre: 'Retrouver son souffle', emoji: '🫁', description: 'Respiration, désencombrement, endurance.' },
       { groupe: 'Les séances', fichier: 'equilibre.html', titre: 'Équilibre et vertiges', emoji: '🌀', description: 'Fixer le regard, équilibre immobile puis en mouvement.' },
       { groupe: 'Les séances', fichier: 'memoire.html', titre: 'Mémoire et attention', emoji: '🧠', description: 'Après un traumatisme crânien : attention, mémoire, double tâche.' },
-      { groupe: 'Les séances', fichier: 'chakra.html', titre: 'Réadaptation du chakra', emoji: '🌊', description: 'Méditation, contrôle fin, endurance, sans jamais dépasser le niveau d’avant.' },
+      { groupe: 'Les séances', cache: true, fichier: 'chakra.html', titre: 'Réadaptation du chakra', emoji: '🌊', description: 'Méditation, contrôle fin, endurance, sans jamais dépasser le niveau d’avant.' },
       { groupe: 'Les séances', fichier: 'retour-en-mission.html', titre: 'Retour en mission', emoji: '⚔️', description: 'Réathlétisation, combat encadré et test de reprise.' },
     ],
   },
@@ -123,6 +124,7 @@ const RACINE = new URL('../../', SCRIPT.src);
 const ACCUEIL = { chemin: 'index.html', titre: 'Accueil', emoji: '生', categorie: null };
 const TOUTES = [ACCUEIL];
 for (const cat of PLAN) {
+  cat.pages = cat.pages.filter((page) => !page.cache);
   cat.chemin = `${cat.id}/index.html`;
   cat.categorie = cat;
   cat.estCategorie = true;
