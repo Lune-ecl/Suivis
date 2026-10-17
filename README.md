@@ -14,11 +14,11 @@ Le site est rangé en sept catégories, chacune avec sa page d'ensemble et ses s
 | Catégorie | Dossier | Sous-pages |
 |---|---|---|
 | 🏥 La branche | `branche/` | Présentation, rôles et organisation, dossier médical, règles et garde-fous |
-| 💬 Le suivi sur Discord | `discord/` | Forum, ouvrir un dossier, étiquettes, rendez-vous et comptes rendus, IRS, urgences et pauses, clôture, rythme |
+| 💬 Le suivi sur parchemin | `parchemins/` | Forum, ouvrir un dossier, étiquettes, rendez-vous et comptes rendus, IRS, urgences et pauses, clôture, rythme |
 | 🧬 Soins et pathologies | `pathologies/` | Parcours de soin, examens et traitements, une fiche par catégorie (génétique, inconnue, post-opératoire, rééducation, séquelle permanente, chronique), plusieurs pathologies |
 | 💪 Rééducation | `reeducation/` | Principes, mesurer les progrès, accompagner le patient, puis onze séances (marche, dos, épaule, main et signes, amputation, brûlures, souffle, équilibre, mémoire, chakra, retour en mission) |
 | 🗓️ Exemples de suivis | `exemples/` | Cinq suivis racontés semaine par semaine, et les situations particulières |
-| 📋 Modèles Discord | `modeles/` | Ouvrir un dossier, pendant le suivi, avec l'IRS, les imprévus, la fin du suivi |
+| 📋 Modèles de parchemins | `modeles/` | Ouvrir un dossier, pendant le suivi, avec l'IRS, les imprévus, la fin du suivi |
 | 💡 FAQ et glossaire | `faq/` | Dossiers et prise en charge, les patients, travailler avec l'IRS, glossaire |
 
 Sur chaque page :

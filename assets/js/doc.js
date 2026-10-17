@@ -18,7 +18,7 @@ const PLAN = [
     ],
   },
   {
-    id: 'discord', titre: 'Le suivi sur Discord', nav: 'Discord', emoji: '💬', couleur: 'var(--ciel)',
+    id: 'parchemins', titre: 'Le suivi sur parchemin', nav: 'Parchemin', emoji: '📜', couleur: 'var(--ciel)',
     description: 'Le forum, l’ouverture d’un dossier, les étiquettes, les rendez-vous, l’IRS, les urgences et la clôture.',
     pages: [
       { fichier: 'forum.html', titre: 'Le forum de la branche', emoji: '🗂️', description: 'Un post par patient : ce qu’on y publie et ce qu’on évite.' },
@@ -79,7 +79,7 @@ const PLAN = [
     ],
   },
   {
-    id: 'modeles', titre: 'Modèles Discord', nav: 'Modèles', emoji: '📋', couleur: 'var(--sarcelle)',
+    id: 'modeles', titre: 'Modèles de parchemins', nav: 'Modèles', emoji: '📋', couleur: 'var(--sarcelle)',
     description: 'Tous les messages du forum, prêts à copier : de la fiche patient à la réouverture d’un dossier.',
     pages: [
       { fichier: 'ouverture.html', titre: 'Ouvrir un dossier', emoji: '📁', description: 'Titre du post, fiche patient, consignes du forum et message épinglé.' },
@@ -336,7 +336,7 @@ function construirePied() {
   const pied = element('footer', { class: 'pied' }, `
     <span class="kanji" aria-hidden="true">生命</span>
     Seimei · Branche « Suivi des pathologies », en lien avec l’IRS.<br>
-    Ce site explique le fonctionnement de la branche : le suivi lui-même se déroule sur le forum Discord.
+    Ce site explique le fonctionnement de la branche : le suivi lui-même se déroule sur les parchemins de la branche.
   `);
   document.body.append(pied);
 }
