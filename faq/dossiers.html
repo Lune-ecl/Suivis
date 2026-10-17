@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Questions de l'équipe · Seimei — Suivi des pathologies</title>
-  <meta name="description" content="Les questions pratiques des médecins et des soignants de la branche.">
+  <title>Dossiers et prise en charge · Seimei — Suivi des pathologies</title>
+  <meta name="description" content="Les questions pratiques des médecins et des soignants : ouvrir un dossier, le prendre en charge, le tenir à jour.">
   <meta name="theme-color" content="#060a13">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7b7'/%3E%3Cstop offset='1' stop-color='%2314b8a6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Ctext x='32' y='45' font-size='36' font-weight='700' text-anchor='middle' fill='%2303221a' font-family='serif'%3E%E7%94%9F%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Shippori+Mincho:wght@700&display=swap">
-  <link rel="stylesheet" href="../assets/css/doc.css?v=2">
-  <script src="../assets/js/doc.js?v=2" defer></script>
+  <link rel="stylesheet" href="../assets/css/doc.css?v=3">
+  <script src="../assets/js/doc.js?v=3" defer></script>
 </head>
 <body>
 <div class="fond" aria-hidden="true"></div>
@@ -20,10 +20,14 @@
 
   <header class="hero-doc" data-kanji="問">
     <p class="surtitre">FAQ et glossaire</p>
-    <h1>Questions de l'équipe</h1>
-    <p class="chapo">Les questions pratiques des médecins et des soignants de la branche.</p>
+    <h1>Dossiers et prise en charge</h1>
+    <p class="chapo">Les questions pratiques des médecins et des soignants : ouvrir un dossier, le prendre en charge, le tenir à jour.</p>
   </header>
 
+  <details class="repli" id="q-qui-ouvre">
+    <summary><span class="emoji" aria-hidden="true">📁</span> Qui ouvre un dossier ?</summary>
+    <div class="repli-corps"><p>Un membre de la branche, jamais le patient. Le plus souvent, c'est le médecin qui l'a reçu en premier : il crée le post, remplit la fiche patient et pose les étiquettes. Les étapes sont détaillées dans <a href="../discord/ouvrir-un-dossier.html">Ouvrir un dossier</a>.</p></div>
+  </details>
   <details class="repli" id="q-qui-prend">
     <summary><span class="emoji" aria-hidden="true">🩺</span> Qui peut prendre en charge un dossier ?</summary>
     <div class="repli-corps"><p>Un médecin de la branche. Il se présente dans le post avec le <a href="../modeles/suivi.html#prise-en-charge">message de prise en charge</a>. Le responsable peut aussi attribuer directement un patient à un médecin, par exemple pour équilibrer la charge de chacun.</p></div>
@@ -32,9 +36,17 @@
     <summary><span class="emoji" aria-hidden="true">📚</span> Combien de dossiers puis-je suivre ?</summary>
     <div class="repli-corps"><p>Autant que tu peux en faire vivre. Mieux vaut trois dossiers actifs avec un compte rendu à chaque rendez-vous que dix dossiers en pause. En cas de surcharge, parles-en au responsable.</p></div>
   </details>
+  <details class="repli" id="q-categorie">
+    <summary><span class="emoji" aria-hidden="true">🏷️</span> Quelle catégorie choisir ?</summary>
+    <div class="repli-corps"><p>Celle qui correspond le mieux à la situation du patient, ou <em>Pathologie inconnue</em> en cas de doute : l'étiquette sera corrigée quand la cause sera connue. Le tableau <a href="../pathologies/parcours.html#choisir-son-parcours">Quel parcours pour quelle situation ?</a> peut aider.</p></div>
+  </details>
+  <details class="repli" id="q-plusieurs">
+    <summary><span class="emoji" aria-hidden="true">➕</span> Le patient a plusieurs pathologies. Faut-il plusieurs posts ?</summary>
+    <div class="repli-corps"><p>Non : un patient, un seul post. Toutes ses pathologies sont regroupées dans le même dossier, avec les étiquettes de catégorie correspondantes.</p></div>
+  </details>
   <details class="repli" id="q-cr">
     <summary><span class="emoji" aria-hidden="true">📋</span> Que mettre dans un compte rendu ?</summary>
-    <div class="repli-corps"><p>Ce qui s'est passé, ce qui a été observé, ce qui a été décidé, et la suite. Il doit permettre à un autre médecin de reprendre le dossier sans relire tous les RP. Utilise le <a href="../modeles/suivi.html#compte-rendu">modèle de compte rendu</a>.</p></div>
+    <div class="repli-corps"><p>Ce qui s'est passé, ce qui a été observé, ce qui a été décidé, et la suite. Il doit permettre à un autre médecin de reprendre le dossier sans avoir assisté aux rendez-vous. Utilise le <a href="../modeles/suivi.html#compte-rendu">modèle de compte rendu</a>.</p></div>
   </details>
   <details class="repli" id="q-etiquette">
     <summary><span class="emoji" aria-hidden="true">🏷️</span> Quand dois-je changer l'étiquette de statut ?</summary>
@@ -48,17 +60,13 @@
         <li>Donne-lui une forme concrète : préparation de plantes, pilule, inhalation, injection, séances de ninjutsu médical, régime, programme d'exercices.</li>
         <li>Prévois un effet secondaire possible : cela rend l'essai plus réaliste.</li>
         <li>Fixe une durée d'essai et des critères pour juger s'il fonctionne.</li>
-        <li>Vérifie qu'il ne donne aucun avantage de puissance.</li>
+        <li>Vérifie qu'il soigne sans rendre le patient plus fort qu'avant.</li>
       </ul>
     </div>
   </details>
-  <details class="repli" id="q-irs-toujours">
-    <summary><span class="emoji" aria-hidden="true">🔬</span> Faut-il passer par l'IRS pour chaque dossier ?</summary>
-    <div class="repli-corps"><p>Non. L'IRS est presque toujours utile pour une maladie génétique ou une pathologie inconnue, mais une convalescence, une rééducation ou une pathologie chronique bien connue peuvent s'en passer.</p></div>
-  </details>
-  <details class="repli" id="q-joueur-silence">
-    <summary><span class="emoji" aria-hidden="true">🔕</span> Le joueur ne répond plus.</summary>
-    <div class="repli-corps"><p>Relance-le une fois dans le post en le mentionnant. Sans réponse au bout de trois semaines d'inactivité, passe le dossier <span class="etiquette s-pause">⏸️ En pause</span> avec le <a href="../modeles/imprevus.html#mise-en-pause">message de mise en pause</a>.</p></div>
+  <details class="repli" id="q-patient-absent">
+    <summary><span class="emoji" aria-hidden="true">🔕</span> Le patient ne vient plus aux rendez-vous.</summary>
+    <div class="repli-corps"><p>Fais-le relancer. Sans nouvelles pendant trois semaines, passe le dossier <span class="etiquette s-pause">⏸️ En pause</span> avec le <a href="../modeles/imprevus.html#mise-en-pause">message de mise en pause</a>. Le suivi reprendra à son retour.</p></div>
   </details>
   <details class="repli" id="q-je-m-absente">
     <summary><span class="emoji" aria-hidden="true">✈️</span> Je dois m'absenter.</summary>
@@ -70,7 +78,7 @@
   </details>
   <details class="repli" id="q-trop-long">
     <summary><span class="emoji" aria-hidden="true">✂️</span> Mon compte rendu dépasse 2 000 caractères.</summary>
-    <div class="repli-corps"><p>Coupe-le en deux messages entre deux rubriques, ou résume davantage : le détail se trouve dans le RP lui-même.</p></div>
+    <div class="repli-corps"><p>Coupe-le en deux messages entre deux rubriques, ou résume davantage : le compte rendu garde l'essentiel, pas chaque détail.</p></div>
   </details>
 
 </main>
